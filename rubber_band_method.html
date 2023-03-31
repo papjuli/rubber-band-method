@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <title>Rubber band method demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="style.css"></style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <!-- Icons from https://remixicon.com/ -->
+  </head>
+<body>
+  <div class="grid-container" style="display:grid">
+    <div id="header" style="grid-area: header">
+      <h1>The rubber band method</h1>
+    </div>
+    <div id="graph-menu" style="grid-area: graph-menu">
+      <button id="run-button"><img class="menu-icon" src="assets/play-line.svg"> Run </button>
+      <button id="randomize-button"><img class="menu-icon" src="assets/shuffle-line.svg"> Randomize </button>
+
+      <div class="dropdown">
+        <button class="dropbtn"><img class="menu-icon" src="assets/share-line.svg"> Load graph </button>
+        <div class="dropdown-content" id="loadGraphDropdown">
+          <button data-name="accident">accident</button>
+          <button data-name="accident2">accident 2</button>
+          <button data-name="connectproof">connectivity proof</button>
+          <button data-name="cube">cube</button>
+          <button data-name="dodecahedron">dodecahedron graph</button>
+          <button data-name="dodecaplus">dodecahedron+</button>
+          <button data-name="dodecasymm">dodecasymm</button>
+          <button data-name="grid">grid</button>
+          <button data-name="gridminus">grid-</button>
+          <button data-name="icosahedron">icosahedron</button>
+          <button data-name="maxcutbig">max cut big</button>
+          <button data-name="maxcutbigger">max cut bigger</button>
+          <button data-name="maxcutintro">max cut intro</button>
+          <button data-name="MyGraph">my graph</button>
+          <button data-name="non2con">non2con</button>
+          <button data-name="octahedron">octahedron</button>
+          <button data-name="onesep">onesep</button>
+          <button data-name="petersen-var">petersen-var</button>
+          <button data-name="petersen">Petersen</button>
+          <button data-name="pipe">pipe</button>
+          <button data-name="planar0">planar0</button>
+          <button data-name="planar1">planar1</button>
+          <button data-name="planar2">planar2</button>
+          <button data-name="planar3">planar3</button>
+          <button data-name="planar4">planar4</button>
+          <button data-name="planar5">planar5</button>
+          <button data-name="planar6">planar6</button>
+          <button data-name="planar7">planar7</button>
+          <button data-name="planarpf">planarpf</button>
+          <button data-name="planarx">planarx</button>
+          <button data-name="prism">prism</button>
+          <button data-name="squares">squares</button>
+          <button data-name="termvil">termvil</button>
+          <button data-name="tetrahedron">tetrahedron</button>
+          <button data-name="tree1">tree1</button>
+          <button data-name="tree2">tree2</button>
+          <button data-name="tree3">tree3</button>
+          <button data-name="tree4">tree4</button>
+          <button data-name="tree5">tree5</button>
+          <button data-name="traingles">traingles</button>
+          <button data-name="twins">twins</button>
+          <button data-name="twosep">twosep</button>
+          <button data-name="twosep1">twosep1</button>
+        </div>
+      </div>
+    </div>
+    <div id="sigma-container" style="grid-area: graph"></div>
+    <div id="topic-menu" style="grid-area: topic-menu">
+      <div class="dropdown">
+        <button class="dropbtn"><img class="menu-icon" src="assets/file-list-3-line.svg"> Topic</button>
+        <div class="dropdown-content" id="loadTopicDropdown">
+          <button data-topic-name='Intro'>Introduction</button>
+          <button data-topic-name='Planarity'>Planarity</button>
+          <button data-topic-name='Connectivity'>Connectivity</button>
+          <button data-topic-name='MaxCut'>Maximum cut</button>
+          <button data-topic-name='SquareTiling'>Square tiling</button>
+        </div>
+      </div>
+    </div>
+    <div id="topic-container" style="grid-area: topic">
+      <div id="topic-text"></div>
+      <button id="prev-btn" style="display: inline-block" disabled>Previous</button>
+      <button id="next-btn" style="float:right">Next</button>
+      </br>
+    </div>
+  </div>
+  <script type="module" src="./node_modules/sigma/build/sigma.min.js"></script>
+  <script type="module" src="./node_modules/graphology/dist/graphology.umd.js"></script>
+  <script type="module" src="graph.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

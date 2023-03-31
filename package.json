@@ -1,0 +1,17 @@
+{
+  "name": "sigma2_test",
+  "version": "1.0.0",
+  "description": "rubber band method with sigma v2",
+  "main": "main.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "papjuli@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "graphology": "^0.21.1",
+    "graphology-layout": "^0.4.0",
+    "graphology-types": "^0.20.0",
+    "sigma": "latest"
+  }
+}

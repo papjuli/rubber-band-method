@@ -1,0 +1,43 @@
+<div>
+  <h2>Maximum cut</h2>
+
+  <p>An efficient approximation algorithm can be illustrated by a version of rubber bands.</p>
+
+  <p>On the left, you see a random drawing of the dodecahedron graph. Click the new Max Cut button; this computes the maximum cut (24) by brute force. For such a small graph this is possible; but try open File>Open>maxcutbig.grf; this graph is only a few nodes bigger, but it takes quite a while to get the result. Each new node would double the running time of this simple algorithm.</p>
+</div>
+
+<div style="display: none">
+  <h2>An approximation algorithm using rubber bands</h2>
+
+  <p>On the left you see the dodecahedron again. Click Max Cut to see that the maximum cut has 24 edges.</p>
+
+  <p>Click Random Cut. This spins a line like in roulette, and gives a random cut when it stops. Try this several times; you get different cuts as the process is random, but most probably they will all be quite small compared with the maximum cut (24).</p>
+
+  <p>Click Move to get a nicer picture, and then try Random Cut. The result is even worse (6 edges). Of course, Tutte's method brings adjacent nodes closer, so it will be less likely that a random line cuts through many edges.</p>
+</div>
+
+<div style="display: none">
+  <p>This gives the idea to reverse Tutte's procedure: replace the rubber bands by "springs" that provide a repellent (rather than attractive) force between adjacent nodes. Choose Force>repel and then open any graph, say the dodecahedron. Click Move... </p>
+
+  <p>Whoops, the nodes flew away to infinity (as we could have expected). To do anything useful, we have to constrain them. Choose Force>repel constrained. A circle appears showing the region in which the nodes can move. </p>
+  
+  <p>Open File>Open>cube.grf, and click Move. The nodes are pushed to the boundary and then wander around until the graph collapses onto a single segment. Check by dragging the nodes a little that all edges go accross. The cube is a bipartite graph and so all edges occur in its maximum cut. The springs found this maximum cut!</p>
+</div>
+
+<div style="display: none">
+  <p>Next, open File>Open>dodecahedron.grf again. Click Move. Again, the nodes are pushed to the boundary and then wander around until they reach an equilibrium. This equilibrium is not particularly simple, and may be different if you repeat this from loading the same graph again.</p>
+
+  <p>Try Random Cut. The result is much better; if you try it many times, you get the true maximum (24) often, and not much less in most cases.  Of course, the springs pushed adjacent nodes as far as possible, so a random line will more likely cut through many edges.</p>
+  
+  <p>Experiment with other graphs; doing Move with the repel constrained force and then Random Cut gets very close to the maximum cut! An interesting choice is to go File>Random Graph and choose about 20 nodes and various densities.</p>
+</div>
+
+<div style="display: none">
+  <p>This is the basis of the Goemans-Williamson algorithm for obtaining an approximate maximum cut. To get it right for all graphs, you have to do it in the n-dimensional space, where n is the number of nodes. </p>
+
+  <p>(Strangely enough, the computation of the position with maximum energy is easier in the n-dimensional space than in the plane. But of course, it is more difficult to draw.) </p>
+</div>
+
+<div>
+  
+</div>
