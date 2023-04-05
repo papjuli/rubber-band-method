@@ -1,0 +1,11 @@
+10
+0,1,0,0,1,1,0,0,0,0,Color [Red],,,
+1,0,1,0,0,0,1,0,0,0,Color [Red],,,
+0,1,0,1,0,0,0,1,0,0,Color [Red],,,
+0,0,1,0,1,0,0,0,1,0,Color [Red],Nailed,,
+1,0,0,1,0,0,0,0,0,1,Color [Red],Nailed,,
+1,0,0,0,0,0,0,1,1,0,Color [White],Nailed,
+0,1,0,0,0,0,0,0,1,1,Color [White],,
+0,0,1,0,0,1,0,0,0,1,Color [White],Nailed,
+0,0,0,1,0,1,1,0,0,0,Color [White],Nailed,
+0,0,0,0,1,0,1,1,0,0,Color [White],Nailed,

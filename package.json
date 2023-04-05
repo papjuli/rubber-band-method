@@ -9,9 +9,7 @@
   "author": "papjuli@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "graphology": "^0.21.1",
-    "graphology-layout": "^0.4.0",
-    "graphology-types": "^0.20.0",
+    "graphology": "^0.25.1",
     "sigma": "latest"
   }
 }

@@ -10,6 +10,14 @@ const settings = {
   sigmaContainer: document.getElementById("sigma-container"),
 }
 
+const colorToHex = new Map([
+  ["Red", "#ee0000"],
+  ["Blue", "#0000ee"],
+  ["Green", "#00ee00"],
+  ["Yellow", "#eeee00"],
+  ["White", settings.sigmaSettings.defaultNodeColor],  // white was the default in teh orginal code
+])
+
 const sigma = new Sigma.Sigma(
   new graphology.Graph(),
   settings.sigmaContainer,
@@ -22,10 +30,11 @@ document.getElementById('randomize-button').onclick = randomizeFreeNodes
 let timeoutId = null;
 
 function loadGraph(graph) {
-  console.log("drawGraph")
+  console.log("loadGraph")
   clearTimeout(timeoutId)
   sigma.graph = graph
   setUpGraph(graph)
+  // logNodeAttributes(graph)
 }
 
 function setUpGraph(graph) {
@@ -64,9 +73,10 @@ function parseGrf(url, callback) {
             graph.addEdge('n' + i,'n' + j);
           }
         }
-        for (j = nodeCount; j < nodeData.length; j++) {
-          if (nodeData[j] != '' && nodeData[j] != '\r') {
-            graph.setNodeAttribute('n' + i, nodeData[j], true)
+        graph.setNodeAttribute('n' + i, "color", colorToHex.get(nodeData[nodeCount]));
+        for (j = nodeCount + 1; j < nodeData.length; j++) {
+          if (nodeData[j] == "Nailed") {
+            graph.setNodeAttribute('n' + i, "Nailed", true)
           }
         }
       }
@@ -82,22 +92,25 @@ function placeNailedNodes(graph) {
   graph.forEachNode((node, attributes) => {
     if (attributes.Nailed) nailedNodes.push(node)
   })
-  // put nailed nodes around unit circle
-  // we assume that they form a cycle with no other edges among them
+  if (nailedNodes.length == 0) return;
+  if (nailedNodes.length == 1) {
+    graph.setNodeAttribute(nailedNodes[0], "x", 0)
+    graph.setNodeAttribute(nailedNodes[0], "y", 1)
+    return;
+  }
+  if (nailedNodes.length == 2) {
+    graph.setNodeAttribute(nailedNodes[0], "x", -1)
+    graph.setNodeAttribute(nailedNodes[0], "y", 0)
+    graph.setNodeAttribute(nailedNodes[1], "x", 1)
+    graph.setNodeAttribute(nailedNodes[1], "y", 0)
+    return;
+  }
   let alpha = 2 * Math.PI / nailedNodes.length
-  let prevNode, nextNode
-  let currentNode = nailedNodes[0]
-  graph.setNodeAttribute(currentNode, "x", 0)
-  graph.setNodeAttribute(currentNode, "y", 1)
-  for (let i = 1; i < nailedNodes.length; i++) {
-      nextNode = nailedNodes.find(n => {
-          return graph.neighbors(currentNode).includes(n) && n != prevNode
-      })
-      prevNode = currentNode
-      currentNode = nextNode
-      graph.setNodeAttribute(currentNode, "x", Math.sin(i * alpha))
-      graph.setNodeAttribute(currentNode, "y", Math.cos(i * alpha))
-  }  
+  // put nailed nodes around unit circle, in teh order they are in the file
+  for (let i = 0; i < nailedNodes.length; i++) {
+    graph.setNodeAttribute(nailedNodes[i], "x", Math.sin(i * alpha))
+    graph.setNodeAttribute(nailedNodes[i], "y", Math.cos(i * alpha))
+  }
 }
 
 function randomizeFreeNodes() {
