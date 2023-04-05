@@ -69,15 +69,12 @@
     </div>
     <div id="sigma-container" style="grid-area: graph"></div>
     <div id="topic-menu" style="grid-area: topic-menu">
-      <div class="dropdown">
-        <button class="dropbtn"><img class="menu-icon" src="assets/file-list-3-line.svg"> Topic</button>
-        <div class="dropdown-content" id="loadTopicDropdown">
-          <button data-topic-name='Intro'>Introduction</button>
-          <button data-topic-name='Planarity'>Planarity</button>
-          <button data-topic-name='Connectivity'>Connectivity</button>
-          <button data-topic-name='MaxCut'>Max cut</button>
-          <button data-topic-name='SquareTiling'>Square tiling</button>
-        </div>
+      <div class="tabs" id="topicTabs">
+        <button class="tablink" data-topic-name="Intro" id="IntroTab">Introduction</button>
+        <button class="tablink" data-topic-name="Planarity">Planarity</button>
+        <button class="tablink" data-topic-name="Connectivity">Connectivity</button>
+        <button class="tablink" data-topic-name="MaxCut">Max cut</button>
+        <button class="tablink" data-topic-name="SquareTiling">Square tiling</button>
       </div>
     </div>
     <div id="topic-container" style="grid-area:topic; overflow-y:scroll">

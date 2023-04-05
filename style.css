@@ -63,6 +63,19 @@ button:disabled {
   border-color: #90E0EF;
 }
 
+.tabs button {
+  border-radius: 0;
+  border-top-left-radius: 0.6em;
+  border-top-right-radius: 0.6em;
+  border-bottom: 0;
+}
+
+.tabs .active {
+  /* height: 45px; */
+  border-bottom: none;
+  background: #CAF0F8;
+}
+
 #graph-menu .menu-icon, #topic-menu .menu-icon, #topic .menu-icon {
   height: 1.2em;
   margin-bottom: -0.2em;
