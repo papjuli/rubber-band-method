@@ -1,5 +1,46 @@
 <div>
   <h2>Tiling rectangles by squares</h2>
   
-  TODO
+  <p>
+    In 1940, Brooks, Smith, Stone and Tutte developed a method for tiling a square by different squares. 
+    Their main tool was a construction that produced a tiling of a rectangle with squares from any planar map. 
+    This method can be thought of as an application of rubber bands.
+  </p>
+
+  <p>
+    On the right you see the dodecahedron graph again, with just two nodes of the infinite face nailed down.
+    Clicking <b>Move</b> the whole graph shrinks to a single segment (I cheated, and did not allow it to shrink completely, so that you can see the graph).
+  </p>
+
+  <p>
+    This does not look very interesting, but one can use this picture to construct a tiling of a rectangle by squares.
+  </p>
+
+  <hr></hr>
+
+  <p>
+    Click the <b>Squares</b> button; you'll see a square tiling of a rectangle.
+    The dodecahedron graph is overlayed, but you can hide it by clicking the <b>Show/Hide</b> button.
+  </p>
+
+  <p>
+    How do we get this tiling? You can observe that each square corresponds to an edge of the graph, and the side length of the square is equal to the length of the edge (more precisely, the side is equal to the length of the vertical projection of the edge; but remember, the drawing is actually collapsed onto a horizontal segment!).
+    The squares are put together so that those corresponding to the edges entering a node from the left are attached to a vertical segment from the left, and those corresponding to the edges entering the same node from the right are attached to the same vertical segment from the right.
+    The total side lengths from the left and right match; if you work it out, this is equivalent to the equilibrium condition.
+  </p>
+
+  <p>
+    Click the <b>Morph</b> button to see the correspondence better. If you click again, you see thick vertical lines marking the segments corresponding to the nodes of the graph. Click it the third time; the thick segments shrink to a single point, showing how the tiling gives you a graph.
+  </p>
+
+  <hr></hr>
+
+  <p>
+    You can create your own graphs to experiment with, or you can open any of the planar graphs from the library. 
+    (Note: this method gives garbage if your graph is not planar.)
+  </p>
+
+  <p>
+    A particularly interesting example is the graph named "squares1". This gives you a <i>square</i>, tiled by <i>different</i> little squares. This is the smallest known such construction (in terms of the number of squares).
+  </p>
 </div>

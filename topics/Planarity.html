@@ -1,37 +1,34 @@
 <div>
   <h2>How to draw a graph?</h2>
 
-  <p>On the left, the dodecahedron graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
+  <p>On the right, the dodecahedron graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
 
-  <p>Click on the button  Move. The edges contract until the system reaches equilibrium. The edges don’t cross any more, and we get a pretty drawing of the dodecahedron.</p>
-</div>
+  <p>Click on the <b>Run</b> button. The edges contract until the system reaches equilibrium. The edges don't cross any more, and we get a pretty drawing of the dodecahedron.</p>
 
-<div style="display: none">
+
   <p><em>Does this work because the dodecahedron graph is very symmetric?</em></p>
 
-  <p>Go to File>Open>planar1.grf. This is a planar graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click  Move: The edges contract and eventually they will not cross any more.</p>
+  <p>Load the graph named "planar1". This is a planar graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
 
-  <p>Play with the other planar graphs in File>Open: try out all five platonic’solids, and the other, less regular planar graphs.</p>
+  <p>Play with the other planar graphs: try out all five platonic solids, and the other, less regular planar graphs.</p>
 
   <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p>
-</div>
 
-<div style="display: none">
+
   <p>Tutte proved the following nontrivial fact:</p>
 
-  <p>Nail the nodes of any face of a 3-connected planar graph to a convex polygon, and replace the edges by rubber bands. The equilibrium provides an embedding in the plane.</p>
+  <blockquote>Nail the nodes of any face of a 3-connected planar graph to a convex polygon, and replace the edges by rubber bands. The equilibrium provides an embedding in the plane.</blockquote>
   
   <p>This embedding has very nice properties: all the edges are straight line segments, and all the faces are convex polygons.</p>
-</div>
 
-<div style="display: none">
+
   <p>Is this a good method to display planar 3-connected graphs?</p>
 
-  <p>Often it is, but there are some bad examples. Open File>Open>triangles.grf and click Move: This simple graph is drawn in the plane, but most of its nodes are crowded near the middle of the bottom. File>Open>pipe.grf gives a similar example.</p>
+  <p>Often it is, but there are some bad examples. Load the graph named "triangles" and click Run: This simple graph is drawn in the plane, but most of its nodes are crowded near the middle of the bottom. The "pipe" graph gives a similar example.</p>
 
   <p>What to do if a planar graph is not 3-connected?</p>
 
-  <p>We can add edges to it to make it 3-connected, and delete these at the end. As a special case, a tree can be drawn nicely by fixing its leaves. Try File>Open>tree1.grf...tree5.grf.</p>
+  <p>We can add edges to it to make it 3-connected, and delete these at the end. As a special case, a tree can be drawn nicely by fixing its leaves. Try the "tree5" graph.</p>
 
-  <p>Is this a good method to display nonplanar graphs? Sometimes; check File>Open>petersen.grf to see a nice drawing of a very famous and very symmetric nonplanar graph, the "Petersen graph".</p>
+  <p>Is this a good method to display nonplanar graphs? Sometimes; load and run the Petersen graph to see a nice drawing of this very famous and very symmetric nonplanar graph.</p>
 </div>

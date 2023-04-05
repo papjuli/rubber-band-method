@@ -1,43 +1,82 @@
 <div>
   <h2>Maximum cut</h2>
 
-  <p>An efficient approximation algorithm can be illustrated by a version of rubber bands.</p>
+  <h3>Introduction</h3>
 
-  <p>On the left, you see a random drawing of the dodecahedron graph. Click the new Max Cut button; this computes the maximum cut (24) by brute force. For such a small graph this is possible; but try open File>Open>maxcutbig.grf; this graph is only a few nodes bigger, but it takes quite a while to get the result. Each new node would double the running time of this simple algorithm.</p>
-</div>
+  <p>The task is to divide the nodes of a graph into two classes so that the number of edges between the two classes is as large as possible.  Click <b>Max Cut</b> to see this division for the graph on the right hand side.
+    
+  The two classes are indicated by the Black and White colors of the nodes. Click <b>Separate</b> if you want to see the two classes on the right and left, and <b>Restore</b> to get back the original layout.</p>
 
-<div style="display: none">
-  <h2>An approximation algorithm using rubber bands</h2>
+  <p>
+    The algorithm behind the Max Cut button computes the maximum cut (24) by brute force. For such a small graph this is possible; but try open the graph called "maxcutbig"; this graph is only a few nodes bigger, but it takes quite a while to get the result. Each new node would double the running time of this simple algorithm.
+  </p>
 
-  <p>On the left you see the dodecahedron again. Click Max Cut to see that the maximum cut has 24 edges.</p>
+  <p>
+    Finding a maximum cut in a graph is difficult (NP-hard), so we try to find an <i>approximately</i> largest cut. An important algorithm of Goemans and Williamson finds a cut which is always at least 87% of the optimum (and generally much closer). It is known that no polynomial time algorithm will get always within 6% of the maximum cut (unless P=NP).
+  </p>
 
-  <p>Click Random Cut. This spins a line like in roulette, and gives a random cut when it stops. Try this several times; you get different cuts as the process is random, but most probably they will all be quite small compared with the maximum cut (24).</p>
+  <p>
+    We start with two games that serve to illustrate the difficulty of the maximum cut poblem, and how simple approximation algorithms work.
+  </p>
 
-  <p>Click Move to get a nicer picture, and then try Random Cut. The result is even worse (6 edges). Of course, Tutte's method brings adjacent nodes closer, so it will be less likely that a random line cuts through many edges.</p>
-</div>
+  <h3>A maximum cut game - why is it hard?</h3>
 
-<div style="display: none">
-  <p>This gives the idea to reverse Tutte's procedure: replace the rubber bands by "springs" that provide a repellent (rather than attractive) force between adjacent nodes. Choose Force>repel and then open any graph, say the dodecahedron. Click Move... </p>
+  <p>
+    <b>Goal</b>: try to find a maximum cut.
+  </p>
 
-  <p>Whoops, the nodes flew away to infinity (as we could have expected). To do anything useful, we have to constrain them. Choose Force>repel constrained. A circle appears showing the region in which the nodes can move. </p>
+  <p>
+    Click on any node to toggle its color. 
+    The number of edges connecting different colors is displayed on the bottom of the screen. If you feel you have found the best cut, click the <b>Max Cut</b> button to see how large the "real" maximum cut is.
+  </p>
+
+  <p>
+    If you find that no toggle improves the current solution, you have a <b>locally maximum cut</b>. You see that this is not necessarily optimal. But it is easy to show that this cut contains at least half of the edges, so in particular it is at least 50% of the maximum cut.
+  </p>
+
+  <h3>Another maximum cut game: online is even harder!</h3>
+
+  <p>
+    You are offered the nodes of a 16-node graph one by one. By clicking on the white or the black button, you can decide what its color should be. Try to maximize the cut you create. When done, click on the <b>Max Cut</b> button to see how well you did. Compare your result with the total number of edges too.
+  </p>
+
+  <p>
+    Most likely you did not get the maximum cut, but you surely managed to cut at least half of the edges (it was enough to make sure that this was so in each step). This shows that the size of the maximum cut is at least half of the number of edges, and such an approximately maximum cut can be found by this simple linear-time algorithm. In other words, <b>this algorithm is aheuristic with at most 50% error</b>.
+  </p>
+
+  <p>
+    Now we'll describe an algorithm which gives a much smaller error.
+  </p>
+
+
+  <h3>An approximation algorithm using rubber bands</h3>
+
+  <p>On the left you see the dodecahedron graph again. Click <b>Max Cut</b> to see that the maximum cut has 24 edges.</p>
+
+  <p>Click <b>Random Cut</b>. This spins a line like in roulette, and gives a random cut when it stops. Try this several times; you get different cuts as the process is random, but most probably they will all be quite small compared with the maximum cut (24).</p>
+
+  <p>Click <b>Move</b> to get a nicer picture, and then try <b>Random Cut</b>. The result is even worse (6 edges). Of course, Tutte's method brings adjacent nodes closer, so it will be less likely that a random line cuts through many edges.</p>
+
+  <hr></hr>
+
+  <p>This gives the idea to <b>reverse Tutte's procedure</b>: replace the rubber bands by "springs" that provide a repellent (rather than attractive) force between adjacent nodes. Choose <b>Force>repel</b> and then open any graph, say the dodecahedron. Click <b>Move</b>... </p>
+
+  <p>Whoops, the nodes flew away to infinity (as we could have expected). To do anything useful, we have to constrain them. Choose <b>Force>repel constrained</b>. A circle appears showing the region in which the nodes can move. </p>
   
-  <p>Open File>Open>cube.grf, and click Move. The nodes are pushed to the boundary and then wander around until the graph collapses onto a single segment. Check by dragging the nodes a little that all edges go accross. The cube is a bipartite graph and so all edges occur in its maximum cut. The springs found this maximum cut!</p>
-</div>
+  <p>Open the graph called "cube", and click <b>Move</b>. The nodes are pushed to the boundary and then wander around until the graph collapses onto a single segment. Check by dragging the nodes a little that all edges go accross. The cube is a bipartite graph and so all edges occur in its maximum cut. The springs found this maximum cut!</p>
 
-<div style="display: none">
-  <p>Next, open File>Open>dodecahedron.grf again. Click Move. Again, the nodes are pushed to the boundary and then wander around until they reach an equilibrium. This equilibrium is not particularly simple, and may be different if you repeat this from loading the same graph again.</p>
+  <hr></hr>
 
-  <p>Try Random Cut. The result is much better; if you try it many times, you get the true maximum (24) often, and not much less in most cases.  Of course, the springs pushed adjacent nodes as far as possible, so a random line will more likely cut through many edges.</p>
+  <p>Next, open the dodecahedron graph again. Click <b>Move</b>. Again, the nodes are pushed to the boundary and then wander around until they reach an equilibrium. This equilibrium is not particularly simple, and may be different if you repeat this from loading the same graph again.</p>
+
+  <p>Try <b>Random Cut</b>. The result is much better; if you try it many times, you get the true maximum (24) often, and not much less in most cases.  Of course, the springs pushed adjacent nodes as far as possible, so a random line will more likely cut through many edges.</p>
   
-  <p>Experiment with other graphs; doing Move with the repel constrained force and then Random Cut gets very close to the maximum cut! An interesting choice is to go File>Random Graph and choose about 20 nodes and various densities.</p>
+  <p>Experiment with other graphs; doing <b>Move</b> with the repel constrained force and then <b>Random Cut</b> gets very close to the maximum cut! An interesting choice is to generate a <b>Random Graph</b> and choose about 20 nodes and various densities.</p>
+
+  <hr></hr>
+
+  <p>This is the basis of the Goemans-Williamson algorithm for obtaining an approximate maximum cut. To get it right for all graphs, you have to do it in the <i>n</i>-dimensional space, where <i>n</i> is the number of nodes. </p>
+
+  <p>(Strangely enough, the computation of the position with maximum energy is easier in the <i>n</i>-dimensional space than in the plane. But of course, it is more difficult to draw.) </p>
 </div>
 
-<div style="display: none">
-  <p>This is the basis of the Goemans-Williamson algorithm for obtaining an approximate maximum cut. To get it right for all graphs, you have to do it in the n-dimensional space, where n is the number of nodes. </p>
-
-  <p>(Strangely enough, the computation of the position with maximum energy is easier in the n-dimensional space than in the plane. But of course, it is more difficult to draw.) </p>
-</div>
-
-<div>
-  
-</div>
