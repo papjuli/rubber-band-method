@@ -52,8 +52,9 @@ class GraphRenderer {
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
     console.log(width, height);
+    let scale = Math.min(width, height) / 2 * 0.9;
     this.group.transform({
-      scale: Math.min(width, height) / 2 * 0.9,
+      scale: [scale, -scale],
       translateX: width / 2,
       translateY: height / 2
     });
@@ -115,7 +116,7 @@ function parseGrf(url, callback) {
       var lines = xhr.responseText.split('\n')
         .filter(line => !line.startsWith('#'));
       var nodeCount = parseInt(lines[0]);
-      var i, j, nodeData, isEdge;
+      var i, j, nodeData, isEdge, color;
       for (i = 0; i < nodeCount; i++) {
         graph.addNode({id: 'n' + i})
       }
@@ -127,8 +128,9 @@ function parseGrf(url, callback) {
             graph.addEdge({from: 'n' + i, to: 'n' + j, weight: 1});
           }
         }
-        if (nodeData[nodeCount] != "")
-          graph.getNode('n' + i).color = nodeData[nodeCount];
+        color = nodeData[nodeCount].trim();
+        if (color != "")
+          graph.getNode('n' + i).color = color;
         for (j = nodeCount + 1; j < nodeData.length; j++) {
           if (nodeData[j] == "Nailed") {
             graph.getNode('n' + i).nailed = true;

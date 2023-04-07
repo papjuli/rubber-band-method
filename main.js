@@ -5,6 +5,15 @@ const tabLinks = document.getElementsByClassName('tablink')
 
 loadTopic('Intro', document.getElementById('IntroTab'))
 
+const graphsForTopics = new Map([
+  ["Intro", "./graphs/dodecahedron.grf"],
+  ["Planarity", "./graphs/dodecahedron.grf"],
+  ["Connectivity", "./graphs/twins.grf"],
+  ["MaxCut", "./graphs/planar5.grf"],
+  ["SquareTiling" , "./graphs/dodecahedron.grf"],
+])
+
+
 let settings = {
   nodes: {
     size: 0.04,
@@ -44,22 +53,23 @@ function loadTopic(topicName, button) {
   .then((data) => {
     topicTextElement.innerHTML = data;
     for (let i = 0; i < tabLinks.length; i++) {
-      tabLinks[i].classList.remove("active")
+      tabLinks[i].classList.remove("active");
     }
-    button.classList.add("active")
+    button.classList.add("active");
   })
 }
 
 let loadTopicButtons = document.querySelectorAll("#topicTabs button")
 loadTopicButtons.forEach(btn => {
   btn.onclick = () => {
-    loadTopic(btn.dataset.topicName, btn)
+    loadTopic(btn.dataset.topicName, btn);
+    loadGraph(graphsForTopics.get(btn.dataset.topicName), renderer);
   }
 })
 
 let loadGraphButtons = document.querySelectorAll("#loadGraphDropdown button")
 loadGraphButtons.forEach(btn => {
   btn.onclick = () => {
-    loadGraph(`./graphs/${btn.dataset.name}.grf`, renderer)
+    loadGraph(`./graphs/${btn.dataset.name}.grf`, renderer);
   }
 })
