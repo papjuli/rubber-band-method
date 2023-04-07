@@ -1,3 +1,13 @@
+:root {
+  --color1: #cdecfb;
+  --color2: #a9dcf8;
+  --color3: #8ec8ff;
+  --color4: #63a6f7;
+  --color5: #0f5cc2;
+  --color6: #244bae;
+  --color7: #263879;
+}
+
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
@@ -12,7 +22,7 @@ html, body, #sigma-container {
 }
 
 #header {
-  background-color: #0077B6;
+  background-color: var(--color6);
   color: whitesmoke;
   padding: 1em;
 }
@@ -22,7 +32,7 @@ li {
 }
 
 #topic-container, #topic-menu {
-  background-color: #CAF0F8;
+  background-color: var(--color1);
   padding: 1em;
 }
 
@@ -43,11 +53,11 @@ li {
 
 button, label {
   font-size: 1.1em;
-  color: #242946;
-  background-color: #90E0EF;
+  color: var(--color7);
+  background-color: var(--color3);
   display: inline-block;
   border-radius: 0.6em;
-  border-color: #48CAE4;
+  border-color: var(--color4);
   padding: 0.5em 0.5em 0.5em 0.5em;
   text-align: center;
   border-width: 2px;
@@ -55,14 +65,14 @@ button, label {
 }
 
 button:hover, label:hover {
-  color: #023E8A;
-  background-color: #ADE8F4;
+  color: var(--color6);
+  background-color: var(--color2);
 }
 
 button:disabled {
-  color: #48CAE4;
-  background-color: #CAF0F8;
-  border-color: #90E0EF;
+  color: var(--color4);
+  background-color: var(--color1);
+  border-color: var(--color3);
 }
 
 .tabs button {
@@ -75,7 +85,7 @@ button:disabled {
 .tabs .active {
   /* height: 45px; */
   border-bottom: none;
-  background: #CAF0F8;
+  background: var(--color1);
 }
 
 #graph-menu .menu-icon, #topic-menu .menu-icon, #topic .menu-icon {
@@ -111,5 +121,5 @@ button:disabled {
 
 hr {
   border: 0;
-  border-top: 1px solid #a1bdd6;
+  border-top: 1px solid var(--color3);
 }
