@@ -1,60 +1,114 @@
 
-const settings = {
-  delay: 0.02,
-  rate: 0.01,
-  threshold: 0.00001,
-  sigmaSettings: {
-    defaultNodeColor: '#023E8A',
-    defaultEdgeColor: '#023E8A'
-  },
-  sigmaContainer: document.getElementById("sigma-container"),
+class Graph {
+  constructor() {
+    this.nodesById = new Map();
+    this.edgesAt = new Map();
+  }
+
+  addNode(node) {
+    if (!node.id) throw "Node must have an id";
+    this.nodesById.set(node.id, node);
+    this.edgesAt.set(node.id, []);
+  }
+
+  addEdge(edge) {
+    this.edgesAt.get(edge.from).push(edge);
+    this.edgesAt.get(edge.to).push(edge);
+  }
+
+  getNode(id) {
+    return this.nodesById.get(id);
+  }
+
+  forEachNode(callback) {
+    this.nodesById.forEach(callback);
+  }
+
+  forEachEdge(callback) {
+    this.edgesAt.forEach((edges, nodeId) => {
+      edges.forEach((edge) => {
+        let otherId = edge.from == nodeId ? edge.to : edge.from;
+        if (nodeId < otherId) {
+          callback(edge);
+        }
+      });
+    });
+  }
+
+  forEachEdgeAt(nodeId, callback) {
+    this.edgesAt.get(nodeId).forEach(callback);
+  }
+
+  degree(nodeId) {
+    return this.edgesAt.get(nodeId).length;
+  }
 }
 
-const colorToHex = new Map([
-  ["Red", "#ee0000"],
-  ["Blue", "#0000ee"],
-  ["Green", "#00ee00"],
-  ["Yellow", "#eeee00"],
-  ["White", settings.sigmaSettings.defaultNodeColor],  // white was the default in teh orginal code
-])
 
-const sigma = new Sigma.Sigma(
-  new graphology.Graph(),
-  settings.sigmaContainer,
-  settings.sigmaSettings
-)
+class GraphRenderer {
+  constructor(container, settings) {
+    this.svg = SVG().addTo(container).size("100%", "100%");
+    this.group = this.svg.group();
+    let width = this.svg.node.clientWidth;
+    let height = this.svg.node.clientHeight;
+    console.log(width, height);
+    this.group.transform({
+      scale: Math.min(width, height) / 2 * 0.9,
+      translateX: width / 2,
+      translateY: height / 2
+    });
+    this.settings = settings
+    this.lastTimeoutId = null;
+  }
 
-document.getElementById('run-button').onclick = rubberBandStep
-document.getElementById('randomize-button').onclick = randomizeFreeNodes
+  setGraph(graph) {
+    this.graph = graph;
+  }
 
-let timeoutId = null;
+  clear() {
+    clearTimeout(this.lastTimeoutId);
+    this.group.clear();
+  }
 
-function loadGraph(graph) {
+  render() {
+    this.clear();
+    this.graph.forEachEdge((edge) => {
+      let color = edge.color || this.settings.edges.color;
+      let width = edge.width || this.settings.edges.width;
+      let s = this.graph.getNode(edge.from);
+      let t = this.graph.getNode(edge.to);
+      this.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+    });
+    this.graph.forEachNode((node) => {
+      // let color = node.color || this.settings.nodes.color;
+      let color = this.settings.nodes.color;
+      if (node.color) {
+        color = this.settings.colors.get(node.color);
+      }
+      let size = node.size || this.settings.nodes.size;
+      this.group.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
+      if (node.nailed) {
+        let nailRadius = size * 0.3;
+        this.group.circle(nailRadius)
+          .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
+          .fill(this.settings.nodes.nailColor);
+      }
+    });
+  }
+}
+
+
+function loadGraph(url, renderer) {
   console.log("loadGraph")
-  clearTimeout(timeoutId)
-  sigma.graph = graph
-  setUpGraph(graph)
-  // logNodeAttributes(graph)
+  parseGrf(url, (graph) => setupGraph(graph, renderer))
 }
 
-function setUpGraph(graph) {
-  graph.forEachNode((node, attributes) => {attributes.size = 6})
-  graph.forEachEdge((e, attributes) => {attributes.weight = 2})
-  placeNailedNodes(graph)
-  randomizeFreeNodes(graph)
-}
-
-function logNodeAttributes(graph) {
-  graph.forEachNode((node, attributes) => {
-    console.log(node, attributes)
-  })
-}
 
 function parseGrf(url, callback) {
   var xhr = new XMLHttpRequest()
   if (!xhr) throw 'XMLHttpRequest not supported, cannot load the file.'
 
-  var graph = new graphology.Graph()
+  var graph = new Graph()
   xhr.open('GET', url, true)
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4) {
@@ -63,20 +117,21 @@ function parseGrf(url, callback) {
       var nodeCount = parseInt(lines[0]);
       var i, j, nodeData, isEdge;
       for (i = 0; i < nodeCount; i++) {
-        graph.addNode('n' + i)
+        graph.addNode({id: 'n' + i})
       }
       for (i = 0; i < nodeCount; i++) {
         nodeData = lines[i + 1].split(',');
         for (j = i + 1; j < nodeCount; j++) {
           isEdge = nodeData[j];
           if (isEdge == 1) {
-            graph.addEdge('n' + i,'n' + j);
+            graph.addEdge({from: 'n' + i, to: 'n' + j, weight: 1});
           }
         }
-        graph.setNodeAttribute('n' + i, "color", colorToHex.get(nodeData[nodeCount]));
+        if (nodeData[nodeCount] != "")
+          graph.getNode('n' + i).color = nodeData[nodeCount];
         for (j = nodeCount + 1; j < nodeData.length; j++) {
           if (nodeData[j] == "Nailed") {
-            graph.setNodeAttribute('n' + i, "Nailed", true)
+            graph.getNode('n' + i).nailed = true;
           }
         }
       }
@@ -87,75 +142,87 @@ function parseGrf(url, callback) {
   xhr.send();
 }
 
+
+function setupGraph(graph, renderer) {
+  console.log("setupGraph")
+  placeNailedNodes(graph);
+  randomizeFreeNodes(graph);
+  renderer.setGraph(graph);
+  renderer.render();
+}
+
+
 function placeNailedNodes(graph) {
   let nailedNodes = [];
-  graph.forEachNode((node, attributes) => {
-    if (attributes.Nailed) nailedNodes.push(node)
+  graph.forEachNode((node) => {
+    if (node.nailed) nailedNodes.push(node)
   })
   if (nailedNodes.length == 0) return;
   if (nailedNodes.length == 1) {
-    graph.setNodeAttribute(nailedNodes[0], "x", 0)
-    graph.setNodeAttribute(nailedNodes[0], "y", 1)
+    nailedNodes[0].x = 0
+    nailedNodes[0].y = 1
     return;
   }
   if (nailedNodes.length == 2) {
-    graph.setNodeAttribute(nailedNodes[0], "x", -1)
-    graph.setNodeAttribute(nailedNodes[0], "y", 0)
-    graph.setNodeAttribute(nailedNodes[1], "x", 1)
-    graph.setNodeAttribute(nailedNodes[1], "y", 0)
+    nailedNodes[0].x = -1
+    nailedNodes[0].y = 0
+    nailedNodes[1].x = 1
+    nailedNodes[1].y = 0
     return;
   }
   let alpha = 2 * Math.PI / nailedNodes.length
-  // put nailed nodes around unit circle, in teh order they are in the file
+  // put nailed nodes around unit circle, in the order they are in the file
   for (let i = 0; i < nailedNodes.length; i++) {
-    graph.setNodeAttribute(nailedNodes[i], "x", Math.sin(i * alpha))
-    graph.setNodeAttribute(nailedNodes[i], "y", Math.cos(i * alpha))
+    nailedNodes[i].x = Math.sin(i * alpha)
+    nailedNodes[i].y = Math.cos(i * alpha)
   }
 }
 
-function randomizeFreeNodes() {
+
+function randomizeFreeNodes(graph) {
   // let seed = Math.random()
   // Math.seedrandom(seed)
-  // console.log("random seed:", seed)
-  sigma.graph.forEachNode((node, attributes) => {
-    if (!attributes.Nailed) {
-      attributes.x = Math.random() * 2 - 1
-      attributes.y = Math.random() * 2 - 1
+  graph.forEachNode((node) => {
+    if (!node.nailed) {
+      node.x = Math.random() * 2 - 1
+      node.y = Math.random() * 2 - 1
     }
   })
-  sigma.refresh()
 }
 
-function rubberBandStep() {
-  let graph = sigma.graph
+
+function rubberBandStep(renderer) {
+  let graph = renderer.graph
   console.log('step')
   let force, dx, dy
   let maxChange = 0
-  graph.forEachNode((node, attributes) => {
-    attributes.prevX = attributes.x
-    attributes.prevY = attributes.y
-    attributes.force = {x: 0, y: 0}
+  graph.forEachNode((node) => {
+    node.prevX = node.x
+    node.prevY = node.y
+    node.force = {x: 0, y: 0}
   })
-  graph.forEachNode((node, attributes) => {
-    if (!attributes.Nailed && graph.degree(node) > 0) {
+  graph.forEachNode((node) => {
+    if (!node.nailed && graph.degree(node.id) > 0) {
       force = {x: 0, y: 0}
-      graph.forEachEdge(node, (e, edgeAttrs, source, target, sourceAttrs, targetAttrs) => {
-        let otherAttrs = source == node ? targetAttrs : sourceAttrs
-        force.x += (otherAttrs.x - attributes.x) * edgeAttrs.weight
-        force.y += (otherAttrs.y - attributes.y) * edgeAttrs.weight
+      graph.forEachEdgeAt(node.id, (edge) => {
+        let otherId = edge.from == node.id ? edge.to : edge.from
+        let otherNode = graph.getNode(otherId)
+        force.x += (otherNode.prevX - node.prevX) * edge.weight
+        force.y += (otherNode.prevY - node.prevY) * edge.weight
       })
-      dx = settings.rate * force.x
-      dy = settings.rate * force.y
-      attributes.x += dx
-      attributes.y += dy
+      dx = renderer.settings.rate * force.x
+      dy = renderer.settings.rate * force.y
+      node.x += dx
+      node.y += dy
       maxChange = Math.max(maxChange, Math.abs(dx), Math.abs(dy))
     }
   })
-  sigma.refresh()
+  renderer.render()
 
-  if (maxChange > settings.threshold) {
-    timeoutId = setTimeout(rubberBandStep, settings.delay)
+  if (maxChange > renderer.settings.threshold) {
+    renderer.lastTimeoutId = setTimeout(rubberBandStep, renderer.settings.delay, renderer)
   }
 }
 
-export { loadGraph, parseGrf }
+
+export { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep };
