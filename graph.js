@@ -58,8 +58,9 @@ class GraphRenderer {
       translateX: width / 2,
       translateY: height / 2
     });
-    this.settings = settings
+    this.settings = settings;
     this.lastTimeoutId = null;
+    this.mode = "attract";
   }
 
   setGraph(graph) {
@@ -198,6 +199,7 @@ function rubberBandStep(renderer) {
   console.log('step')
   let force, dx, dy
   let maxChange = 0
+  let maxCoord = 0
   graph.forEachNode((node) => {
     node.prevX = node.x
     node.prevY = node.y
@@ -214,14 +216,27 @@ function rubberBandStep(renderer) {
       })
       dx = renderer.settings.rate * force.x
       dy = renderer.settings.rate * force.y
-      node.x += dx
-      node.y += dy
-      maxChange = Math.max(maxChange, Math.abs(dx), Math.abs(dy))
+      if (renderer.mode == "attract") {
+        node.x += dx
+        node.y += dy
+      } else {
+        node.x -= dx
+        node.y -= dy
+      }
+      if (renderer.mode == "repel-constrained") {
+        let r = Math.sqrt(node.x * node.x + node.y * node.y)
+        if (r > 1) {
+          node.x /= r
+          node.y /= r
+        }
+      }
+      maxChange = Math.max(maxChange, Math.abs(node.x - node.prevX), Math.abs(node.y - node.prevY))
+      maxCoord = Math.max(maxCoord, Math.abs(node.x), Math.abs(node.y))
     }
   })
   renderer.render()
 
-  if (maxChange > renderer.settings.threshold) {
+  if (maxChange > renderer.settings.threshold && maxCoord < 10000) {
     renderer.lastTimeoutId = setTimeout(rubberBandStep, renderer.settings.delay, renderer)
   }
 }

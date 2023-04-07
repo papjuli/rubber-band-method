@@ -41,18 +41,20 @@ li {
   grid-template-rows: max-content max-content 1fr;
 }
 
-button {
+button, label {
   font-size: 1.1em;
   color: #242946;
   background-color: #90E0EF;
   display: inline-block;
   border-radius: 0.6em;
   border-color: #48CAE4;
-  padding: 0.6em 0.8em 0.6em 0.8em;
+  padding: 0.5em 0.5em 0.5em 0.5em;
   text-align: center;
+  border-width: 2px;
+  border-style: outset;
 }
 
-button:hover {
+button:hover, label:hover {
   color: #023E8A;
   background-color: #ADE8F4;
 }
@@ -91,13 +93,13 @@ button:disabled {
   position: absolute;
   z-index: 1;
   overflow: hidden;
-  -webkit-transition: all 0.5s ease-in-out;
-  -moz-transition: all 0.5s ease-in-out;
-  -o-transition: all 0.5s ease-in-out;
-  transition: all 0.5s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
-.dropdown-content button {
+.dropdown-content button, .dropdown-content label {
   font-size: 1em;
   border-radius: 0em;
 }

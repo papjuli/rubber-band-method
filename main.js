@@ -59,17 +59,22 @@ function loadTopic(topicName, button) {
   })
 }
 
-let loadTopicButtons = document.querySelectorAll("#topicTabs button")
-loadTopicButtons.forEach(btn => {
+
+document.querySelectorAll("#topicTabs button").forEach(btn => {
   btn.onclick = () => {
     loadTopic(btn.dataset.topicName, btn);
     loadGraph(graphsForTopics.get(btn.dataset.topicName), renderer);
   }
 })
 
-let loadGraphButtons = document.querySelectorAll("#loadGraphDropdown button")
-loadGraphButtons.forEach(btn => {
+document.querySelectorAll("#loadGraphDropdown button").forEach(btn => {
   btn.onclick = () => {
     loadGraph(`./graphs/${btn.dataset.name}.grf`, renderer);
+  }
+})
+
+document.querySelectorAll("#forceDropdown input").forEach(btn => {
+  btn.onclick = () => {
+    renderer.mode = btn.dataset.mode;
   }
 })
