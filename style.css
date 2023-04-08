@@ -36,7 +36,7 @@ li {
   padding: 1em;
 }
 
-#graph-menu {
+#graph-menu, #info {
   padding: 1em; 
 }
 
@@ -46,9 +46,10 @@ li {
   grid-template-areas:
     'header header'
     'topic-menu graph-menu'
-    'topic graph';
+    'topic graph'
+    'topic info';
   grid-template-columns: 40% 60%;
-  grid-template-rows: max-content max-content 1fr;
+  grid-template-rows: max-content max-content 1fr max-content;
 }
 
 button, label {

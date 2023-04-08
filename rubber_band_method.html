@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Rubber band method demo</title>
+    <title>Rubber band method</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style.css"></style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@
           <button data-name="accident2">accident 2</button>
           <button data-name="connectproof">connectivity proof</button>
           <button data-name="cube">cube</button>
-          <button data-name="dodecahedron">dodecahedron graph</button>
+          <button data-name="dodecahedron">dodecahedron</button>
           <button data-name="dodecaplus">dodecahedron+</button>
           <button data-name="dodecasymm">dodecasymm</button>
           <button data-name="grid">grid</button>
@@ -88,6 +88,11 @@
     <div id="topic-container" style="grid-area:topic; overflow-y:scroll">
       <div id="topic-text"></div>
       </br>
+    </div>
+    <div id="info" style="grid-area: info">
+      Graph: <span id="graph-name" style="display:inline-block;width:10em"> </span>
+      Vertices: <span id="num-vertices" style="display:inline-block;width:4em"> </span>
+      Edges: <span id="num-edges" style="display:inline-block;width:4em"> </span>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>

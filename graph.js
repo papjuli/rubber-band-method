@@ -16,6 +16,16 @@ class Graph {
     this.edgesAt.get(edge.to).push(edge);
   }
 
+  nodeCount() {
+    return this.nodesById.size;
+  }
+
+  edgeCount() {
+    let count = 0;
+    this.edgesAt.forEach((edges) => count += edges.length);
+    return count / 2;
+  }
+
   getNode(id) {
     return this.nodesById.get(id);
   }
@@ -100,9 +110,13 @@ class GraphRenderer {
 }
 
 
-function loadGraph(url, renderer) {
+function loadGraph(url, renderer, callback) {
   console.log("loadGraph")
-  parseGrf(url, (graph) => setupGraph(graph, renderer))
+  parseGrf(url, (graph) => {
+    setupGraph(graph, renderer);
+    if (callback)
+      callback(renderer);
+  })
 }
 
 

@@ -38,7 +38,17 @@ let settings = {
 
 let renderer = new GraphRenderer(document.getElementById('graph-container'), settings);
 
-loadGraph("./graphs/dodecahedron.grf", renderer);
+function setInfo(renderer, graphName) {
+  document.getElementById('graph-name').innerHTML = graphName;
+  document.getElementById('num-vertices').innerHTML = renderer.graph.nodeCount();
+  document.getElementById('num-edges').innerHTML = renderer.graph.edgeCount();
+}
+
+loadGraph(
+  "./graphs/dodecahedron.grf", 
+  renderer, 
+  (renderer) => setInfo(renderer, "dodecahedron")
+);
 
 document.getElementById('randomize-button').onclick = () => {
   randomizeFreeNodes(renderer.graph);
@@ -69,7 +79,8 @@ document.querySelectorAll("#topicTabs button").forEach(btn => {
 
 document.querySelectorAll("#loadGraphDropdown button").forEach(btn => {
   btn.onclick = () => {
-    loadGraph(`./graphs/${btn.dataset.name}.grf`, renderer);
+    loadGraph(`./graphs/${btn.dataset.name}.grf`, renderer, 
+      (renderer) => setInfo(renderer, btn.innerHTML));
   }
 })
 
