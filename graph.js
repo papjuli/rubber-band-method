@@ -115,7 +115,7 @@ function loadGraph(url, renderer, callback) {
   parseGrf(url, (graph) => {
     setupGraph(graph, renderer);
     if (callback)
-      callback(renderer);
+      callback(graph);
   })
 }
 
