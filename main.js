@@ -106,6 +106,7 @@ function loadTopic(topicName, button) {
   .then(response => response.text())
   .then((data) => {
     topicTextElement.innerHTML = data;
+    topicTextElement.scrollIntoView();
     for (let i = 0; i < tabLinks.length; i++) {
       tabLinks[i].classList.remove("active");
     }
