@@ -135,3 +135,16 @@ document.querySelectorAll("#forceDropdown input").forEach(btn => {
     renderer.mode = btn.dataset.mode;
   }
 })
+
+const editbuttonicon = document.getElementById('edit-graph-icon');
+document.getElementById('edit-graph-button').onclick = () => {
+  if (renderer.editable == true) { 
+    renderer.editable = false;
+    editbuttonicon.setAttribute("src", "assets/lock-line.svg"); 
+    document.getElementById('edit-buttons-container').toggleAttribute("hidden");
+  }
+  else { renderer.editable = true; 
+    editbuttonicon.setAttribute("src", "assets/lock-unlock-line.svg");    
+    document.getElementById('edit-buttons-container').toggleAttribute("hidden");
+  }
+};

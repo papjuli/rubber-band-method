@@ -59,6 +59,7 @@ class GraphRenderer {
   constructor(container, settings) {
     this.svg = SVG().addTo(container).size("100%", "100%");
     this.group = this.svg.group();
+    console.log(this.svg.node.childNodes[0].childNodes);
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
     console.log(width, height);
@@ -71,6 +72,35 @@ class GraphRenderer {
     this.settings = settings;
     this.lastTimeoutId = null;
     this.mode = "attract";
+    this.editable = false;
+
+    //this.svg.node.addEventListener("click",
+    //  (e) => { console.log(e.offsetX, e.offsetY) });
+    this.svg.node.addEventListener("mouseup",
+      (e) => {
+        //console.log("svg.node mouseup");
+        if (this.grabbednodeid) {
+          let node = this.graph.getNode(this.grabbednodeid);
+          node.x = this.ex2x(e.offsetX);
+          node.y = this.ey2y(e.offsetY);
+          this.render();
+          node.grab = false;
+          this.grabbednodeid = undefined;
+        }
+      }
+    );
+    this.svg.node.addEventListener("mousemove",
+      (e) => {
+        //console.log("svg.node mousemove");
+        if (this.grabbednodeid) {
+          let node = this.graph.getNode(this.grabbednodeid);
+          //if ((this.x2ex(node.x) == e.offsetX) && (this.y2ey(node.y) == e.offsetY)) { console.log("kihagy"); }
+          node.x = this.ex2x(e.offsetX);
+          node.y = this.ey2y(e.offsetY);
+          this.render();          
+        }
+      }
+    );
   }
 
   setGraph(graph) {
@@ -80,6 +110,22 @@ class GraphRenderer {
   clear() {
     clearTimeout(this.lastTimeoutId);
     this.group.clear();
+  }
+
+  ex2x(ex) {
+    return ((ex - this.group.transform('translateX')) / -this.group.transform('scaleX'));
+  }
+
+  ey2y(ey) {
+    return ((ey - this.group.transform('translateY')) / -this.group.transform('scaleY'));
+  }
+
+  x2ex(x) {
+    return (-x * this.group.transform('scaleX') + this.group.transform('translateX'));
+  }
+
+  y2ey(y) {
+    return (-y * this.group.transform('scaleY') + this.group.transform('translateY'));
   }
 
   render() {
@@ -98,7 +144,16 @@ class GraphRenderer {
         color = this.settings.colors.get(node.color);
       }
       let size = node.size || this.settings.nodes.size;
-      this.group.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
+      this.group.circle(size)
+        .move(node.x - size / 2, node.y - size / 2)
+        .fill(color)
+        .on('mousedown', (e) => {
+          //console.log("down");
+          if (this.editable) {
+            this.grabbednodeid = node.id;
+            node.grab = true;
+          }
+        });
       if (node.nailed) {
         let nailRadius = size * 0.3;
         this.group.circle(nailRadius)
@@ -126,21 +181,21 @@ function parseGrf(url, callback) {
 
   var graph = new Graph()
   xhr.open('GET', url, true)
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       var lines = xhr.responseText.split('\n')
         .filter(line => !line.startsWith('#'));
       var nodeCount = parseInt(lines[0]);
       var i, j, nodeData, isEdge, color;
       for (i = 0; i < nodeCount; i++) {
-        graph.addNode({id: 'n' + i})
+        graph.addNode({ id: 'n' + i })
       }
       for (i = 0; i < nodeCount; i++) {
         nodeData = lines[i + 1].split(',');
         for (j = i + 1; j < nodeCount; j++) {
           isEdge = nodeData[j];
           if (isEdge == 1) {
-            graph.addEdge({from: 'n' + i, to: 'n' + j, weight: 1});
+            graph.addEdge({ from: 'n' + i, to: 'n' + j, weight: 1 });
           }
         }
         color = nodeData[nodeCount].trim();
@@ -217,11 +272,11 @@ function rubberBandStep(renderer) {
   graph.forEachNode((node) => {
     node.prevX = node.x
     node.prevY = node.y
-    node.force = {x: 0, y: 0}
+    node.force = { x: 0, y: 0 }
   })
   graph.forEachNode((node) => {
     if (!node.nailed && graph.degree(node.id) > 0) {
-      force = {x: 0, y: 0}
+      force = { x: 0, y: 0 }
       graph.forEachEdgeAt(node.id, (edge) => {
         let otherId = edge.from == node.id ? edge.to : edge.from
         let otherNode = graph.getNode(otherId)

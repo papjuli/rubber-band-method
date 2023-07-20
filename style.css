@@ -124,3 +124,7 @@ hr {
   border: 0;
   border-top: 1px solid var(--color3);
 }
+
+#edit-buttons-container {
+  padding-top: 0.5em;
+}
