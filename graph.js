@@ -100,7 +100,7 @@ class GraphRenderer {
       let size = node.size || this.settings.nodes.size;
       this.group.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
       if (node.nailed) {
-        let nailRadius = size * 0.3;
+        let nailRadius = size * 0.4;
         this.group.circle(nailRadius)
           .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
           .fill(this.settings.nodes.nailColor);

@@ -61,7 +61,7 @@ const allGraphs = new Map([
 
 let settings = {
   nodes: {
-    size: 0.04,
+    size: 0.05,
     color: "#445498",  // "#023E8A"
     nailColor: "lightgrey"
   },
@@ -70,7 +70,7 @@ let settings = {
     width: 0.006
   },
   rate: 0.04,
-  delay: 0.02,
+  delay: 0.04,
   threshold: 0.00001,
   colors: new Map([
     ["Red", "#ee0000"],

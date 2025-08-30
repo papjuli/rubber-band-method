@@ -1,16 +1,16 @@
 :root {
-  --color1: #cdecfb;
-  --color2: #a9dcf8;
-  --color3: #8ec8ff;
-  --color4: #63a6f7;
-  --color5: #0f5cc2;
-  --color6: #244bae;
-  --color7: #263879;
+  --color1: #f2f2f2;
+  --color2: #f2f2f2;
+  --color3: #cce4fa;
+  --color4: #69a3ea;
+  --color5: #3075cf;
+  --color6: #3056b5;
+  --color7: #304591;
 }
 
 body {
   font-family: 'Open Sans', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 html, body, #sigma-container {
@@ -44,22 +44,23 @@ li {
   display: grid;
   height: 100%;
   grid-template-areas:
-    'header header'
-    'topic-menu graph-menu'
+    'header graph-menu'
+    'topic-menu graph'
     'topic graph'
     'topic info';
-  grid-template-columns: 40% 60%;
+  grid-template-columns: 45% 55%;
   grid-template-rows: max-content max-content 1fr max-content;
 }
 
 button, label {
   font-size: 1.1em;
+  font-weight: bold;
   color: var(--color7);
   background-color: var(--color3);
   display: inline-block;
   border-radius: 0.6em;
   border-color: var(--color4);
-  padding: 0.5em 0.5em 0.5em 0.5em;
+  padding: 0.3em 0.5em 0.3em 0.3em;
   text-align: center;
   border-width: 2px;
   border-style: outset;
@@ -81,6 +82,7 @@ button:disabled {
   border-top-left-radius: 0.6em;
   border-top-right-radius: 0.6em;
   border-bottom: 0;
+  padding: 0.5em 0.5em 0.4em 0.5em;
 }
 
 .tabs .active {
@@ -122,5 +124,5 @@ button:disabled {
 
 hr {
   border: 0;
-  border-top: 1px solid var(--color3);
+  border-top: 1px solid var(--color6);
 }
