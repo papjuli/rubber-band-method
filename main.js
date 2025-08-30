@@ -1,7 +1,10 @@
 import { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep } from './graph.js'
 
+
 const topicTextElement = document.getElementById('topic-text');
 const tabLinks = document.getElementsByClassName('tablink');
+const loadGraphDropdown = document.getElementById('loadGraphDropdown');
+const forceDropdown = document.getElementById('forceDropdown');
 
 loadTopic('Intro', document.getElementById('IntroTab'));
 
@@ -62,11 +65,11 @@ const allGraphs = new Map([
 let settings = {
   nodes: {
     size: 0.05,
-    color: "#445498",  // "#023E8A"
+    color: "#445498",
     nailColor: "lightgrey"
   },
   edges: {
-    color: "#445498",  // "#023E8A",
+    color: "#445498",
     width: 0.006
   },
   rate: 0.04,
@@ -83,8 +86,7 @@ let settings = {
 
 let renderer = new GraphRenderer(document.getElementById('graph-container'), settings);
 
-function loadGraphAndSetInfo(graphName, path=null) {
-  if (!path) path = allGraphs.get(graphName);
+function loadGraphAndSetInfo(graphName, path=allGraphs.get(graphName)) {
   loadGraph(path, renderer, (graph) => {
     document.getElementById('graph-name').innerHTML = graphName;
     document.getElementById('num-vertices').innerHTML = graph.nodeCount();
@@ -107,8 +109,8 @@ function loadTopic(topicName, button) {
   .then((data) => {
     topicTextElement.innerHTML = data;
     topicTextElement.scrollIntoView();
-    for (let i = 0; i < tabLinks.length; i++) {
-      tabLinks[i].classList.remove("active");
+    for (const tab of tabLinks) {
+      tab.classList.remove("active");
     }
     button.classList.add("active");
   })
@@ -123,14 +125,16 @@ document.querySelectorAll("#topicTabs button").forEach(btn => {
   }
 })
 
+
 allGraphs.forEach((path, name) => {
   let btn = document.createElement("button");
   btn.innerHTML = name;
   btn.onclick = () => loadGraphAndSetInfo(name, path);
-  document.getElementById("loadGraphDropdown").appendChild(btn);
+  loadGraphDropdown.appendChild(btn);
 })
 
-document.querySelectorAll("#forceDropdown input").forEach(btn => {
+
+forceDropdown.querySelectorAll("input").forEach(btn => {
   btn.onclick = () => {
     renderer.mode = btn.dataset.mode;
   }
