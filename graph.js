@@ -92,7 +92,6 @@ class GraphRenderer {
       this.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
     });
     this.graph.forEachNode((node) => {
-      // let color = node.color || this.settings.nodes.color;
       let color = this.settings.nodes.color;
       if (node.color) {
         color = this.settings.colors.get(node.color);
@@ -155,6 +154,9 @@ function parseGrf(url, callback) {
       if (callback)
         callback(graph);
     }
+    else {
+      console.error("Failed to load graph");
+    }
   };
   xhr.send();
 }
@@ -197,8 +199,6 @@ function placeNailedNodes(graph) {
 
 
 function randomizeFreeNodes(graph) {
-  // let seed = Math.random()
-  // Math.seedrandom(seed)
   graph.forEachNode((node) => {
     if (!node.nailed) {
       node.x = Math.random() * 2 - 1
