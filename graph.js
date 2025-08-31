@@ -109,10 +109,13 @@ class GraphRenderer {
 }
 
 
-function loadGraph(url, renderer, callback) {
+function loadGraph(url, renderer, callback, topicName="") {
   console.log("loadGraph")
   parseGrf(url, (graph) => {
-    setupGraph(graph, renderer);
+    if (topicName == "SquareTiling")
+      setupGraphForTiling(graph, renderer);
+    else
+      setupGraph(graph, renderer);
     if (callback)
       callback(graph);
   })
@@ -171,6 +174,38 @@ function setupGraph(graph, renderer) {
 }
 
 
+function setupGraphForTiling(graph, renderer) {
+  console.log("setupGraphForTiling")
+  // choose two nodes (which should be on a face)
+  let nailedNodes = [];
+  graph.forEachNode((node) => {
+    if (node.nailed) nailedNodes.push(node)
+  })
+  if (nailedNodes.length < 2) {
+    console.log("Not enough nailed nodes");
+    return;
+  }
+  let n1 = nailedNodes[0];
+  n1.x = -1;
+  n1.y = -0.8;
+  let n2 = nailedNodes[Math.floor(nailedNodes.length / 2)];
+  n2.x = 1;
+  n2.y = -0.8;
+  // "unnail" the others, but set them fixed in the y axis
+  nailedNodes.forEach((node, index) => {
+    if (node !== n1 && node !== n2) {
+      node.nailed = false;
+      node.y = index < nailedNodes.length / 2 ? -0.6 : -1;
+      node.fixed_y = true;
+    }
+  });
+
+  randomizeFreeNodes(graph);
+  renderer.setGraph(graph);
+  renderer.render();
+}
+
+
 function placeNailedNodes(graph) {
   let nailedNodes = [];
   graph.forEachNode((node) => {
@@ -201,8 +236,8 @@ function placeNailedNodes(graph) {
 function randomizeFreeNodes(graph) {
   graph.forEachNode((node) => {
     if (!node.nailed) {
-      node.x = Math.random() * 2 - 1
-      node.y = Math.random() * 2 - 1
+      if (!node.fixed_x) node.x = Math.random() * 2 - 1
+      if (!node.fixed_y) node.y = Math.random() * 2 - 1
     }
   })
 }
@@ -230,6 +265,8 @@ function rubberBandStep(renderer) {
       })
       dx = renderer.settings.rate * force.x
       dy = renderer.settings.rate * force.y
+      if (node.fixed_x) dx = 0
+      if (node.fixed_y) dy = 0
       if (renderer.mode == "attract") {
         node.x += dx
         node.y += dy

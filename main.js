@@ -5,8 +5,9 @@ const topicTextElement = document.getElementById('topic-text');
 const tabLinks = document.getElementsByClassName('tablink');
 const loadGraphDropdown = document.getElementById('loadGraphDropdown');
 const forceDropdown = document.getElementById('forceDropdown');
+let currentTopic = "Intro";
 
-loadTopic('Intro', document.getElementById('IntroTab'));
+loadTopic(currentTopic, document.getElementById('IntroTab'));
 
 const graphsForTopics = new Map([
   ["Intro", "dodecahedron"],
@@ -86,15 +87,17 @@ let settings = {
 
 let renderer = new GraphRenderer(document.getElementById('graph-container'), settings);
 
-function loadGraphAndSetInfo(graphName, path=allGraphs.get(graphName)) {
+function loadGraphAndSetInfo(
+    graphName, topicName, path=allGraphs.get(graphName)) {
+  console.log("Loading graph:", graphName, "for topic:", topicName);
   loadGraph(path, renderer, (graph) => {
     document.getElementById('graph-name').innerHTML = graphName;
     document.getElementById('num-vertices').innerHTML = graph.nodeCount();
     document.getElementById('num-edges').innerHTML = graph.edgeCount();
-  });
+  }, topicName);
 }
 
-loadGraphAndSetInfo("dodecahedron");
+loadGraphAndSetInfo("dodecahedron", "Intro");
 
 document.getElementById('randomize-button').onclick = () => {
   randomizeFreeNodes(renderer.graph);
@@ -104,6 +107,7 @@ document.getElementById('run-button').onclick = () => rubberBandStep(renderer);
 
 
 function loadTopic(topicName, button) {
+  currentTopic = topicName;
   fetch(`./topics/${topicName}.html`)
   .then(response => response.text())
   .then((data) => {
@@ -121,7 +125,7 @@ document.querySelectorAll("#topicTabs button").forEach(btn => {
   btn.onclick = () => {
     loadTopic(btn.dataset.topicName, btn);
     let graphName = graphsForTopics.get(btn.dataset.topicName);
-    loadGraphAndSetInfo(graphName);
+    loadGraphAndSetInfo(graphName, btn.dataset.topicName);
   }
 })
 
@@ -129,7 +133,7 @@ document.querySelectorAll("#topicTabs button").forEach(btn => {
 allGraphs.forEach((path, name) => {
   let btn = document.createElement("button");
   btn.innerHTML = name;
-  btn.onclick = () => loadGraphAndSetInfo(name, path);
+  btn.onclick = () => loadGraphAndSetInfo(name, currentTopic, path);
   loadGraphDropdown.appendChild(btn);
 })
 
