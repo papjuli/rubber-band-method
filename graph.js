@@ -58,12 +58,13 @@ class Graph {
 class GraphRenderer {
   constructor(container, settings) {
     this.svg = SVG().addTo(container).size("100%", "100%");
-    this.group = this.svg.group();
+    this.outerGroup = this.svg.group();
+    this.innerGroup = this.outerGroup.group();
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
     console.log(width, height);
     let scale = Math.min(width, height) / 2 * 0.9;
-    this.group.transform({
+    this.outerGroup.transform({
       scale: [scale, -scale],
       translateX: width / 2,
       translateY: height / 2
@@ -75,15 +76,28 @@ class GraphRenderer {
 
   setGraph(graph) {
     this.graph = graph;
+    this.innerGroup.transform({ scale: [1, 1] });
   }
 
   setSquareTiling(tiling) {
     this.squareTiling = tiling;
+    if (tiling) {
+      let maxY = Math.max(...this.squareTiling.map(tile => tile.y + tile.size));
+      if (maxY > 1) {
+        let scale = 2 / (maxY + 1);
+        console.log("Scale:", scale);
+        this.innerGroup.transform({
+          scale: [scale, scale]
+        });
+      }
+    } else {
+      this.innerGroup.transform({ scale: [1, 1] });
+    }
   }
 
   clear() {
     clearTimeout(this.lastTimeoutId);
-    this.group.clear();
+    this.innerGroup.clear();
   }
 
   renderGraph() {
@@ -92,7 +106,7 @@ class GraphRenderer {
       let width = edge.width || this.settings.edges.width;
       let s = this.graph.getNode(edge.from);
       let t = this.graph.getNode(edge.to);
-      this.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+      this.innerGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
     });
     this.graph.forEachNode((node) => {
       let color = this.settings.nodes.color;
@@ -100,10 +114,10 @@ class GraphRenderer {
         color = this.settings.colors.get(node.color);
       }
       let size = node.size || this.settings.nodes.size;
-      this.group.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
+      this.innerGroup.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
       if (node.nailed) {
         let nailRadius = size * 0.4;
-        this.group.circle(nailRadius)
+        this.innerGroup.circle(nailRadius)
           .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
           .fill(this.settings.nodes.nailColor);
       }
@@ -113,7 +127,7 @@ class GraphRenderer {
   renderSquareTiling() {
     if (!this.squareTiling) return;
     this.squareTiling.forEach((tile) => {
-      this.group.rect(tile.size, tile.size)
+      this.innerGroup.rect(tile.size, tile.size)
         .stroke({ color: "#fff", width: 0.005 })
         .move(tile.x, tile.y)
         .fill(tile.color);
@@ -329,9 +343,6 @@ function createSquareTiling(graph) {
   // define heights for the nodes:
   // the height of the first node is 0
 
-  // TODO: the height of the entire tiling can be more than 2,
-  // so we need to apply some scaling...
-  
   let tiling = [];
   nodes[0].height = -1;
   nodes.forEach((node) => {
@@ -363,6 +374,13 @@ function createSquareTiling(graph) {
       tiling.push(tile);
       currHeight += edgeSize;
     });
+    // move the node to the midpoint of the vertical segment 
+    // corresponding to the node
+    if (laterNeighbors.length > 0) {
+      node.y = (node.height + currHeight) / 2;
+    } else {
+      node.y = nodes[0].y;
+    }
   });
   return tiling;
 }
