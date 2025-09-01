@@ -77,13 +77,16 @@ class GraphRenderer {
     this.graph = graph;
   }
 
+  setSquareTiling(tiling) {
+    this.squareTiling = tiling;
+  }
+
   clear() {
     clearTimeout(this.lastTimeoutId);
     this.group.clear();
   }
 
-  render() {
-    this.clear();
+  renderGraph() {
     this.graph.forEachEdge((edge) => {
       let color = edge.color || this.settings.edges.color;
       let width = edge.width || this.settings.edges.width;
@@ -106,11 +109,30 @@ class GraphRenderer {
       }
     });
   }
+
+  renderSquareTiling() {
+    if (!this.squareTiling) return;
+    this.squareTiling.forEach((tile) => {
+      this.group.rect(tile.size, tile.size)
+        .stroke({ color: "#fff", width: 0.005 })
+        .move(tile.x, tile.y)
+        .fill(tile.color);
+    });
+  }
+
+  render() {
+    this.clear();
+    this.renderSquareTiling();
+    this.renderGraph();
+  }
 }
 
 
 function loadGraph(url, renderer, callback, topicName="") {
-  console.log("loadGraph")
+  console.log("loadGraph");
+  renderer.clear();
+  renderer.setGraph(null);
+  renderer.setSquareTiling(null);
   parseGrf(url, (graph) => {
     if (topicName == "SquareTiling")
       setupGraphForTiling(graph, renderer);
@@ -293,4 +315,57 @@ function rubberBandStep(renderer) {
 }
 
 
-export { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep };
+function createSquareTiling(graph) {
+  console.log("Creating square tiling");
+  // Assumes the graph is already set up for tiling 
+  // and rubber banding is applied.
+  // Sort the nodes by x coordinate.
+  let nodes = [];
+  graph.forEachNode((node) => {
+    nodes.push(node);
+    node.height = undefined;
+  });
+  nodes.sort((a, b) => a.x - b.x);
+  // define heights for the nodes:
+  // the height of the first node is 0
+
+  // TODO: the height of the entire tiling can be more than 2,
+  // so we need to apply some scaling...
+  
+  let tiling = [];
+  nodes[0].height = -1;
+  nodes.forEach((node) => {
+    let laterNeighbors = [];
+    graph.forEachEdgeAt(node.id, (edge) => {
+      let otherId = edge.from == node.id ? edge.to : edge.from;
+      let otherNode = graph.getNode(otherId);
+      if (otherNode.x > node.x) laterNeighbors.push(otherNode);
+    });
+
+    // sort later neighbors by slope of edge
+    laterNeighbors.sort((a, b) => {
+      let slopeA = (a.y - node.y) / (a.x - node.x);
+      let slopeB = (b.y - node.y) / (b.x - node.x);
+      return slopeA - slopeB;
+    });
+    let currHeight = node.height;
+    laterNeighbors.forEach((neighbor) => {
+      let edgeSize = neighbor.x - node.x;
+      neighbor.height = (neighbor.height == undefined) ? currHeight : Math.min(neighbor.height, currHeight);
+
+      let tile = {
+        size: edgeSize,
+        x: node.x,
+        y: currHeight,
+        // random pastel color
+        color: `hsl(${Math.random() * 360}, 100%, 85%)`
+      };
+      tiling.push(tile);
+      currHeight += edgeSize;
+    });
+  });
+  return tiling;
+}
+
+
+export { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep, createSquareTiling };

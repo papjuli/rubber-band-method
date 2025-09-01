@@ -1,4 +1,4 @@
-import { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep } from './graph.js'
+import { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep, createSquareTiling } from './graph.js'
 
 
 const topicTextElement = document.getElementById('topic-text');
@@ -108,6 +108,11 @@ document.getElementById('run-button').onclick = () => rubberBandStep(renderer);
 
 function loadTopic(topicName, button) {
   currentTopic = topicName;
+  if (topicName == "SquareTiling") {
+    document.querySelector(".square-tiling-controls").style.display = "block";
+  } else {
+    document.querySelector(".square-tiling-controls").style.display = "none";
+  }
   fetch(`./topics/${topicName}.html`)
   .then(response => response.text())
   .then((data) => {
@@ -143,3 +148,10 @@ forceDropdown.querySelectorAll("input").forEach(btn => {
     renderer.mode = btn.dataset.mode;
   }
 })
+
+
+document.getElementById('squares-button').onclick = () => {
+  let tiling = createSquareTiling(renderer.graph);
+  renderer.setSquareTiling(tiling);
+  renderer.render();
+};
