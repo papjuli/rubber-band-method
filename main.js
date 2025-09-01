@@ -142,9 +142,30 @@ document.getElementById('edit-graph-button').onclick = () => {
     renderer.editable = false;
     editbuttonicon.setAttribute("src", "assets/lock-line.svg"); 
     document.getElementById('edit-buttons-container').toggleAttribute("hidden");
+    //change cursor for nodes:
+    renderer.render();
   }
   else { renderer.editable = true; 
     editbuttonicon.setAttribute("src", "assets/lock-unlock-line.svg");    
     document.getElementById('edit-buttons-container').toggleAttribute("hidden");
+    const edit_node_btn = document.getElementById('edit-nodes-button');
+    edit_node_btn.classList.remove('active-button');
+    edit_node_btn.classList.add('standard-button');
+    renderer.editnodes = false;
+    renderer.render();
   }
-};
+}
+
+const edit_node_btn = document.getElementById('edit-nodes-button');
+edit_node_btn.onclick = () => {
+  if (renderer.editnodes) {
+    renderer.editnodes = false;
+    edit_node_btn.classList.remove('active-button');
+    edit_node_btn.classList.add('standard-button');
+  } else {
+    renderer.editnodes = true;
+    edit_node_btn.classList.add('active-button');
+    edit_node_btn.classList.remove('standard-button');
+  }   
+  renderer.render();
+}

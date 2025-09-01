@@ -128,3 +128,39 @@ hr {
 #edit-buttons-container {
   padding-top: 0.5em;
 }
+
+.grab {
+  cursor: grab;
+}
+
+.grabbing {
+  cursor: grabbing;
+}
+
+.not-allowed-cursor {
+  cursor: not-allowed;
+}
+
+.add-cursor {
+  cursor: url("assets/cursor1green.svg") 5 3, auto;
+}
+
+.delete-cursor {
+  cursor: url("assets/cursor1red.svg") 5 3, auto;
+}
+
+.active-button {
+  color: var(--color5);
+  background-color: var(--color1);
+}
+
+.standard-button {
+  color: var(--color7);
+  background-color: var(--color3);
+}
+
+/*
+#graph-container {
+  cursor: url("assets/cursor1green.svg") 5 3, auto;
+}
+*/

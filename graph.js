@@ -8,12 +8,28 @@ class Graph {
   addNode(node) {
     if (!node.id) throw "Node must have an id";
     this.nodesById.set(node.id, node);
-    this.edgesAt.set(node.id, []);
+    //this.edgesAt.set(node.id, []);
+    this.edgesAt.set(node.id, new Set());
+    return node;
+  }
+
+  deleteNode(node) {
+    this.edgesAt.get(node.id).forEach((adjEdge) => {
+      this.deleteEdge(adjEdge);
+    })
+    this.nodesById.delete(node.id);
   }
 
   addEdge(edge) {
-    this.edgesAt.get(edge.from).push(edge);
-    this.edgesAt.get(edge.to).push(edge);
+    //this.edgesAt.get(edge.from).push(edge);
+    //this.edgesAt.get(edge.to).push(edge);
+    this.edgesAt.get(edge.from).add(edge);
+    this.edgesAt.get(edge.to).add(edge);
+  }
+
+  deleteEdge(edge) {
+    this.edgesAt.get(edge.from).delete(edge);
+    this.edgesAt.get(edge.to).delete(edge);
   }
 
   nodeCount() {
@@ -22,7 +38,8 @@ class Graph {
 
   edgeCount() {
     let count = 0;
-    this.edgesAt.forEach((edges) => count += edges.length);
+    //this.edgesAt.forEach((edges) => count += edges.length);
+    this.edgesAt.forEach((edges) => count += edges.size);
     return count / 2;
   }
 
@@ -50,7 +67,8 @@ class Graph {
   }
 
   degree(nodeId) {
-    return this.edgesAt.get(nodeId).length;
+//    return this.edgesAt.get(nodeId).length;
+    return this.edgesAt.get(nodeId).size;
   }
 }
 
@@ -76,6 +94,15 @@ class GraphRenderer {
 
     //this.svg.node.addEventListener("click",
     //  (e) => { console.log(e.offsetX, e.offsetY) });
+    
+    this.svg.node.addEventListener("click", (e) => {
+      if (this.editable && this.editnodes) {
+        this.addNode(e.offsetX, e.offsetY);
+        this.render();
+      }
+    }
+    );
+    
     this.svg.node.addEventListener("mouseup",
       (e) => {
         //console.log("svg.node mouseup");
@@ -83,12 +110,13 @@ class GraphRenderer {
           let node = this.graph.getNode(this.grabbednodeid);
           node.x = this.ex2x(e.offsetX);
           node.y = this.ey2y(e.offsetY);
-          this.render();
           node.grab = false;
           this.grabbednodeid = undefined;
+          this.render();
         }
       }
     );
+
     this.svg.node.addEventListener("mousemove",
       (e) => {
         //console.log("svg.node mousemove");
@@ -112,6 +140,11 @@ class GraphRenderer {
     this.group.clear();
   }
 
+  refreshInfo() {
+    document.getElementById('num-vertices').innerHTML = this.graph.nodeCount();
+    document.getElementById('num-edges').innerHTML = this.graph.edgeCount();  
+  }
+
   ex2x(ex) {
     return ((ex - this.group.transform('translateX')) / -this.group.transform('scaleX'));
   }
@@ -128,14 +161,88 @@ class GraphRenderer {
     return (-y * this.group.transform('scaleY') + this.group.transform('translateY'));
   }
 
+  addNode(ex, ey) {
+    let n = this.graph.nodeCount;
+    let node = this.graph.addNode({ id : n});
+    node.x = this.ex2x(ex);
+    node.y = this.ey2y(ey);
+    this.refreshInfo();
+    this.render();
+  }
+
+  renderNode(node) {
+    let color = this.settings.nodes.color;
+    if (node.color) {
+      color = this.settings.colors.get(node.color);
+    }
+    let size = node.size || this.settings.nodes.size;
+    const circle = this.group.circle(size);
+    //console.log("ci: ", circle);
+    circle.move(node.x - size / 2, node.y - size / 2)
+      .fill(color)
+      .on('click', () => {
+        console.log("click");
+        if (this.editable && this.editnodes) {
+          this.graph.deleteNode(node);
+          this.refreshInfo();
+          this.render();
+        }
+      })
+      .on('mousedown', (e) => {
+        //console.log("down");
+        if (this.editable && !this.editnodes) {
+          this.grabbednodeid = node.id;
+          node.grab = true;
+          this.render();
+        }  
+      })
+     ;  
+     if (this.editable) {
+      circle.node.classList.add("grab");
+    } else {
+      //circle.node.classList.remove("grab");
+    }
+    if (this.grabbednodeid == node.id) {
+      circle.node.classList.add("grabbing");
+    } else {
+      //circle.node.classList.remove("grabbing");
+    }
+    if (this.editnodes) {
+      circle.node.classList.add("delete-cursor");
+    }
+    if (node.nailed) {
+      let nailRadius = size * 0.3;
+      this.group.circle(nailRadius)
+        .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
+        .fill(this.settings.nodes.nailColor);
+    }
+  }
+
   render() {
     this.clear();
+
+    const gc = document.getElementById('graph-container');
+    if (this.editnodes) {
+      gc.classList.add('add-cursor');
+    }
+    else {
+      gc.classList.remove('add-cursor');
+    }
+
     this.graph.forEachEdge((edge) => {
       let color = edge.color || this.settings.edges.color;
       let width = edge.width || this.settings.edges.width;
       let s = this.graph.getNode(edge.from);
       let t = this.graph.getNode(edge.to);
-      this.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+      this.group.line(s.x, s.y, t.x, t.y).stroke({ width, color })
+        .on('click', () => {
+          //TODO masik gombra kotni!
+          if (this.editable && this.editnodes) {
+            this.graph.deleteEdge(edge);
+            this.refreshInfo();
+            this.render();
+          }
+        });
     });
     this.graph.forEachNode((node) => {
       // let color = node.color || this.settings.nodes.color;
@@ -144,16 +251,40 @@ class GraphRenderer {
         color = this.settings.colors.get(node.color);
       }
       let size = node.size || this.settings.nodes.size;
-      this.group.circle(size)
-        .move(node.x - size / 2, node.y - size / 2)
+      const circle = this.group.circle(size);
+      //console.log("ci: ", circle);
+      circle.move(node.x - size / 2, node.y - size / 2)
         .fill(color)
+        .on('click', () => {
+          console.log("click");
+          if (this.editable && this.editnodes) {
+            this.graph.deleteNode(node);
+            this.refreshInfo();
+            this.render();
+          }
+        })
         .on('mousedown', (e) => {
           //console.log("down");
-          if (this.editable) {
+          if (this.editable && !this.editnodes) {
             this.grabbednodeid = node.id;
             node.grab = true;
-          }
-        });
+            this.render();
+          }  
+        })
+       ;
+      if (this.editable) {
+        circle.node.classList.add("grab");
+      } else {
+        //circle.node.classList.remove("grab");
+      }
+      if (this.grabbednodeid == node.id) {
+        circle.node.classList.add("grabbing");
+      } else {
+        //circle.node.classList.remove("grabbing");
+      }
+      if (this.editnodes) {
+        circle.node.classList.add("delete-cursor");
+      }
       if (node.nailed) {
         let nailRadius = size * 0.3;
         this.group.circle(nailRadius)

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 24 24"
+   width="32"
+   height="32"
+   version="1.1"
+   id="svg235"
+   sodipodi:docname="cursor1green.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs239" />
+  <sodipodi:namedview
+     id="namedview237"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="7.375"
+     inkscape:cx="16"
+     inkscape:cy="16.067797"
+     inkscape:window-width="1850"
+     inkscape:window-height="1136"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg235" />
+  <path
+     d="m 10.448741,13.869919 2.553,7.0141 -4.6985003,1.7101 -2.5529,-7.0141 -3.89886,2.4452 1.61856,-16.0196997 11.5371003,11.2313997 z m -0.0105,5.8188 -2.7150003,-7.4596 2.9594003,-0.4109 -5.6391903,-5.4897797 -0.79113,7.8301797 2.53122,-1.5875 2.715,7.4596 z"
+     id="path233" />
+  <path
+     style="fill:#008000;stroke-width:0.135593"
+     d="M 10.919216,21.687458 C 9.9573188,19.035899 9.119811,16.835231 9.058088,16.797084 8.996365,16.758937 8.2601635,17.157512 7.4220847,17.682807 5.9766596,18.588776 5.8962054,18.621719 5.8574719,18.323462 5.8226869,18.05561 6.4776377,11.196858 6.7233689,9.255647 l 0.081352,-0.6426581 3.5794451,3.4901161 c 1.968694,1.919563 3.580005,3.525331 3.58069,3.568373 6.85e-4,0.04304 -0.59367,0.153825 -1.320788,0.246185 -2.135534,0.271259 -2.338983,0.312516 -2.338983,0.474325 0,0.08467 0.78889,2.31924 1.75309,4.965721 l 1.75309,4.811783 -0.36326,0.163376 c -0.199793,0.08986 -0.457,0.166127 -0.571572,0.169491 -0.152108,0.0045 -0.680175,-1.294619 -1.957217,-4.814901 z"
+     id="path330"
+     transform="scale(0.75)" />
+</svg>
