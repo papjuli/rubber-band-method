@@ -155,3 +155,10 @@ document.getElementById('squares-button').onclick = () => {
   renderer.setSquareTiling(tiling);
   renderer.render();
 };
+
+
+document.getElementById('show-hide-button').onclick = () => {
+    renderer.showGraph = !renderer.showGraph;
+    renderer.render();
+};
+

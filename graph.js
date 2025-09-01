@@ -72,6 +72,7 @@ class GraphRenderer {
     this.settings = settings;
     this.lastTimeoutId = null;
     this.mode = "attract";
+    this.showGraph = true;
   }
 
   setGraph(graph) {
@@ -137,7 +138,9 @@ class GraphRenderer {
   render() {
     this.clear();
     this.renderSquareTiling();
-    this.renderGraph();
+    if (this.showGraph) {
+      this.renderGraph();
+    }
   }
 }
 
