@@ -73,6 +73,7 @@ class GraphRenderer {
     this.lastTimeoutId = null;
     this.mode = "attract";
     this.showGraph = true;
+    this.morphStage = 0;
   }
 
   setGraph(graph) {
@@ -83,7 +84,7 @@ class GraphRenderer {
   setSquareTiling(tiling) {
     this.squareTiling = tiling;
     if (tiling) {
-      let maxY = Math.max(...this.squareTiling.map(tile => tile.y + tile.size));
+      let maxY = Math.max(...this.squareTiling.squares.map(tile => tile.y + tile.size));
       if (maxY > 1) {
         let scale = 2 / (maxY + 1);
         console.log("Scale:", scale);
@@ -94,11 +95,20 @@ class GraphRenderer {
     } else {
       this.innerGroup.transform({ scale: [1, 1] });
     }
+    this.morphStage = 0;
   }
 
   clear() {
     clearTimeout(this.lastTimeoutId);
     this.innerGroup.clear();
+  }
+
+  render() {
+    this.clear();
+    this.renderSquareTiling();
+    if (this.showGraph) {
+      this.renderGraph();
+    }
   }
 
   renderGraph() {
@@ -127,19 +137,47 @@ class GraphRenderer {
 
   renderSquareTiling() {
     if (!this.squareTiling) return;
-    this.squareTiling.forEach((tile) => {
-      this.innerGroup.rect(tile.size, tile.size)
+    this.squareTiling.squares.forEach((square) => {
+      this.innerGroup.rect(square.size, square.size)
         .stroke({ color: "#fff", width: 0.005 })
-        .move(tile.x, tile.y)
-        .fill(tile.color);
+        .move(square.x, square.y)
+        .fill(square.color);
     });
   }
 
-  render() {
-    this.clear();
-    this.renderSquareTiling();
-    if (this.showGraph) {
-      this.renderGraph();
+  renderTilingSegments() {
+    if (!this.squareTiling) return;
+    // draw the vertical segments corresponding to the nodes
+    this.squareTiling.verticalSegments.forEach((segment, nodeId) => {
+      let x = this.graph.getNode(nodeId).x;
+      this.innerGroup.line(x, segment.y1, x, segment.y2)
+        .stroke({ width: 0.02, color: this.settings.nodes.color });
+    });
+    // draw the horizontal segments corresponding to the edges
+    this.squareTiling.squares.forEach((square) => {
+      let y = square.y + square.size / 2;
+      this.innerGroup.line(square.x, y, square.x + square.size, y)
+        .stroke({ width: this.settings.edges.width, 
+                  color: this.settings.edges.color, 
+                  linecap: 'round' });
+    });
+  }
+
+  morphSegments() {
+    if (!this.squareTiling) return;
+    // TODO
+  }
+
+  morphTiling() {
+    if (!this.squareTiling) return;
+    if (this.morphStage == 0) {
+      this.morphStage = 1;
+      this.showGraph = false;
+      this.render();
+      this.renderTilingSegments();
+    } else if (this.morphStage == 1) {
+      this.morphStage = 2;
+      // TODO
     }
   }
 }
@@ -346,8 +384,9 @@ function createSquareTiling(graph) {
   // define heights for the nodes:
   // the height of the first node is 0
 
-  let tiling = [];
+  let tiling = {squares: [], verticalSegments: new Map()};
   nodes[0].height = -1;
+  tiling.verticalSegments.set(nodes[0].id, {y1: nodes[0].height, y2: 2 * nodes[0].y});
   nodes.forEach((node) => {
     let laterNeighbors = [];
     graph.forEachEdgeAt(node.id, (edge) => {
@@ -367,22 +406,25 @@ function createSquareTiling(graph) {
       let edgeSize = neighbor.x - node.x;
       neighbor.height = (neighbor.height == undefined) ? currHeight : Math.min(neighbor.height, currHeight);
 
-      let tile = {
+      let square = {
         size: edgeSize,
         x: node.x,
         y: currHeight,
         // random pastel color
         color: `hsl(${Math.random() * 360}, 100%, 85%)`
       };
-      tiling.push(tile);
+      tiling.squares.push(square);
       currHeight += edgeSize;
     });
     // move the node to the midpoint of the vertical segment 
     // corresponding to the node
     if (laterNeighbors.length > 0) {
       node.y = (node.height + currHeight) / 2;
+      tiling.verticalSegments.set(node.id, {y1: node.height, y2: currHeight});
     } else {
       node.y = nodes[0].y;
+      let seg0 = tiling.verticalSegments.get(nodes[0].id);
+      tiling.verticalSegments.set(node.id, {y1: seg0.y1, y2: seg0.y2});
     }
   });
   return tiling;

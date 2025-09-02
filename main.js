@@ -162,3 +162,7 @@ document.getElementById('show-hide-button').onclick = () => {
     renderer.render();
 };
 
+
+document.getElementById('morph-button').onclick = () => {
+  renderer.morphTiling();
+};
