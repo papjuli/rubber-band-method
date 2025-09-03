@@ -167,3 +167,44 @@ document.getElementById('show-hide-button').onclick = () => {
 document.getElementById('morph-button').onclick = () => {
   renderer.morphTiling();
 };
+
+// Custom HTML tooltip logic with pointer interaction
+document.addEventListener('DOMContentLoaded', () => {
+  const tooltip = document.getElementById('tooltip-box');
+  let hideTimeout = null;
+
+  function showTooltip(target) {
+    tooltip.innerHTML = target.querySelector('.tooltip-content').innerHTML;
+    tooltip.style.display = 'block';
+    const rect = target.getBoundingClientRect();
+    tooltip.style.left = rect.left + window.scrollX + 'px';
+    tooltip.style.top = rect.bottom + window.scrollY + 5 + 'px';
+  }
+
+  function hideTooltip() {
+    tooltip.style.display = 'none';
+  }
+
+  document.body.addEventListener('mouseover', function(e) {
+    const target = e.target.closest('.tooltip');
+    if (target) {
+      clearTimeout(hideTimeout);
+      showTooltip(target);
+    }
+  });
+
+  document.body.addEventListener('mouseout', function(e) {
+    const target = e.target.closest('.tooltip');
+    if (target) {
+      // Delay hiding to allow pointer to move into tooltip
+      hideTimeout = setTimeout(hideTooltip, 200);
+    }
+  });
+
+  tooltip.addEventListener('mouseover', function() {
+    clearTimeout(hideTimeout);
+  });
+  tooltip.addEventListener('mouseout', function() {
+    hideTimeout = setTimeout(hideTooltip, 200);
+  });
+});

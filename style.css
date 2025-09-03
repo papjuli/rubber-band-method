@@ -40,6 +40,25 @@ li {
   padding: 1em; 
 }
 
+.tooltip {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted #888;
+}
+
+.tooltip-box {
+  position: absolute;
+  display: none;
+  background: #d7d3d3;
+  padding: 8px 12px;
+  border-radius: 6px;
+  z-index: 1000;
+  font-size: 1em;
+  max-width: 350px;
+  box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
+  white-space: normal;
+}
+
 .grid-container {
   display: grid;
   height: 100%;
