@@ -31,7 +31,7 @@ const allGraphs = new Map([
   ["max cut big", "./graphs/maxcutbig.grf"],
   ["max cut bigger", "./graphs/maxcutbigger.grf"],
   ["max cut intro", "./graphs/maxcutintro.grf"],
-  ["MyGraph", "./graphs/MyGraph.grf"],
+  // ["MyGraph", "./graphs/MyGraph.grf"],
   ["non2con", "./graphs/non2con.grf"],
   ["octahedron", "./graphs/octahedron.grf"],
   ["onesep", "./graphs/onesep.grf"],
