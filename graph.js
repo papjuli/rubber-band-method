@@ -1,3 +1,4 @@
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
 
 class Graph {
   constructor() {
@@ -60,6 +61,9 @@ class GraphRenderer {
     this.svg = SVG().addTo(container).size("100%", "100%");
     this.outerGroup = this.svg.group();
     this.innerGroup = this.outerGroup.group();
+    this.tilingGroup = this.innerGroup.group();
+    this.morphGroup = this.innerGroup.group();
+    this.graphGroup = this.innerGroup.group();
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
     console.log(width, height);
@@ -76,9 +80,13 @@ class GraphRenderer {
     this.morphStage = 0;
   }
 
+  resetScale() {
+    this.innerGroup.transform({ scale: [1, 1] });
+  }
+
   setGraph(graph) {
     this.graph = graph;
-    this.innerGroup.transform({ scale: [1, 1] });
+    this.resetScale();
   }
 
   setSquareTiling(tiling) {
@@ -93,18 +101,20 @@ class GraphRenderer {
         });
       }
     } else {
-      this.innerGroup.transform({ scale: [1, 1] });
+      this.resetScale();
     }
     this.morphStage = 0;
   }
 
-  clear() {
+  clearAll() {
     clearTimeout(this.lastTimeoutId);
-    this.innerGroup.clear();
+    this.graphGroup.clear();
+    this.tilingGroup.clear();
+    this.morphGroup.clear();
   }
 
   render() {
-    this.clear();
+    this.clearAll();
     this.renderSquareTiling();
     if (this.showGraph) {
       this.renderGraph();
@@ -117,7 +127,7 @@ class GraphRenderer {
       let width = edge.width || this.settings.edges.width;
       let s = this.graph.getNode(edge.from);
       let t = this.graph.getNode(edge.to);
-      this.innerGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+      this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
     });
     this.graph.forEachNode((node) => {
       let color = this.settings.nodes.color;
@@ -125,10 +135,10 @@ class GraphRenderer {
         color = this.settings.colors.get(node.color);
       }
       let size = node.size || this.settings.nodes.size;
-      this.innerGroup.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
+      this.graphGroup.circle(size).move(node.x - size / 2, node.y - size / 2).fill(color);
       if (node.nailed) {
         let nailRadius = size * 0.4;
-        this.innerGroup.circle(nailRadius)
+        this.graphGroup.circle(nailRadius)
           .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
           .fill(this.settings.nodes.nailColor);
       }
@@ -138,7 +148,7 @@ class GraphRenderer {
   renderSquareTiling() {
     if (!this.squareTiling) return;
     this.squareTiling.squares.forEach((square) => {
-      this.innerGroup.rect(square.size, square.size)
+      this.tilingGroup.rect(square.size, square.size)
         .stroke({ color: "#fff", width: 0.005 })
         .move(square.x, square.y)
         .fill(square.color);
@@ -150,22 +160,60 @@ class GraphRenderer {
     // draw the vertical segments corresponding to the nodes
     this.squareTiling.verticalSegments.forEach((segment, nodeId) => {
       let x = this.graph.getNode(nodeId).x;
-      this.innerGroup.line(x, segment.y1, x, segment.y2)
+      this.morphGroup.line(x, segment.y1, x, segment.y2)
         .stroke({ width: 0.02, color: this.settings.nodes.color });
     });
     // draw the horizontal segments corresponding to the edges
     this.squareTiling.squares.forEach((square) => {
       let y = square.y + square.size / 2;
-      this.innerGroup.line(square.x, y, square.x + square.size, y)
+      this.morphGroup.line(square.x, y, square.x + square.size, y)
         .stroke({ width: this.settings.edges.width, 
                   color: this.settings.edges.color, 
                   linecap: 'round' });
     });
   }
 
-  morphSegments() {
+  morphSegments(step=0) {
     if (!this.squareTiling) return;
-    // TODO
+    let totalSteps = this.settings.morphSteps;
+    if (step == totalSteps) {
+        this.morphGroup.clear();
+        this.showGraph = true;
+        this.renderGraph();
+        return;
+    }
+    this.morphGroup.clear();
+    let verticalSegments = new Map();
+    this.squareTiling.verticalSegments.forEach((segment, nodeId) => {
+        let shrinkedSegment = { ...segment };
+        shrinkedSegment.y1 += step / totalSteps * (segment.y2 - segment.y1) * 0.5;
+        shrinkedSegment.y2 -= step / totalSteps * (segment.y2 - segment.y1) * 0.5;
+        verticalSegments.set(nodeId, shrinkedSegment);
+    });
+    // draw the shrinked vertical segments corresponding to the nodes
+    verticalSegments.forEach((segment, nodeId) => {
+        let x = this.graph.getNode(nodeId).x;
+        this.morphGroup.line(x, segment.y1, x, segment.y2)
+            .stroke({ width: 0.02, color: this.settings.nodes.color });
+    });
+
+    // draw the horizontal segments corresponding to the edges,
+    // so that it moves with the shrinking vertical segment
+    this.squareTiling.squares.forEach((square) => {
+      let y = square.y + square.size / 2;
+      let seg1 = verticalSegments.get(square.nodeId1);
+      let seg2 = verticalSegments.get(square.nodeId2);
+      let y1 = clamp(y, seg1.y1, seg1.y2);
+      let y2 = clamp(y, seg2.y1, seg2.y2);
+      this.morphGroup.line(square.x, y1, square.x + square.size, y2)
+        .stroke({ width: this.settings.edges.width,
+                   color: this.settings.edges.color,
+                   linecap: 'round' });
+    });
+
+    setTimeout(() => {
+        this.morphSegments(step+1);
+    }, this.settings.delay);
   }
 
   morphTiling() {
@@ -176,8 +224,8 @@ class GraphRenderer {
       this.render();
       this.renderTilingSegments();
     } else if (this.morphStage == 1) {
-      this.morphStage = 2;
-      // TODO
+      this.morphStage = 0;
+      this.morphSegments();
     }
   }
 }
@@ -185,7 +233,7 @@ class GraphRenderer {
 
 function loadGraph(url, renderer, callback, topicName="") {
   console.log("loadGraph");
-  renderer.clear();
+  renderer.clearAll();
   renderer.setGraph(null);
   renderer.setSquareTiling(null);
   parseGrf(url, (graph) => {
@@ -233,9 +281,6 @@ function parseGrf(url, callback) {
       }
       if (callback)
         callback(graph);
-    }
-    else {
-      console.error("Failed to load graph");
     }
   };
   xhr.send();
@@ -411,7 +456,9 @@ function createSquareTiling(graph) {
         x: node.x,
         y: currHeight,
         // random pastel color
-        color: `hsl(${Math.random() * 360}, 100%, 85%)`
+        color: `hsl(${Math.random() * 360}, 100%, 85%)`,
+        nodeId1: node.id,
+        nodeId2: neighbor.id
       };
       tiling.squares.push(square);
       currHeight += edgeSize;

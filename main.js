@@ -82,7 +82,8 @@ let settings = {
     ["Green", "#03e090"],
     ["Yellow", "#eeee00"],
     ["White", "#445498"]
-  ])
+  ]),
+  morphSteps: 200
 }
 
 let renderer = new GraphRenderer(document.getElementById('graph-container'), settings);
