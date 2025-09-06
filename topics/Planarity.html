@@ -1,16 +1,99 @@
 <div>
   <h2>How to draw a graph?</h2>
 
-  <p>On the right, the dodecahedron graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
+  <p>On the right, the <span class="tooltip">
+  dodecahedron<span class="tooltip-content" style="display:none;">
+  The dodecahedron graph is the graph formed by the vertices and edges of the dodecahedron, one of the five platonic solids.<br>
+  <img src="assets/dodecahedron.png" alt="Dodecahedron" style="height:120px;">
+  </span></span> graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
 
-  <p>Click on the <b>Run</b> button. The edges contract until the system reaches equilibrium. The edges don't cross any more, and we get a pretty drawing of the dodecahedron.</p>
+  <p>Click on the <b>Run</b> button. The edges contract until the system reaches <span class="tooltip">
+  equilibrium<span class="tooltip-content" style="display:none;">
+  Working out the physics: the <i>energy</i> of the system is defined by: <br>
+  <math display="block" class="tml-display" style="display:block math;">
+  <mrow>
+    <mrow>
+      <munder>
+        <mo movablelimits="false">∑</mo>
+        <mrow>
+          <mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo>∈</mo><mi>E</mi><mo form="prefix" stretchy="false">(</mo><mi>G</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+        </mrow>
+      </munder>
+    </mrow>
+    <mo form="prefix" stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mi>x</mi><mi>j</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
+    <mo>+</mo>
+    <mo form="prefix" stretchy="false">(</mo>
+    <msub><mi>y</mi><mi>i</mi></msub>
+    <mo>−</mo>
+    <msub><mi>y</mi><mi>j</mi></msub>
+    <msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
+    <mo separator="true">,</mo>
+  </mrow>
+</math>
+where <math>
+  <mrow>
+    <mo form="prefix" stretchy="false">(</mo>
+    <msub><mi>x</mi><mi>i</mi></msub>
+    <mo separator="true">,</mo>
+    <msub><mi>y</mi><mi>i</mi></msub>
+    <mo form="postfix" stretchy="false">)</mo>
+  </mrow>
+</math> is the position of node <math><mi>i</mi></math> in the plane. Taking gradients it is easy to derive the <b>equilibrium condition</b>: every node that is not nailed down must be at the <i>center of gravity</i> of its neighbors. In formula:
+<math display="block" class="tml-display" style="display:block math;">
+  <mrow>
+    <mfrac>
+      <mn>1</mn>
+      <mrow>
+        <mi>deg</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+      </mrow>
+    </mfrac>
+    <mrow>
+      <munder>
+        <mo movablelimits="false">∑</mo>
+        <mrow>
+          <mi>j</mi><mo>∈</mo><mi>N</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+        </mrow>
+      </munder>
+    </mrow>
+    <msub><mi>x</mi><mi>j</mi></msub>
+    <mo>=</mo>
+    <msub><mi>x</mi><mi>i</mi></msub>
+  </mrow>
+</math> and <math display="block" class="tml-display" style="display:block math;">
+  <mrow>
+    <mfrac>
+      <mn>1</mn>
+      <mrow>
+        <mi>deg</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+      </mrow>
+    </mfrac>
+    <mrow>
+      <munder>
+        <mo movablelimits="false">∑</mo>
+        <mrow>
+          <mi>j</mi><mo>∈</mo><mi>N</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+        </mrow>
+      </munder>
+    </mrow>
+    <msub><mi>y</mi><mi>j</mi></msub>
+    <mo>=</mo>
+    <msub><mi>y</mi><mi>i</mi></msub>
+  </mrow>
+</math>
+  </span></span>. The edges don't cross any more, and we get a pretty drawing of the dodecahedron.</p>
 
 
   <p><em>Does this work because the dodecahedron graph is very symmetric?</em></p>
 
-  <p>Load the graph named "planar1". This is a planar graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
+  <p>Load the graph named "planar1". This is a <span class="tooltip">
+  planar<span class="tooltip-content" style="display:none;">
+  A graph is <b>planar</b> if it can be drawn in the plane so that the edges are continuous curves that do not intersect each other. Such a drawing is called an <b>embedding</b> of the graph in the plane.
+  </span></span> graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
 
-  <p>Play with the other planar graphs: try out all five platonic solids, and the other, less regular planar graphs.</p>
+  <p>Play with the other planar graphs: try out all five <span class="tooltip">
+  platonic solids<span class="tooltip-content" style="display:none;">
+  The five <b>platonic solids</b> are the tetrahedron, cube, octahedron, dodecahedron and icosahedron. For more, see <a href="http://mathworld.wolfram.com/PlatonicSolid.html" target="_blank">http://mathworld.wolfram.com/PlatonicSolid.html</a>
+  </span></span>, and the other, less regular planar graphs.</p>
 
   <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p>
 
