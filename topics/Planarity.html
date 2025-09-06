@@ -20,11 +20,11 @@
         </mrow>
       </munder>
     </mrow>
-    <mo form="prefix" stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mi>x</mi><mi>j</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
+    <mo form="prefix" stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>-</mo><msub><mi>x</mi><mi>j</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
     <mo>+</mo>
     <mo form="prefix" stretchy="false">(</mo>
     <msub><mi>y</mi><mi>i</mi></msub>
-    <mo>−</mo>
+    <mo>-</mo>
     <msub><mi>y</mi><mi>j</mi></msub>
     <msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
     <mo separator="true">,</mo>
@@ -97,21 +97,49 @@ where <math>
 
   <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p>
 
+  <hr>
 
   <p>Tutte proved the following nontrivial fact:</p>
 
-  <blockquote>Nail the nodes of any face of a 3-connected planar graph to a convex polygon, and replace the edges by rubber bands. The equilibrium provides an embedding in the plane.</blockquote>
-  
+  <blockquote><b>Nail the nodes of any <span class="tooltip">
+  face<span class="tooltip-content" style="display:none;">
+  A 3-connected planar graph, when drawn in the plane without edge crossings, divides the plane into regions called <b>faces</b>, which are bounded by cycles. While there are many ways to draw the graph, the family of these cycles is always the same. These cycles can be characterized by the properties that
+  <ul>
+    <li>they have no chords, and</li>
+    <li>deleting their nodes from the graph, it remains connected.</li>
+  </ul>
+    (Based on these, such a cycle can be easily found by depth-first search even if the graph is only given as an abstract graph.)
+  </span></span> of a <span class="tooltip">
+  3-connected<span class="tooltip-content" style="display:none;">
+  A graph <b>connected</b> if any two of its nodes can be reached from each other on a path. <br>
+  A graph is <b><i>k</i>-connected</b> 
+  (for some <i>k</i><math><mrow><mo>≥</mo><mn>2</mn></mrow></math>) 
+  if it is connected and it stays connected if fewer than <i>k</i> of its nodes are deleted. (We assume that the graph has more than <i>k</i> nodes.)
+  </span></span> planar graph to a convex polygon, and replace the edges by rubber bands. The equilibrium provides an <span class="tooltip">
+  embedding<span class="tooltip-content" style="display:none;">
+  A graph is <b>planar</b> if it can be drawn in the plane so that the edges are continuous curves that do not intersect each other. Such a drawing is called an <b>embedding</b> of the graph in the plane.
+  </span></span> in the plane.</b></blockquote>
+
   <p>This embedding has very nice properties: all the edges are straight line segments, and all the faces are convex polygons.</p>
 
+  <hr>
 
-  <p>Is this a good method to display planar 3-connected graphs?</p>
+  <p><i>Is this a good method to display planar 3-connected graphs?</i></p>
 
   <p>Often it is, but there are some bad examples. Load the graph named "triangles" and click Run: This simple graph is drawn in the plane, but most of its nodes are crowded near the middle of the bottom. The "pipe" graph gives a similar example.</p>
 
-  <p>What to do if a planar graph is not 3-connected?</p>
+  <p><i>What to do if a planar graph is not 3-connected?</i></p>
 
-  <p>We can add edges to it to make it 3-connected, and delete these at the end. As a special case, a tree can be drawn nicely by fixing its leaves. Try the "tree5" graph.</p>
+  <p>We can add edges to it to make it 3-connected, and delete these at the end. As a special case, a <span class="tooltip">
+  tree<span class="tooltip-content" style="display:none;">
+  These trees are unrooted.
+  </span></span> can be drawn nicely by fixing its leaves. Try the tree graphs (tree1,... tree5).</p>
 
-  <p>Is this a good method to display nonplanar graphs? Sometimes; load and run the Petersen graph to see a nice drawing of this very famous and very symmetric nonplanar graph.</p>
+  <p><i>Is this a good method to display nonplanar graphs?</i></p>
+
+  <p>Sometimes; load and run the <span class="tooltip">
+  Petersen<span class="tooltip-content" style="display:none;">
+    <img src="assets/Petersen_Julius.jpg" alt="Julius Peter Christian Petersen" style="height:120px;"><br>
+  <b>Julius Peter Christian Petersen</b> (1839-1910): Danish mathematician, one of the founding fathers of graph theory. For more, see <a href="https://mathshistory.st-andrews.ac.uk/Biographies/Petersen/" target="_blank">https://mathshistory.st-andrews.ac.uk/Biographies/Petersen/</a>
+  </span></span> graph to see a nice drawing of this very famous and very symmetric nonplanar graph.</p>
 </div>
