@@ -10,7 +10,7 @@
 
 body {
   font-family: 'Open Sans', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 html, body, #sigma-container {
@@ -58,6 +58,10 @@ li {
   max-width: 350px;
   box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
   white-space: normal;
+}
+
+.tooltip-content, img {
+  margin: 6px 0;
 }
 
 .grid-container {
