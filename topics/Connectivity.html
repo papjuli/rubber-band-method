@@ -12,13 +12,13 @@
 
   <p>Suppose that we don't want three nodes on the same line (say, don't want that a node blocks communication between two others).</p>
 
-  <p>Load the "triangles" and click Move. The nodes in the middle end up on one line, due to the symmetry. If you don't like this, it is easy to help: reinforce the edge connecting the lowest node in the middle to the node on the left. The symmetry is broken and the nodes are not on one line any more.</p>
+  <p>Load the "triangles" and click <b>Run</b>. The nodes in the middle end up on one line, due to the symmetry. If you don't like this, it is easy to help: reinforce the edge connecting the lowest node in the middle to the node on the left. The symmetry is broken and the nodes are not on one line any more.</p>
 
-  <p>Now load the graph named "accident" and click Move. The four points on each diagonal are lined up because of symmetry; but for the two triples on lines parallel to the main diagonal there is no symmetry explanation; this degeneracy was due to numerical coincidence. Reinforcing an appropriate edge helps again. </p>
+  <p>Now load the graph named "accident" and click <b>Run</b>. The four points on each diagonal are lined up because of symmetry; but for the two triples on lines parallel to the main diagonal there is no symmetry explanation; this degeneracy was due to numerical coincidence. Reinforcing an appropriate edge helps again. </p>
 
   <hr></hr>
 
-  <p>Load "twosep" and click Move. All green nodes collapse to one line. Try pulling them apart or reinforcing edges: they will always collapse onto the segment between the two nodes separating them from the rest of the graph. And this will happen in every graph where two nodes separate some part from the red (nailed) nodes. So this is an essential degeneracy (not just a consequence of symmetry or numerical coincidence).</p>
+  <p>Load "twosep" and click <b>Run</b>. All green nodes collapse to one line. Try pulling them apart or reinforcing edges: they will always collapse onto the segment between the two nodes separating them from the rest of the graph. And this will happen in every graph where two nodes separate some part from the red (nailed) nodes. So this is an essential degeneracy (not just a consequence of symmetry or numerical coincidence).</p>
 
   <p><i>So when can degeneracy be broken by reinforcing edges?</i></p>
 
@@ -26,7 +26,7 @@
 
   <p>It turns out that low connectivity is the only reason for essential degeneracy:</p>
 
-  <blockquote>If two nodes collide for every possible reinforcement of the edges, then they must be separated from the red nodes by a single node; if three nodes end up on one line for every possible reinforcement of the edges, then they must be separated from the red nodes by two nodes.</blockquote>
+  <blockquote><b>If two nodes collide for every possible reinforcement of the edges, then they must be separated from the red nodes by a single node; if three nodes end up on one line for every possible reinforcement of the edges, then they must be separated from the red nodes by two nodes.</b></blockquote>
 
   <p>Later in this section we'll show an illustrated proof of this result, but first here are some algorithmic applications.</p>
 
@@ -34,11 +34,11 @@
 
   <p>This “rubber band” method can be used to test whether a graph has two such separating nodes:</p> 
   
-  <ol>
+  <ol><b>
     <li>choose random "strengths" for the edges, </li>
 
     <li>check if any three of the nodes become collinear in the equilibrium.</li>
-  </ol>
+  </b></ol>
 
   <p>For two nodes there are better methods, but if we want to check separability by <i>k</i> nodes, this algorithm is the most efficient in a certain range of <i>k</i>. We have to work in the (<i>k</i>-1)-dimensional space, however.</p>
 
@@ -51,7 +51,7 @@
   <ul>
     <li>You don't want to simulate the physics if you want to do fast computation; instead, you solve the system of linear equations that describe the equilibrium. This takes only one matrix inversion.</li>
 
-    <li>To test for <i>k</i>-connectivity, we have to check that for all choices of the red (nailed) nodes and all choices of the green nodes. This is too much; but one can show that it suffices to check for <i>k</i> neighbors of a randomly chosen node as red nodes, and <i>k</i> neighbors of another randomly chosen node as green nodes.</li>
+    <li>To test for <i>k</i>-connectivity, we have to do a check for all choices of the red (nailed) nodes and all choices of the green nodes. This is too much; but one can show that it suffices to check for <i>k</i> neighbors of a randomly chosen node as red nodes, and <i>k</i> neighbors of another randomly chosen node as green nodes.</li>
 
     <li>If the green nodes are almost but not exactly collinear, how do we know that this is a numerical error? The trick is to do the computation over a finite field, where we can do exact division. Of course, all physical content is then lost, but the result remains valid!</li>
   </ul>
@@ -60,9 +60,16 @@
 
   <h3>Connectivity testing: a proof</h3>
 
-  <p>Click Move to get a nicer drawing of the graph on the right. You'll see three green nodes that are lined up. It is probably easy (by trial and error) to reinforce an edge to make them noncollinear, but the following should convince you that this is always possible.</p>
+  <p>Load the "connectivity proof" graph and click <b>Run</b> to get a nicer drawing of it. You'll see three green nodes that are lined up. It is probably easy (by trial and error) to reinforce an edge to make them noncollinear, but the following should convince you that this is <i>always</i> possible.</p>
 
-  <p>Since these three green nodes cannot be separated from the three red nodes by two nodes, you can find three disjoint paths that connect them to the three red nodes. Select Edit>Add thick edge, and make the edges on these paths thick by clicking one of their endnodes and then the other. Click Move: the thick edges pull the green nodes close to the red nodes. If you make them thicker by repeating the process, they will be pulled in even closer. Trivially, they are not collinear for such a reinforcement of the paths. QED.</p>
+  <p>Since these three green nodes cannot be separated from the three red nodes by two nodes, you can find <i>three disjoint paths</i> that connect them to the three red nodes. Select Edit>Add thick edge, and make the edges on these paths thick by clicking one of their endnodes and then the other. Click <b>Run</b>: the thick edges pull the green nodes close to the red nodes. If you make them thicker by repeating the process, they will be pulled in even closer. Trivially, they are not collinear for such a reinforcement of the paths. QED.</p>
 
-  <p>But can we always find three disjoint paths from the green nodes to the red nodes? Yes, this is guaranteed by Menger's Theorem. (In our case it was easy to find them by inspection.)</p>
+  <p>But can we always find three disjoint paths from the green nodes to the red nodes? Yes, this is guaranteed by <span class="tooltip">
+  Menger's Theorem<span class="tooltip-content" style="display:none;">
+  <b>Menger's Theorem</b> is one of the most fundamental results in graph theory: <br />
+    Let A and B be two <i>k</i>-element sets of nodes in a graph. Then <br />
+    <span style="margin-left: 4em;margin-right: 4em;margin-top: 0.5em;margin-bottom: 0.5em;display: inline-block">there are <i>k</i> disjoint paths connecting the nodes in A to the nodes in B </span><br />
+    <span style="margin-left: 8em;margin-right: 4em;margin-top: 0.5em;margin-bottom: 0.5em;display: inline-block">if and only if </span><br />
+    <span style="margin-left: 4em;margin-right: 4em;margin-top: 0.5em;margin-bottom: 0.5em;display: inline-block">no set of fewer than <i>k</i> nodes separates every node of A from every node of B.</span>
+  </span></span>. (In our case it was easy to find them by inspection.)</p>
 </div>
