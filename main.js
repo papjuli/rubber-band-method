@@ -177,8 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
     tooltip.innerHTML = target.querySelector('.tooltip-content').innerHTML;
     tooltip.style.display = 'block';
     const rect = target.getBoundingClientRect();
-    tooltip.style.left = rect.left + window.scrollX + 'px';
-    tooltip.style.top = rect.bottom + window.scrollY + 5 + 'px';
+    const tooltipRect = tooltip.getBoundingClientRect();
+    let left = rect.left + window.scrollX;
+    let top;
+    // Check if tooltip would overflow bottom of viewport
+    if (rect.bottom + 5 + tooltipRect.height > window.innerHeight) {
+      // Place above
+      top = rect.top + window.scrollY - tooltipRect.height - 5;
+    } else {
+      // Place below
+      top = rect.bottom + window.scrollY + 5;
+    }
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
   }
 
   function hideTooltip() {
