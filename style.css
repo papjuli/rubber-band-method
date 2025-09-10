@@ -55,7 +55,7 @@ li {
   border-radius: 6px;
   z-index: 1000;
   font-size: 1em;
-  max-width: 350px;
+  max-width: 380px;
   box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
   white-space: normal;
 }
