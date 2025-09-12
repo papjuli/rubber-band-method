@@ -41,7 +41,7 @@ li {
 }
 
 .tooltip {
-  font-weight: bold;
+  /* font-weight: bold; */
   position: relative;
   cursor: help;
   border-bottom: 1px dotted #888;

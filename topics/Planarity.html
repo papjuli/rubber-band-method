@@ -1,57 +1,40 @@
 <div>
   <h2>How to draw a graph?</h2>
 
-  <p>On the right, the <span class="tooltip">
-  dodecahedron<span class="tooltip-content" style="display:none;">
-  The dodecahedron graph is the graph formed by the vertices and edges of the dodecahedron, one of the five platonic solids.<br>
-  <img src="assets/dodecahedron.png" alt="Dodecahedron" style="height:180px;">
-  </span></span> graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
+  <p>On the right, the <span class="tooltip" data-tooltip-id="tooltip-dodecahedron">
+  dodecahedron</span> graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
 
   <p>Click on the <b>Run</b> button. The edges contract until the system reaches <span class="tooltip" data-tooltip-id="tooltip-equilibrium">equilibrium</span>. The edges don't cross any more, and we get a pretty drawing of the dodecahedron.</p>
 
 
   <p><em>Does this work because the dodecahedron graph is very symmetric?</em></p>
 
-  <p>Load the graph named "planar1". This is a <span class="tooltip">
-  planar<span class="tooltip-content" style="display:none;">
-  A graph is <b>planar</b> if it can be drawn in the plane so that the edges are continuous curves that do not intersect each other. Such a drawing is called an <b>embedding</b> of the graph in the plane.
-  </span></span> graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
+  <p>Load the graph named "planar1". This is a <span class="tooltip" data-tooltip-id="tooltip-planar">
+  planar</span> graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
 
-  <p>Play with the other planar graphs: try out all five <span class="tooltip">
+  <p>Play with the other <span class="tooltip" data-tooltip-id="tooltip-planar">
+  planar</span> graphs: try out all five <span class="tooltip">
   platonic solids<span class="tooltip-content" style="display:none;">
   The five <b>platonic solids</b> are the tetrahedron, cube, octahedron, dodecahedron and icosahedron. For more, see <a href="http://mathworld.wolfram.com/PlatonicSolid.html" target="_blank">http://mathworld.wolfram.com/PlatonicSolid.html</a>
   </span></span>, and the other, less regular planar graphs.</p>
 
-  <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p>
+  <!-- <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p> -->
 
   <hr>
 
-  <p>Tutte proved the following nontrivial fact:</p>
+  <p><span class="tooltip" data-tooltip-id="tooltip-Tutte">Tutte</span> proved the following nontrivial fact:</p>
 
-  <blockquote><b>Nail the nodes of any <span class="tooltip">
-  face<span class="tooltip-content" style="display:none;">
-  A 3-connected planar graph, when drawn in the plane without edge crossings, divides the plane into regions called <b>faces</b>, which are bounded by cycles. While there are many ways to draw the graph, the family of these cycles is always the same. These cycles can be characterized by the properties that
-  <ul>
-    <li>they have no chords, and</li>
-    <li>deleting their nodes from the graph, it remains connected.</li>
-  </ul>
-    (Based on these, such a cycle can be easily found by depth-first search even if the graph is only given as an abstract graph.)
-  </span></span> of a <span class="tooltip">
-  3-connected<span class="tooltip-content" style="display:none;">
-  A graph <b>connected</b> if any two of its nodes can be reached from each other on a path. <br>
-  A graph is <b><i>k</i>-connected</b> 
-  (for some <i>k</i><math><mrow><mo>≥</mo><mn>2</mn></mrow></math>) 
-  if it is connected and it stays connected if fewer than <i>k</i> of its nodes are deleted. (We assume that the graph has more than <i>k</i> nodes.)
-  </span></span> planar graph to a convex polygon, and replace the edges by rubber bands. The equilibrium provides an <span class="tooltip">
-  embedding<span class="tooltip-content" style="display:none;">
-  A graph is <b>planar</b> if it can be drawn in the plane so that the edges are continuous curves that do not intersect each other. Such a drawing is called an <b>embedding</b> of the graph in the plane.
-  </span></span> in the plane.</b></blockquote>
+  <blockquote><b>Nail the nodes of any <span class="tooltip" data-tooltip-id="tooltip-face">
+  face</span> of a <span class="tooltip" data-tooltip-id="tooltip-3-connected">
+  3-connected</span> planar graph to a convex polygon, and replace the edges by rubber bands. The <span class="tooltip" data-tooltip-id="tooltip-equilibrium">equilibrium</span> provides an <span class="tooltip" data-tooltip-id="tooltip-planar">
+  embedding</span> in the plane.</b></blockquote>
 
-  <p>This embedding has very nice properties: all the edges are straight line segments, and all the faces are convex polygons.</p>
+  <p>This <span class="tooltip" data-tooltip-id="tooltip-planar">embedding</span> has very nice properties: all the edges are straight line segments, and all the <span class="tooltip" data-tooltip-id="tooltip-face">
+  faces</span> are convex polygons.</p>
 
   <hr>
 
-  <p><i>Is this a good method to display planar 3-connected graphs?</i></p>
+  <p><i>Is this a good method to display planar <span class="tooltip" data-tooltip-id="tooltip-3-connected">3-connected</span> graphs?</i></p>
 
   <p>Often it is, but there are some bad examples. Load the graph named "triangles" and click Run: This simple graph is drawn in the plane, but most of its nodes are crowded near the middle of the bottom. The "pipe" graph gives a similar example.</p>
 

@@ -64,78 +64,133 @@
   <script type="module" src="tooltips.js"></script>
   <div id="tooltip-box" class="tooltip-box"></div>
   <div id="tooltip-contents" style="display:none;">
+    <div id="tooltip-Tutte">
+      <img src="assets/W._T._Tutte.jpg" alt="William Thomas Tutte" style="height:180px;"><br>
+      <b>William Thomas Tutte</b> (1917-2002): British-Canadian mathematician, who made fundamental 
+      contributions to graph theory. For more, see 
+      <a href="https://uwaterloo.ca/combinatorics-and-optimization/professor-william-t-tutte" target="_blank">https://uwaterloo.ca/combinatorics-and-optimization/professor-william-t-tutte</a>.
+    </div>
+    <div id="tooltip-Tutte-paper">
+      W.T. Tutte: How to draw a graph, <i>Proc. London Math. Soc.</i> <b>13</b> (1963), 743-768.
+    </div>
+    <div id="tooltip-LLW-paper">
+      N. Linial, L. Lovász & A. Wigderson: Rubber bands, convex embeddings and graph connectivity, <i>Combinatorica</i>, Vol. 8, 91-102, (1988)
+    </div>
+    <div id="tooltip-GW-paper">
+      M.X. Goemans and D.P.Williamson: <i>.879-approximation algorithms for MAX CUT and MAX 2SAT</i>, Proc. 26th ACM Symp. on Theory of Computing (1994), 422-431.
+      <br><a href="https://dl.acm.org/doi/10.1145/195058.195216" target="_blank">https://dl.acm.org/doi/10.1145/195058.195216</a>
+    </div>
+    <div id="tooltip-BSST-paper">
+      R.L. Brooks, C. A. B. Smith, A. H. Stone, W. T. Tutte: The dissection of rectangles into squares, <i>Duke Math. J.</i> 7 (1940), 312-340.
+    </div>
+    <div id="tooltip-planar">
+      A graph is <b>planar</b> if it can be drawn in the plane so that the edges are continuous curves that do not intersect each other. Such a drawing is called an <b>embedding</b> of the graph in the plane.
+    </div>
+    <div id="tooltip-face">
+      A 3-connected planar graph, when drawn in the plane without edge crossings, divides the plane into regions called <b>faces</b>, which are bounded by cycles. While there are many ways to draw the graph, the family of these cycles is always the same. These cycles can be characterized by the properties that
+      <ul>
+        <li>they have no chords, and</li>
+        <li>deleting their nodes from the graph, it remains connected.</li>
+      </ul>
+      (Based on these, such a cycle can be easily found by depth-first search even if the graph is only given as an abstract graph.)
+    </div>
+    <div id="tooltip-dodecahedron">
+      The dodecahedron graph is the graph formed by the vertices and edges  of the dodecahedron, 
+      one of the five platonic solids.<br>
+      <img src="assets/dodecahedron.png" alt="Dodecahedron" style="height:180px;">
+    </div>
+    <div id="tooltip-connectivity">
+      A graph is <b>connected</b> if any two of its nodes can be reached from each other on a path.
+      <br>A graph is <b><i>k</i>-connected</b> if it is connected and it stays connected if fewer than <i>k</i> of its nodes are deleted. (We assume that the graph has more than <i>k</i> nodes.)
+    </div>
+    <div id="tooltip-3-connected">
+      A graph is 3-connected if it is connected and it stays connected if any two of its nodes 
+      are deleted. (We assume that the graph has at least four nodes.)
+    </div>
+    <div id="tooltip-cut">
+      A <b>cut</b> in a graph is obtained by dividing the nodes into two classes, and taking the edges connecting nodes in different classes.
+    </div>
+    <div id="tooltip-brute-force">
+      <b>Brute force</b> in this case means looking at all possible ways of dividing the nodes into 
+      two classes (black and white), counting the edges that go across, and selecting the best.
+
+      <!-- Actually, in this program a useful trick called <b>Branch-and-Bound</b> is added: we do look at 
+      extensions of partial black-and-white colorings if some easy calculation tells us that they are 
+      not going to beat the best cut found so far. This allows us to find the maximum cut in graphs 
+      with 20+ nodes. Real brute force would fail on graphs with about 15 nodes. -->
+    </div>
     <div id="tooltip-equilibrium">
-        Working out the physics: the <i>energy</i> of the system is defined by: <br>
-        <math display="block" class="tml-display" style="display:block math;margin-top: 0.4em;margin-bottom: 0.4em;">
-        <mrow>
-            <mrow>
-            <munder>
-                <mo movablelimits="false">∑</mo>
-                <mrow>
-                <mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo>∈</mo><mi>E</mi><mo form="prefix" stretchy="false">(</mo><mi>G</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
-                </mrow>
-            </munder>
-            </mrow>
-            <mo form="prefix" stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>-</mo><msub><mi>x</mi><mi>j</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
-            <mo>+</mo>
-            <mo form="prefix" stretchy="false">(</mo>
-            <msub><mi>y</mi><mi>i</mi></msub>
-            <mo>-</mo>
-            <msub><mi>y</mi><mi>j</mi></msub>
-            <msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
-            <mo separator="true">,</mo>
-        </mrow>
-        </math>
-        where <math>
-        <mrow>
-            <mo form="prefix" stretchy="false">(</mo>
-            <msub><mi>x</mi><mi>i</mi></msub>
-            <mo separator="true">,</mo>
-            <msub><mi>y</mi><mi>i</mi></msub>
-            <mo form="postfix" stretchy="false">)</mo>
-        </mrow>
-        </math> is the position of node <math><mi>i</mi></math> in the plane. Taking gradients it is easy to derive the <b>equilibrium condition</b>: every node that is not nailed down must be at the <i>center of gravity</i> of its neighbors. In formula:
-        <math display="block" class="tml-display" style="display:block math;margin-top: 0.4em;margin-bottom: 0.4em;">
-        <mrow>
-            <mfrac>
-            <mn>1</mn>
-            <mrow>
-                <mi>deg</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
-            </mrow>
-            </mfrac>
-            <mrow>
-            <munder>
-                <mo movablelimits="false">∑</mo>
-                <mrow>
-                <mi>j</mi><mo>∈</mo><mi>N</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
-                </mrow>
-            </munder>
-            </mrow>
-            <msub><mi>x</mi><mi>j</mi></msub>
-            <mo>=</mo>
-            <msub><mi>x</mi><mi>i</mi></msub>
-        </mrow>
-        </math> and <math display="block" class="tml-display" style="display:block math;">
-        <mrow>
-            <mfrac>
-            <mn>1</mn>
-            <mrow>
-                <mi>deg</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
-            </mrow>
-            </mfrac>
-            <mrow>
-            <munder>
-                <mo movablelimits="false">∑</mo>
-                <mrow>
-                <mi>j</mi><mo>∈</mo><mi>N</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
-                </mrow>
-            </munder>
-            </mrow>
-            <msub><mi>y</mi><mi>j</mi></msub>
-            <mo>=</mo>
-            <msub><mi>y</mi><mi>i</mi></msub>
-        </mrow>
-        </math>
+      Working out the physics: the <i>energy</i> of the system is defined by: <br>
+      <math display="block" class="tml-display" style="display:block math;margin-top: 0.4em;margin-bottom: 0.4em;">
+      <mrow>
+          <mrow>
+          <munder>
+              <mo movablelimits="false">∑</mo>
+              <mrow>
+              <mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo>∈</mo><mi>E</mi><mo form="prefix" stretchy="false">(</mo><mi>G</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+              </mrow>
+          </munder>
+          </mrow>
+          <mo form="prefix" stretchy="false">(</mo><msub><mi>x</mi><mi>i</mi></msub><mo>-</mo><msub><mi>x</mi><mi>j</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
+          <mo>+</mo>
+          <mo form="prefix" stretchy="false">(</mo>
+          <msub><mi>y</mi><mi>i</mi></msub>
+          <mo>-</mo>
+          <msub><mi>y</mi><mi>j</mi></msub>
+          <msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup>
+          <mo separator="true">,</mo>
+      </mrow>
+      </math>
+      where <math>
+      <mrow>
+          <mo form="prefix" stretchy="false">(</mo>
+          <msub><mi>x</mi><mi>i</mi></msub>
+          <mo separator="true">,</mo>
+          <msub><mi>y</mi><mi>i</mi></msub>
+          <mo form="postfix" stretchy="false">)</mo>
+      </mrow>
+      </math> is the position of node <math><mi>i</mi></math> in the plane. Taking gradients it is easy to derive the <b>equilibrium condition</b>: every node that is not nailed down must be at the <i>center of gravity</i> of its neighbors. In formula:
+      <math display="block" class="tml-display" style="display:block math;margin-top: 0.4em;margin-bottom: 0.4em;">
+      <mrow>
+          <mfrac>
+          <mn>1</mn>
+          <mrow>
+              <mi>deg</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+          </mrow>
+          </mfrac>
+          <mrow>
+          <munder>
+              <mo movablelimits="false">∑</mo>
+              <mrow>
+              <mi>j</mi><mo>∈</mo><mi>N</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+              </mrow>
+          </munder>
+          </mrow>
+          <msub><mi>x</mi><mi>j</mi></msub>
+          <mo>=</mo>
+          <msub><mi>x</mi><mi>i</mi></msub>
+      </mrow>
+      </math> and <math display="block" class="tml-display" style="display:block math;">
+      <mrow>
+          <mfrac>
+          <mn>1</mn>
+          <mrow>
+              <mi>deg</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+          </mrow>
+          </mfrac>
+          <mrow>
+          <munder>
+              <mo movablelimits="false">∑</mo>
+              <mrow>
+              <mi>j</mi><mo>∈</mo><mi>N</mi><mo form="prefix" stretchy="false">(</mo><mi>i</mi><mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+              </mrow>
+          </munder>
+          </mrow>
+          <msub><mi>y</mi><mi>j</mi></msub>
+          <mo>=</mo>
+          <msub><mi>y</mi><mi>i</mi></msub>
+      </mrow>
+      </math>
     </div>
   </div>
 </body>
