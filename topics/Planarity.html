@@ -1,34 +1,55 @@
 <div>
   <h2>How to draw a graph?</h2>
 
-  <p>On the right, the dodecahedron graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
+  <p>On the right, the <span class="tooltip" data-tooltip-id="tooltip-dodecahedron">
+  dodecahedron</span> graph is loaded. One face of the dodecahedron is drawn as a regular pentagon (the 5 red nodes); the remaining nodes are put in random position. The five red nodes are fixed, the others can move.</p>
 
-  <p>Click on the <b>Run</b> button. The edges contract until the system reaches equilibrium. The edges don't cross any more, and we get a pretty drawing of the dodecahedron.</p>
+  <p>Click on the <b>Run</b> button. The edges contract until the system reaches <span class="tooltip" data-tooltip-id="tooltip-equilibrium">equilibrium</span>. The edges don't cross any more, and we get a pretty drawing of the dodecahedron.</p>
 
 
   <p><em>Does this work because the dodecahedron graph is very symmetric?</em></p>
 
-  <p>Load the graph named "planar1". This is a planar graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
+  <p>Load the graph named "planar1". This is a <span class="tooltip" data-tooltip-id="tooltip-planar">
+  planar</span> graph where the nodes of one face (the red nodes) are fixed to a square, but the other nodes are in a random position. Click Run: The edges contract and eventually they will not cross any more.</p>
 
-  <p>Play with the other planar graphs: try out all five platonic solids, and the other, less regular planar graphs.</p>
+  <p>Play with the other <span class="tooltip" data-tooltip-id="tooltip-planar">
+  planar</span> graphs: try out all five <span class="tooltip">
+  platonic solids<span class="tooltip-content" style="display:none;">
+  The five <b>platonic solids</b> are the tetrahedron, cube, octahedron, dodecahedron and icosahedron. For more, see <a href="http://mathworld.wolfram.com/PlatonicSolid.html" target="_blank">http://mathworld.wolfram.com/PlatonicSolid.html</a>
+  </span></span>, and the other, less regular planar graphs.</p>
 
-  <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p>
+  <!-- <p>Hint: You can modify the graphs using the methods under the Edit menu: see Help.</p> -->
 
+  <hr>
 
-  <p>Tutte proved the following nontrivial fact:</p>
+  <p><span class="tooltip" data-tooltip-id="tooltip-Tutte">Tutte</span> proved the following nontrivial fact:</p>
 
-  <blockquote>Nail the nodes of any face of a 3-connected planar graph to a convex polygon, and replace the edges by rubber bands. The equilibrium provides an embedding in the plane.</blockquote>
-  
-  <p>This embedding has very nice properties: all the edges are straight line segments, and all the faces are convex polygons.</p>
+  <blockquote><b>Nail the nodes of any <span class="tooltip" data-tooltip-id="tooltip-face">
+  face</span> of a <span class="tooltip" data-tooltip-id="tooltip-3-connected">
+  3-connected</span> planar graph to a convex polygon, and replace the edges by rubber bands. The <span class="tooltip" data-tooltip-id="tooltip-equilibrium">equilibrium</span> provides an <span class="tooltip" data-tooltip-id="tooltip-planar">
+  embedding</span> in the plane.</b></blockquote>
 
+  <p>This <span class="tooltip" data-tooltip-id="tooltip-planar">embedding</span> has very nice properties: all the edges are straight line segments, and all the <span class="tooltip" data-tooltip-id="tooltip-face">
+  faces</span> are convex polygons.</p>
 
-  <p>Is this a good method to display planar 3-connected graphs?</p>
+  <hr>
+
+  <p><i>Is this a good method to display planar <span class="tooltip" data-tooltip-id="tooltip-3-connected">3-connected</span> graphs?</i></p>
 
   <p>Often it is, but there are some bad examples. Load the graph named "triangles" and click Run: This simple graph is drawn in the plane, but most of its nodes are crowded near the middle of the bottom. The "pipe" graph gives a similar example.</p>
 
-  <p>What to do if a planar graph is not 3-connected?</p>
+  <p><i>What to do if a planar graph is not 3-connected?</i></p>
 
-  <p>We can add edges to it to make it 3-connected, and delete these at the end. As a special case, a tree can be drawn nicely by fixing its leaves. Try the "tree5" graph.</p>
+  <p>We can add edges to it to make it 3-connected, and delete these at the end. As a special case, a <span class="tooltip">
+  tree<span class="tooltip-content" style="display:none;">
+  These trees are unrooted.
+  </span></span> can be drawn nicely by fixing its leaves. Try the tree graphs (tree1,... tree5).</p>
 
-  <p>Is this a good method to display nonplanar graphs? Sometimes; load and run the Petersen graph to see a nice drawing of this very famous and very symmetric nonplanar graph.</p>
+  <p><i>Is this a good method to display nonplanar graphs?</i></p>
+
+  <p>Sometimes; load and run the <span class="tooltip">
+  Petersen<span class="tooltip-content" style="display:none;">
+    <img src="assets/Petersen_Julius.jpg" alt="Julius Peter Christian Petersen" style="height:180px;"><br>
+  <b>Julius Peter Christian Petersen</b> (1839-1910): Danish mathematician, one of the founding fathers of graph theory. For more, see <a href="https://mathshistory.st-andrews.ac.uk/Biographies/Petersen/" target="_blank">https://mathshistory.st-andrews.ac.uk/Biographies/Petersen/</a>
+  </span></span> graph to see a nice drawing of this very famous and very symmetric nonplanar graph.</p>
 </div>

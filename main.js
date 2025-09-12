@@ -1,9 +1,13 @@
-import { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep } from './graph.js'
+import { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep, createSquareTiling } from './graph.js'
+
 
 const topicTextElement = document.getElementById('topic-text');
 const tabLinks = document.getElementsByClassName('tablink');
+const loadGraphDropdown = document.getElementById('loadGraphDropdown');
+const forceDropdown = document.getElementById('forceDropdown');
+let currentTopic = "Intro";
 
-loadTopic('Intro', document.getElementById('IntroTab'));
+loadTopic(currentTopic, document.getElementById('IntroTab'));
 
 const graphsForTopics = new Map([
   ["Intro", "dodecahedron"],
@@ -27,7 +31,7 @@ const allGraphs = new Map([
   ["max cut big", "./graphs/maxcutbig.grf"],
   ["max cut bigger", "./graphs/maxcutbigger.grf"],
   ["max cut intro", "./graphs/maxcutintro.grf"],
-  ["MyGraph", "./graphs/MyGraph.grf"],
+  // ["MyGraph", "./graphs/MyGraph.grf"],
   ["non2con", "./graphs/non2con.grf"],
   ["octahedron", "./graphs/octahedron.grf"],
   ["onesep", "./graphs/onesep.grf"],
@@ -61,16 +65,16 @@ const allGraphs = new Map([
 
 let settings = {
   nodes: {
-    size: 0.04,
-    color: "#445498",  // "#023E8A"
+    size: 0.05,
+    color: "#445498",
     nailColor: "lightgrey"
   },
   edges: {
-    color: "#445498",  // "#023E8A",
+    color: "#445498",
     width: 0.006
   },
   rate: 0.04,
-  delay: 0.02,
+  delay: 0.04,
   threshold: 0.00001,
   colors: new Map([
     ["Red", "#ee0000"],
@@ -78,21 +82,23 @@ let settings = {
     ["Green", "#03e090"],
     ["Yellow", "#eeee00"],
     ["White", "#445498"]
-  ])
+  ]),
+  morphSteps: 200
 }
 
 let renderer = new GraphRenderer(document.getElementById('graph-container'), settings);
 
-function loadGraphAndSetInfo(graphName, path=null) {
-  if (!path) path = allGraphs.get(graphName);
+function loadGraphAndSetInfo(
+    graphName, topicName, path=allGraphs.get(graphName)) {
+  console.log("Loading graph:", graphName, "for topic:", topicName);
   loadGraph(path, renderer, (graph) => {
     document.getElementById('graph-name').innerHTML = graphName;
     document.getElementById('num-vertices').innerHTML = graph.nodeCount();
     document.getElementById('num-edges').innerHTML = graph.edgeCount();
-  });
+  }, topicName);
 }
 
-loadGraphAndSetInfo("dodecahedron");
+loadGraphAndSetInfo("dodecahedron", "Intro");
 
 document.getElementById('randomize-button').onclick = () => {
   randomizeFreeNodes(renderer.graph);
@@ -102,13 +108,19 @@ document.getElementById('run-button').onclick = () => rubberBandStep(renderer);
 
 
 function loadTopic(topicName, button) {
+  currentTopic = topicName;
+  if (topicName == "SquareTiling") {
+    document.querySelector(".square-tiling-controls").style.display = "block";
+  } else {
+    document.querySelector(".square-tiling-controls").style.display = "none";
+  }
   fetch(`./topics/${topicName}.html`)
   .then(response => response.text())
   .then((data) => {
     topicTextElement.innerHTML = data;
     topicTextElement.scrollIntoView();
-    for (let i = 0; i < tabLinks.length; i++) {
-      tabLinks[i].classList.remove("active");
+    for (const tab of tabLinks) {
+      tab.classList.remove("active");
     }
     button.classList.add("active");
   })
@@ -119,18 +131,20 @@ document.querySelectorAll("#topicTabs button").forEach(btn => {
   btn.onclick = () => {
     loadTopic(btn.dataset.topicName, btn);
     let graphName = graphsForTopics.get(btn.dataset.topicName);
-    loadGraphAndSetInfo(graphName);
+    loadGraphAndSetInfo(graphName, btn.dataset.topicName);
   }
 })
+
 
 allGraphs.forEach((path, name) => {
   let btn = document.createElement("button");
   btn.innerHTML = name;
-  btn.onclick = () => loadGraphAndSetInfo(name, path);
-  document.getElementById("loadGraphDropdown").appendChild(btn);
+  btn.onclick = () => loadGraphAndSetInfo(name, currentTopic, path);
+  loadGraphDropdown.appendChild(btn);
 })
 
-document.querySelectorAll("#forceDropdown input").forEach(btn => {
+
+forceDropdown.querySelectorAll("input").forEach(btn => {
   btn.onclick = () => {
     renderer.mode = btn.dataset.mode;
   }
@@ -169,3 +183,20 @@ edit_node_btn.onclick = () => {
   }   
   renderer.render();
 }
+
+document.getElementById('squares-button').onclick = () => {
+  let tiling = createSquareTiling(renderer.graph);
+  renderer.setSquareTiling(tiling);
+  renderer.render();
+};
+
+
+document.getElementById('show-hide-button').onclick = () => {
+    renderer.showGraph = !renderer.showGraph;
+    renderer.render();
+};
+
+
+document.getElementById('morph-button').onclick = () => {
+  renderer.morphTiling();
+};
