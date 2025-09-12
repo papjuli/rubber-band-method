@@ -86,7 +86,8 @@ let settings = {
   morphSteps: 200
 }
 
-let renderer = new GraphRenderer(document.getElementById('graph-container'), settings);
+const graphContainer = document.getElementById('graph-container');
+let renderer = new GraphRenderer(graphContainer, settings);
 
 function loadGraphAndSetInfo(
     graphName, topicName, path=allGraphs.get(graphName)) {
@@ -151,6 +152,8 @@ forceDropdown.querySelectorAll("input").forEach(btn => {
 })
 
 const editbuttonicon = document.getElementById('edit-graph-icon');
+const edit_node_btn = document.getElementById('edit-nodes-button');
+
 document.getElementById('edit-graph-button').onclick = () => {
   if (renderer.editable == true) { 
     renderer.editable = false;
@@ -162,24 +165,25 @@ document.getElementById('edit-graph-button').onclick = () => {
   else { renderer.editable = true; 
     editbuttonicon.setAttribute("src", "assets/lock-unlock-line.svg");    
     document.getElementById('edit-buttons-container').toggleAttribute("hidden");
-    const edit_node_btn = document.getElementById('edit-nodes-button');
     edit_node_btn.classList.remove('active-button');
     edit_node_btn.classList.add('standard-button');
     renderer.editnodes = false;
+    graphContainer.classList.remove('add-cursor');
     renderer.render();
   }
 }
 
-const edit_node_btn = document.getElementById('edit-nodes-button');
 edit_node_btn.onclick = () => {
   if (renderer.editnodes) {
     renderer.editnodes = false;
     edit_node_btn.classList.remove('active-button');
     edit_node_btn.classList.add('standard-button');
+    graphContainer.classList.remove('add-cursor');
   } else {
     renderer.editnodes = true;
     edit_node_btn.classList.add('active-button');
     edit_node_btn.classList.remove('standard-button');
+    graphContainer.classList.add('add-cursor');
   }   
   renderer.render();
 }

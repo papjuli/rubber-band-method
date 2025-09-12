@@ -175,20 +175,21 @@ class GraphRenderer {
     document.getElementById('num-edges').innerHTML = this.graph.edgeCount();  
   }
 
+  // TODO handle scaling in innerGroup
   ex2x(ex) {
-    return ((ex - this.group.transform('translateX')) / -this.group.transform('scaleX'));
+    return ((ex - this.outerGroup.transform('translateX')) / -this.outerGroup.transform('scaleX'));
   }
 
   ey2y(ey) {
-    return ((ey - this.group.transform('translateY')) / -this.group.transform('scaleY'));
+    return ((ey - this.outerGroup.transform('translateY')) / -this.outerGroup.transform('scaleY'));
   }
 
   x2ex(x) {
-    return (-x * this.group.transform('scaleX') + this.group.transform('translateX'));
+    return (-x * this.outerGroup.transform('scaleX') + this.outerGroup.transform('translateX'));
   }
 
   y2ey(y) {
-    return (-y * this.group.transform('scaleY') + this.group.transform('translateY'));
+    return (-y * this.outerGroup.transform('scaleY') + this.outerGroup.transform('translateY'));
   }
 
   addNode(ex, ey) {
@@ -249,16 +250,6 @@ class GraphRenderer {
   }
 
   render() {
-    // this.clear();
-
-    // const gc = document.getElementById('graph-container');
-    // if (this.editnodes) {
-    //   gc.classList.add('add-cursor');
-    // }
-    // else {
-    //   gc.classList.remove('add-cursor');
-    // }
-
     this.clearAll();
     this.renderSquareTiling();
     if (this.showGraph) {
