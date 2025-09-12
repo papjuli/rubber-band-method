@@ -35,7 +35,8 @@
       <button id="edit-graph-button"><img id="edit-graph-icon" class="menu-icon" src="assets/lock-line.svg"> Edit graph </button>
       <div id="edit-buttons-container" hidden="true">
         <button id="edit-nodes-button"><img id="edit-graph-icon" class="menu-icon" src="assets/pencil-line.svg"> Add/delete nodes </button>      
-        <button id="edit-graph-button2"><img id="edit-graph-icon" class="menu-icon" src="assets/pencil-line.svg"> Edit graph </button>    
+        <button id="edit-graph-button2"><img id="edit-graph-icon" class="menu-icon" src="assets/pencil-line.svg"> Edit graph </button>   
+      </div>
       <div class="square-tiling-controls" style="line-height: 76%;display:none">
         <!-- <br> -->
         <button id="squares-button">Squares</button>
@@ -63,9 +64,11 @@
       Edges: <span id="num-edges" style="display:inline-block;width:4em"> </span>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
   <script type="module" src="main.js"></script>
   <script type="module" src="tooltips.js"></script>
+
   <div id="tooltip-box" class="tooltip-box"></div>
   <div id="tooltip-contents" style="display:none;">
     <div id="tooltip-Tutte">

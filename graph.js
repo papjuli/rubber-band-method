@@ -77,7 +77,6 @@ class Graph {
 class GraphRenderer {
   constructor(container, settings) {
     this.svg = SVG().addTo(container).size("100%", "100%");
-    console.log(this.svg.node.childNodes[0].childNodes);
     this.outerGroup = this.svg.group();
     this.innerGroup = this.outerGroup.group();
     this.tilingGroup = this.innerGroup.group();
