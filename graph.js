@@ -7,10 +7,10 @@ class Graph {
   }
 
   addNode(node) {
-    if (!node.id) throw "Node must have an id";
+    if (!node.id) node.id = globalThis.crypto.randomUUID();
     this.nodesById.set(node.id, node);
-    //this.edgesAt.set(node.id, []);
     this.edgesAt.set(node.id, new Set());
+    console.log("Added node", node.id);
     return node;
   }
 
@@ -22,8 +22,6 @@ class Graph {
   }
 
   addEdge(edge) {
-    //this.edgesAt.get(edge.from).push(edge);
-    //this.edgesAt.get(edge.to).push(edge);
     this.edgesAt.get(edge.from).add(edge);
     this.edgesAt.get(edge.to).add(edge);
   }
@@ -39,7 +37,6 @@ class Graph {
 
   edgeCount() {
     let count = 0;
-    //this.edgesAt.forEach((edges) => count += edges.length);
     this.edgesAt.forEach((edges) => count += edges.size);
     return count / 2;
   }
@@ -68,7 +65,6 @@ class Graph {
   }
 
   degree(nodeId) {
-//    return this.edgesAt.get(nodeId).length;
     return this.edgesAt.get(nodeId).size;
   }
 }
@@ -106,8 +102,7 @@ class GraphRenderer {
         this.addNode(e.offsetX, e.offsetY);
         this.render();
       }
-    }
-    );
+    });
     
     this.svg.node.addEventListener("mouseup",
       (e) => {
@@ -193,10 +188,7 @@ class GraphRenderer {
   }
 
   addNode(ex, ey) {
-    let n = this.graph.nodeCount;
-    let node = this.graph.addNode({ id : n});
-    node.x = this.ex2x(ex);
-    node.y = this.ey2y(ey);
+    this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
     this.refreshInfo();
     this.render();
   }
