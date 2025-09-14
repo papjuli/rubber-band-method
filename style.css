@@ -175,18 +175,7 @@ hr {
   cursor: url("assets/cursor1red.svg") 5 3, auto;
 }
 
-.active-button {
+button.active-button {
   color: var(--color5);
   background-color: var(--color1);
 }
-
-.standard-button {
-  color: var(--color7);
-  background-color: var(--color3);
-}
-
-/*
-#graph-container {
-  cursor: url("assets/cursor1green.svg") 5 3, auto;
-}
-*/

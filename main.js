@@ -151,42 +151,46 @@ forceDropdown.querySelectorAll("input").forEach(btn => {
   }
 })
 
-const editbuttonicon = document.getElementById('edit-graph-icon');
-const edit_node_btn = document.getElementById('edit-nodes-button');
+const editButtonIcon = document.getElementById('edit-graph-icon');
+const editButtonsContainer = document.getElementById('edit-buttons-container');
+const editModeButtons = new Map([
+  ['nodes', document.getElementById('edit-nodes-button')],
+  ['edges', document.getElementById('edit-edges-button')]
+]);
+
+function deactivateEditModeButtons() {
+  editModeButtons.forEach((btn) => {
+    btn.classList.remove('active-button');
+  });
+}
 
 document.getElementById('edit-graph-button').onclick = () => {
-  if (renderer.editable == true) { 
-    renderer.editable = false;
-    editbuttonicon.setAttribute("src", "assets/lock-line.svg"); 
-    document.getElementById('edit-buttons-container').toggleAttribute("hidden");
-    //change cursor for nodes:
-    renderer.render();
+  if (editButtonsContainer.hasAttribute("hidden")) {
+    editButtonsContainer.removeAttribute("hidden");
+    editButtonIcon.setAttribute("src", "assets/lock-unlock-line.svg");
   }
-  else { renderer.editable = true; 
-    editbuttonicon.setAttribute("src", "assets/lock-unlock-line.svg");    
-    document.getElementById('edit-buttons-container').toggleAttribute("hidden");
-    edit_node_btn.classList.remove('active-button');
-    edit_node_btn.classList.add('standard-button');
-    renderer.editnodes = false;
+  else {
+    editButtonsContainer.setAttribute("hidden", "true");
+    editButtonIcon.setAttribute("src", "assets/lock-line.svg"); 
+    deactivateEditModeButtons();
+    renderer.editMode = null;
     graphContainer.classList.remove('add-cursor');
-    renderer.render();
   }
-}
-
-edit_node_btn.onclick = () => {
-  if (renderer.editnodes) {
-    renderer.editnodes = false;
-    edit_node_btn.classList.remove('active-button');
-    edit_node_btn.classList.add('standard-button');
-    graphContainer.classList.remove('add-cursor');
-  } else {
-    renderer.editnodes = true;
-    edit_node_btn.classList.add('active-button');
-    edit_node_btn.classList.remove('standard-button');
-    graphContainer.classList.add('add-cursor');
-  }   
   renderer.render();
 }
+
+editModeButtons.forEach((btn, mode) => {
+  btn.onclick = () => {
+    let was_active = btn.classList.contains('active-button');
+    deactivateEditModeButtons();
+    if (!was_active) {
+      btn.classList.add('active-button');
+    }
+    renderer.editMode = was_active ? null : mode;
+    graphContainer.classList.toggle('add-cursor', renderer.editMode === 'nodes');
+    renderer.render();
+  };
+});
 
 document.getElementById('squares-button').onclick = () => {
   let tiling = createSquareTiling(renderer.graph);

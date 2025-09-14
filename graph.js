@@ -90,15 +90,15 @@ class GraphRenderer {
     this.settings = settings;
     this.lastTimeoutId = null;
     this.mode = "attract";
-    this.editable = false;
+    this.editMode = null; // "nodes" or "edges" or null
     this.showGraph = true;
     this.morphStage = 0;
+    this.mouseDownPos = null;
+    this.grabbedNodeId = null;
 
-    //this.svg.node.addEventListener("click",
-    //  (e) => { console.log(e.offsetX, e.offsetY) });
-    
     this.svg.node.addEventListener("click", (e) => {
-      if (this.editable && this.editnodes) {
+      console.log("svg.node click");
+      if (this.editMode === "nodes") {
         this.addNode(e.offsetX, e.offsetY);
         this.render();
       }
@@ -107,12 +107,11 @@ class GraphRenderer {
     this.svg.node.addEventListener("mouseup",
       (e) => {
         //console.log("svg.node mouseup");
-        if (this.grabbednodeid) {
-          let node = this.graph.getNode(this.grabbednodeid);
+        if (this.grabbedNodeId) {
+          let node = this.graph.getNode(this.grabbedNodeId);
           node.x = this.ex2x(e.offsetX);
           node.y = this.ey2y(e.offsetY);
-          node.grab = false;
-          this.grabbednodeid = undefined;
+          this.grabbedNodeId = null;
           this.render();
         }
       }
@@ -121,8 +120,8 @@ class GraphRenderer {
     this.svg.node.addEventListener("mousemove",
       (e) => {
         //console.log("svg.node mousemove");
-        if (this.grabbednodeid) {
-          let node = this.graph.getNode(this.grabbednodeid);
+        if (this.grabbedNodeId) {
+          let node = this.graph.getNode(this.grabbedNodeId);
           //if ((this.x2ex(node.x) == e.offsetX) && (this.y2ey(node.y) == e.offsetY)) { console.log("kihagy"); }
           node.x = this.ex2x(e.offsetX);
           node.y = this.ey2y(e.offsetY);
@@ -199,43 +198,49 @@ class GraphRenderer {
       color = this.settings.colors.get(node.color);
     }
     let size = node.size || this.settings.nodes.size;
-    const circle = this.group.circle(size);
-    //console.log("ci: ", circle);
+    const circle = this.graphGroup.circle(size);
     circle.move(node.x - size / 2, node.y - size / 2)
       .fill(color)
-      .on('click', () => {
-        console.log("click");
-        if (this.editable && this.editnodes) {
-          this.graph.deleteNode(node);
-          this.refreshInfo();
-          this.render();
-        }
-      })
       .on('mousedown', (e) => {
-        //console.log("down");
-        if (this.editable && !this.editnodes) {
-          this.grabbednodeid = node.id;
-          node.grab = true;
+        // Track mouse movement to distinguish click vs drag
+        this.mouseDownPos = { x: e.clientX, y: e.clientY };
+        if (this.editMode) {
+          this.grabbedNodeId = node.id;
           this.render();
         }  
       })
-     ;  
-     if (this.editable) {
+      .on('mouseup', (e) => {
+        if (this.mouseDownPos) {
+          const dx = Math.abs(e.clientX - this.mouseDownPos.x);
+          const dy = Math.abs(e.clientY - this.mouseDownPos.y);
+          // Only treat as click if mouse didn't move much
+          if (dx < 3 && dy < 3) {
+            if (this.editMode === "nodes") {
+              this.graph.deleteNode(node);
+              this.refreshInfo();
+              this.render();
+            }
+          }
+        }
+        this.mouseDownPos = null;
+        this.grabbedNodeId = undefined;
+      });
+    if (this.editMode) {
       circle.node.classList.add("grab");
     } else {
       //circle.node.classList.remove("grab");
     }
-    if (this.grabbednodeid == node.id) {
+    if (this.grabbedNodeId == node.id) {
       circle.node.classList.add("grabbing");
     } else {
       //circle.node.classList.remove("grabbing");
     }
-    if (this.editnodes) {
+    if (this.editMode === "nodes") {
       circle.node.classList.add("delete-cursor");
     }
     if (node.nailed) {
-      let nailRadius = size * 0.3;
-      this.group.circle(nailRadius)
+      let nailRadius = size * 0.4;
+      this.graphGroup.circle(nailRadius)
         .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
         .fill(this.settings.nodes.nailColor);
     }
@@ -258,60 +263,14 @@ class GraphRenderer {
       this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color })
         .on('click', () => {
           //TODO masik gombra kotni!
-          if (this.editable && this.editnodes) {
+          if (this.editable && this.editMode === "edges") {
             this.graph.deleteEdge(edge);
             this.refreshInfo();
             this.render();
           }
         });
     });
-    this.graph.forEachNode((node) => {
-      let color = this.settings.nodes.color;
-      if (node.color) {
-        color = this.settings.colors.get(node.color);
-      }
-      let size = node.size || this.settings.nodes.size;
-      const circle = this.graphGroup.circle(size);
-      //console.log("ci: ", circle);
-      circle.move(node.x - size / 2, node.y - size / 2)
-        .fill(color)
-        .on('click', () => {
-          console.log("click");
-          if (this.editable && this.editnodes) {
-            this.graph.deleteNode(node);
-            this.refreshInfo();
-            this.render();
-          }
-        })
-        .on('mousedown', (e) => {
-          //console.log("down");
-          if (this.editable && !this.editnodes) {
-            this.grabbednodeid = node.id;
-            node.grab = true;
-            this.render();
-          }  
-        })
-       ;
-      if (this.editable) {
-        circle.node.classList.add("grab");
-      } else {
-        //circle.node.classList.remove("grab");
-      }
-      if (this.grabbednodeid == node.id) {
-        circle.node.classList.add("grabbing");
-      } else {
-        //circle.node.classList.remove("grabbing");
-      }
-      if (this.editnodes) {
-        circle.node.classList.add("delete-cursor");
-      }
-      if (node.nailed) {
-        let nailRadius = size * 0.4;
-        this.graphGroup.circle(nailRadius)
-          .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
-          .fill(this.settings.nodes.nailColor);
-      }
-    });
+    this.graph.forEachNode((node) => this.renderNode(node));
   }
 
   renderSquareTiling() {
