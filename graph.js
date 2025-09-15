@@ -182,7 +182,18 @@ class GraphRenderer {
     console.log("node mousedown, edit mode: ", this.editMode);
     // Track mouse movement to distinguish click vs drag
     this.mouseDownPos = { x: e.clientX, y: e.clientY };
-    if (this.editMode != null) {
+    if (this.editMode === "edges") {
+      if (this.edgeNodeId1 != null && this.edgeNodeId1 != node.id) {
+        this.graph.addEdge({ from: this.edgeNodeId1, to: node.id, weight: 1 });
+        this.edgeNodeId1 = null;
+        this.refreshInfo();
+        this.render();
+      }
+      else {
+        this.edgeNodeId1 = node.id;
+      }
+    }
+    else if (this.editMode != null) {
       this.grabbedNodeId = node.id;
       // this.render();
     }
