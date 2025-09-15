@@ -168,6 +168,7 @@ document.getElementById('edit-graph-button').onclick = () => {
   if (editButtonsContainer.hasAttribute("hidden")) {
     editButtonsContainer.removeAttribute("hidden");
     editButtonIcon.setAttribute("src", "assets/lock-unlock-line.svg");
+    renderer.editMode = "editing";
   }
   else {
     editButtonsContainer.setAttribute("hidden", "true");
@@ -186,7 +187,7 @@ editModeButtons.forEach((btn, mode) => {
     if (!was_active) {
       btn.classList.add('active-button');
     }
-    renderer.editMode = was_active ? null : mode;
+    renderer.editMode = was_active ? "editing" : mode;
     graphContainer.classList.toggle('add-cursor', renderer.editMode === 'nodes');
     renderer.render();
   };

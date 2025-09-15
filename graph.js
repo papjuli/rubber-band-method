@@ -90,7 +90,7 @@ class GraphRenderer {
     this.settings = settings;
     this.lastTimeoutId = null;
     this.mode = "attract";
-    this.editMode = null; // "nodes" or "edges" or null
+    this.editMode = null; // "nodes", "edges", "editing" or null
     this.showGraph = true;
     this.morphStage = 0;
     this.mouseDownPos = null;
@@ -103,23 +103,9 @@ class GraphRenderer {
         this.render();
       }
     });
-    
-    this.svg.node.addEventListener("mouseup",
-      (e) => {
-        //console.log("svg.node mouseup");
-        if (this.grabbedNodeId) {
-          let node = this.graph.getNode(this.grabbedNodeId);
-          node.x = this.ex2x(e.offsetX);
-          node.y = this.ey2y(e.offsetY);
-          this.grabbedNodeId = null;
-          this.render();
-        }
-      }
-    );
 
     this.svg.node.addEventListener("mousemove",
       (e) => {
-        //console.log("svg.node mousemove");
         if (this.grabbedNodeId) {
           let node = this.graph.getNode(this.grabbedNodeId);
           //if ((this.x2ex(node.x) == e.offsetX) && (this.y2ey(node.y) == e.offsetY)) { console.log("kihagy"); }
@@ -192,57 +178,77 @@ class GraphRenderer {
     this.render();
   }
 
+  onMouseDown(e, node) {
+    console.log("node mousedown, edit mode: ", this.editMode);
+    // Track mouse movement to distinguish click vs drag
+    this.mouseDownPos = { x: e.clientX, y: e.clientY };
+    if (this.editMode != null) {
+      this.grabbedNodeId = node.id;
+      // this.render();
+    }
+  }
+
+  onMouseUp(e, node, circle) {
+    console.log("node mouseup");
+    if (this.mouseDownPos) {
+      const dx = Math.abs(e.clientX - this.mouseDownPos.x);
+      const dy = Math.abs(e.clientY - this.mouseDownPos.y);
+      // Only treat as click if mouse didn't move much
+      if (dx < 3 && dy < 3) {
+        if (this.editMode === "nodes") {
+          this.graph.deleteNode(node);
+          this.refreshInfo();
+          this.render();
+        }
+      }
+      this.mouseDownPos = null;
+      this.grabbedNodeId = null;
+      circle.node.classList.remove("grabbing");
+    }
+  }
+
   renderNode(node) {
     let color = this.settings.nodes.color;
     if (node.color) {
       color = this.settings.colors.get(node.color);
     }
     let size = node.size || this.settings.nodes.size;
-    const circle = this.graphGroup.circle(size);
-    circle.move(node.x - size / 2, node.y - size / 2)
-      .fill(color)
-      .on('mousedown', (e) => {
-        // Track mouse movement to distinguish click vs drag
-        this.mouseDownPos = { x: e.clientX, y: e.clientY };
-        if (this.editMode) {
-          this.grabbedNodeId = node.id;
-          this.render();
-        }  
-      })
-      .on('mouseup', (e) => {
-        if (this.mouseDownPos) {
-          const dx = Math.abs(e.clientX - this.mouseDownPos.x);
-          const dy = Math.abs(e.clientY - this.mouseDownPos.y);
-          // Only treat as click if mouse didn't move much
-          if (dx < 3 && dy < 3) {
-            if (this.editMode === "nodes") {
-              this.graph.deleteNode(node);
-              this.refreshInfo();
-              this.render();
-            }
-          }
-        }
-        this.mouseDownPos = null;
-        this.grabbedNodeId = undefined;
-      });
-    if (this.editMode) {
+    let circle = this.graphGroup.circle(size)
+      .move(node.x - size / 2, node.y - size / 2)
+      .fill(color);
+    
+    let nail_circle = null;
+    if (node.nailed) {
+      let nailRadius = size * 0.4;
+      nail_circle = this.graphGroup.circle(nailRadius)
+        .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
+        .fill(this.settings.nodes.nailColor);
+    }
+
+    circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
+    circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, circle));
+    if (node.nailed) {
+      nail_circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
+      nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, nail_circle));
+    }
+
+    if (this.editMode !== null) {
       circle.node.classList.add("grab");
-    } else {
-      //circle.node.classList.remove("grab");
+      if (node.nailed) {
+        nail_circle.node.classList.add("grab");
+      }
     }
     if (this.grabbedNodeId == node.id) {
       circle.node.classList.add("grabbing");
-    } else {
-      //circle.node.classList.remove("grabbing");
+      if (node.nailed) {
+        nail_circle.node.classList.add("grabbing");
+      }
     }
     if (this.editMode === "nodes") {
       circle.node.classList.add("delete-cursor");
-    }
-    if (node.nailed) {
-      let nailRadius = size * 0.4;
-      this.graphGroup.circle(nailRadius)
-        .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
-        .fill(this.settings.nodes.nailColor);
+      if (node.nailed) {
+        nail_circle.node.classList.add("delete-cursor");
+      }
     }
   }
 
@@ -263,7 +269,7 @@ class GraphRenderer {
       this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color })
         .on('click', () => {
           //TODO masik gombra kotni!
-          if (this.editable && this.editMode === "edges") {
+          if (this.editMode === "edges") {
             this.graph.deleteEdge(edge);
             this.refreshInfo();
             this.render();
