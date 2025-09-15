@@ -277,7 +277,10 @@ class GraphRenderer {
       let width = edge.width || this.settings.edges.width;
       let s = this.graph.getNode(edge.from);
       let t = this.graph.getNode(edge.to);
-      this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color })
+      this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+      // transparent line for interaction
+      this.graphGroup.line(s.x, s.y, t.x, t.y)
+        .stroke({ width: 3 * width, color: '#000', opacity: 0 })
         .on('click', () => {
           //TODO masik gombra kotni!
           if (this.editMode === "edges") {
