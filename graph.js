@@ -67,6 +67,14 @@ class Graph {
   degree(nodeId) {
     return this.edgesAt.get(nodeId).size;
   }
+
+  weightedDegree(nodeId) {
+    let degree = 0;
+    this.forEachEdgeAt(nodeId, (edge) => {
+      degree += edge.weight;
+    });
+    return degree;
+  }
 }
 
 
@@ -113,7 +121,7 @@ class GraphRenderer {
           node.x = this.ex2x(e.offsetX);
           node.y = this.ey2y(e.offsetY);
           if (this.editMode === "rubber-band-move") {
-            solveEquilibrium(this.graph, [this.grabbedNodeId]);
+            solveEquilibrium(this.graph, this.grabbedNodeId);
           }
           this.render();          
         }
@@ -567,14 +575,13 @@ function rubberBandStep(renderer) {
 }
 
 
-function solveEquilibrium(graph, otherFixedNodes=[]) {
+function solveEquilibrium(graph, otherFixedNodeId=null) {
   // see https://mathjs.org/docs/reference/functions/sparse.html
   // and https://mathjs.org/docs/reference/functions/lsolve.html
   let nodeIndex = new Map();
   let indexNode = [];
   let n = graph.nodeCount();
-  let matrix = math.sparse();
-  matrix.resize([n, n], 0);
+  let matrix = math.zeros(n, n, 'sparse');
   let bX = [];
   let bY = [];
   let i = 0;
@@ -587,7 +594,7 @@ function solveEquilibrium(graph, otherFixedNodes=[]) {
   for (let row = 0; row < n; row++) {
     let nodeId = indexNode[row];
     let node = graph.getNode(nodeId);
-    if (node.nailed || otherFixedNodes.includes(nodeId)) {
+    if (node.nailed || otherFixedNodeId === nodeId) {
       matrix.set([row, row], 1);
       bX.push(node.x);
       bY.push(node.y);
@@ -595,16 +602,16 @@ function solveEquilibrium(graph, otherFixedNodes=[]) {
       for (let edge of graph.edgesAt.get(nodeId)) {
         let otherId = edge.from == nodeId ? edge.to : edge.from;
         let col = nodeIndex.get(otherId);
-        matrix.set([row, col], -1);
+        matrix.set([row, col], matrix.get([row, col]) - 1 * edge.weight);
       }
-      matrix.set([row, row], graph.degree(nodeId));
+      matrix.set([row, row], graph.weightedDegree(nodeId));
       bX.push(0);
       bY.push(0);
    }
   }
   // Solve for x and y coordinates
-  let xSolution = math.lsolve(matrix, bX);
-  let ySolution = math.lsolve(matrix, bY);
+  let xSolution = math.lusolve(matrix, bX);
+  let ySolution = math.lusolve(matrix, bY);
   // Update node positions
   for (let i = 0; i < n; i++) {
     let nodeId = indexNode[i];
