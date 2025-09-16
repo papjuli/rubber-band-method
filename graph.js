@@ -106,11 +106,15 @@ class GraphRenderer {
 
     this.svg.node.addEventListener("mousemove",
       (e) => {
-        if (this.grabbedNodeId) {
+        if (this.grabbedNodeId != null && 
+            (this.editMode === "manual-move" || this.editMode === "rubber-band-move")) {
           let node = this.graph.getNode(this.grabbedNodeId);
           //if ((this.x2ex(node.x) == e.offsetX) && (this.y2ey(node.y) == e.offsetY)) { console.log("kihagy"); }
           node.x = this.ex2x(e.offsetX);
           node.y = this.ey2y(e.offsetY);
+          if (this.editMode === "rubber-band-move") {
+            solveEquilibrium(this.graph, [this.grabbedNodeId]);
+          }
           this.render();          
         }
       }
@@ -193,7 +197,7 @@ class GraphRenderer {
         this.edgeNodeId1 = node.id;
       }
     }
-    else if (this.editMode != null) {
+    else if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
       this.grabbedNodeId = node.id;
       // this.render();
     }
@@ -243,13 +247,13 @@ class GraphRenderer {
       nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, nail_circle));
     }
 
-    if (this.editMode !== null) {
+    if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
       circle.node.classList.add("grab");
       if (node.nailed) {
         nail_circle.node.classList.add("grab");
       }
     }
-    if (this.grabbedNodeId == node.id) {
+    if (this.grabbedNodeId == node.id && (this.editMode === "manual-move" || this.editMode === "rubber-band-move")) {
       circle.node.classList.add("grabbing");
       if (node.nailed) {
         nail_circle.node.classList.add("grabbing");
@@ -559,6 +563,54 @@ function rubberBandStep(renderer) {
 
   if (maxChange > renderer.settings.threshold && maxCoord < 10000) {
     renderer.lastTimeoutId = setTimeout(rubberBandStep, renderer.settings.delay, renderer)
+  }
+}
+
+
+function solveEquilibrium(graph, otherFixedNodes=[]) {
+  // see https://mathjs.org/docs/reference/functions/sparse.html
+  // and https://mathjs.org/docs/reference/functions/lsolve.html
+  let nodeIndex = new Map();
+  let indexNode = [];
+  let n = graph.nodeCount();
+  let matrix = math.sparse();
+  matrix.resize([n, n], 0);
+  let bX = [];
+  let bY = [];
+  let i = 0;
+  graph.forEachNode((node) => {
+    nodeIndex.set(node.id, i);
+    indexNode.push(node.id);
+    i++;
+  });
+  
+  for (let row = 0; row < n; row++) {
+    let nodeId = indexNode[row];
+    let node = graph.getNode(nodeId);
+    if (node.nailed || otherFixedNodes.includes(nodeId)) {
+      matrix.set([row, row], 1);
+      bX.push(node.x);
+      bY.push(node.y);
+    } else {
+      for (let edge of graph.edgesAt.get(nodeId)) {
+        let otherId = edge.from == nodeId ? edge.to : edge.from;
+        let col = nodeIndex.get(otherId);
+        matrix.set([row, col], -1);
+      }
+      matrix.set([row, row], graph.degree(nodeId));
+      bX.push(0);
+      bY.push(0);
+   }
+  }
+  // Solve for x and y coordinates
+  let xSolution = math.lsolve(matrix, bX);
+  let ySolution = math.lsolve(matrix, bY);
+  // Update node positions
+  for (let i = 0; i < n; i++) {
+    let nodeId = indexNode[i];
+    let node = graph.getNode(nodeId);
+    node.x = xSolution.get([i, 0]);
+    node.y = ySolution.get([i, 0]);
   }
 }
 

@@ -155,7 +155,9 @@ const editButtonIcon = document.getElementById('edit-graph-icon');
 const editButtonsContainer = document.getElementById('edit-buttons-container');
 const editModeButtons = new Map([
   ['nodes', document.getElementById('edit-nodes-button')],
-  ['edges', document.getElementById('edit-edges-button')]
+  ['edges', document.getElementById('edit-edges-button')],
+  ['manual-move', document.getElementById('manual-move-button')],
+  ['rubber-band-move', document.getElementById('rubber-band-move-button')],
 ]);
 
 function deactivateEditModeButtons() {
