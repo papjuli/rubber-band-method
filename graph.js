@@ -227,6 +227,9 @@ class GraphRenderer {
       this.mouseDownPos = null;
       this.grabbedNodeId = null;
       circle.node.classList.remove("grabbing");
+      if (this.editMode === "rubber-band-move") {
+        rubberBandStep(this);
+      }
     }
   }
 
