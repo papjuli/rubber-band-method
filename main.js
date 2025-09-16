@@ -108,12 +108,19 @@ document.getElementById('randomize-button').onclick = () => {
 document.getElementById('run-button').onclick = () => rubberBandStep(renderer);
 
 
+function hideSecondMenuRow() {
+  document.querySelectorAll('.graph-menu-row-2').forEach(row => {
+    row.setAttribute("hidden", "true");
+  });
+}
+
 function loadTopic(topicName, button) {
   currentTopic = topicName;
   if (topicName == "SquareTiling") {
-    document.querySelector(".square-tiling-controls").style.display = "block";
+    hideSecondMenuRow();
+    document.getElementById("square-tiling-controls").removeAttribute("hidden");
   } else {
-    document.querySelector(".square-tiling-controls").style.display = "none";
+    document.getElementById("square-tiling-controls").setAttribute("hidden", "true");
   }
   fetch(`./topics/${topicName}.html`)
   .then(response => response.text())
@@ -151,6 +158,7 @@ forceDropdown.querySelectorAll("input").forEach(btn => {
   }
 })
 
+const editButton = document.getElementById('edit-graph-button');
 const editButtonIcon = document.getElementById('edit-graph-icon');
 const editButtonsContainer = document.getElementById('edit-buttons-container');
 const editModeButtons = new Map([
@@ -168,13 +176,19 @@ function deactivateEditModeButtons() {
 
 document.getElementById('edit-graph-button').onclick = () => {
   if (editButtonsContainer.hasAttribute("hidden")) {
+    hideSecondMenuRow()
     editButtonsContainer.removeAttribute("hidden");
     editButtonIcon.setAttribute("src", "assets/lock-unlock-line.svg");
+    editButton.classList.add('active-button');
     renderer.editMode = "editing";
   }
   else {
     editButtonsContainer.setAttribute("hidden", "true");
-    editButtonIcon.setAttribute("src", "assets/lock-line.svg"); 
+    if (currentTopic === "SquareTiling") {
+      document.getElementById("square-tiling-controls").removeAttribute("hidden");
+    }
+    editButtonIcon.setAttribute("src", "assets/lock-line.svg");
+    editButton.classList.remove('active-button');
     deactivateEditModeButtons();
     renderer.editMode = null;
     graphContainer.classList.remove('add-cursor');
