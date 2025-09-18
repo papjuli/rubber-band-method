@@ -1,4 +1,3 @@
-const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
 
 class Graph {
   constructor() {
@@ -17,7 +16,7 @@ class Graph {
   deleteNode(node) {
     this.edgesAt.get(node.id).forEach((adjEdge) => {
       this.deleteEdge(adjEdge);
-    })
+    });
     this.nodesById.delete(node.id);
   }
 
@@ -78,344 +77,12 @@ class Graph {
 }
 
 
-class GraphRenderer {
-  constructor(container, settings) {
-    this.svg = SVG().addTo(container).size("100%", "100%");
-    this.outerGroup = this.svg.group();
-    this.innerGroup = this.outerGroup.group();
-    this.tilingGroup = this.innerGroup.group();
-    this.morphGroup = this.innerGroup.group();
-    this.graphGroup = this.innerGroup.group();
-    let width = this.svg.node.clientWidth;
-    let height = this.svg.node.clientHeight;
-    console.log(width, height);
-    let scale = Math.min(width, height) / 2 * 0.9;
-    this.outerGroup.transform({
-      scale: [scale, -scale],
-      translateX: width / 2,
-      translateY: height / 2
-    });
-    this.settings = settings;
-    this.lastTimeoutId = null;
-    this.mode = "attract";
-    this.editMode = null; // "nodes", "edges", "editing" or null
-    this.showGraph = true;
-    this.morphStage = 0;
-    this.mouseDownPos = null;
-    this.grabbedNodeId = null;
-
-    this.svg.node.addEventListener("click", (e) => {
-      console.log("svg.node click");
-      if (this.editMode === "nodes") {
-        this.addNode(e.offsetX, e.offsetY);
-        this.render();
-      }
-    });
-
-    this.svg.node.addEventListener("mousemove",
-      (e) => {
-        if (this.grabbedNodeId != null && 
-            (this.editMode === "manual-move" || this.editMode === "rubber-band-move")) {
-          let node = this.graph.getNode(this.grabbedNodeId);
-          //if ((this.x2ex(node.x) == e.offsetX) && (this.y2ey(node.y) == e.offsetY)) { console.log("kihagy"); }
-          node.x = this.ex2x(e.offsetX);
-          node.y = this.ey2y(e.offsetY);
-          if (this.editMode === "rubber-band-move") {
-            solveEquilibrium(this.graph, this.grabbedNodeId);
-          }
-          this.render();          
-        }
-      }
-    );
-  }
-
-  resetScale() {
-    this.innerGroup.transform({ scale: [1, 1] });
-  }
-
-  setGraph(graph) {
-    this.graph = graph;
-    this.resetScale();
-  }
-
-  setSquareTiling(tiling) {
-    this.squareTiling = tiling;
-    if (tiling) {
-      let maxY = Math.max(...this.squareTiling.squares.map(tile => tile.y + tile.size));
-      if (maxY > 1) {
-        let scale = 2 / (maxY + 1);
-        console.log("Scale:", scale);
-        this.innerGroup.transform({
-          scale: [scale, scale]
-        });
-      }
-    } else {
-      this.resetScale();
-    }
-    this.morphStage = 0;
-  }
-
-  clearAll() {
-    clearTimeout(this.lastTimeoutId);
-    this.graphGroup.clear();
-    this.tilingGroup.clear();
-    this.morphGroup.clear();
-  }
-
-  refreshInfo() {
-    document.getElementById('num-vertices').innerHTML = this.graph.nodeCount();
-    document.getElementById('num-edges').innerHTML = this.graph.edgeCount();  
-  }
-
-  // TODO handle scaling in innerGroup
-  ex2x(ex) {
-    return ((ex - this.outerGroup.transform('translateX')) / -this.outerGroup.transform('scaleX'));
-  }
-
-  ey2y(ey) {
-    return ((ey - this.outerGroup.transform('translateY')) / -this.outerGroup.transform('scaleY'));
-  }
-
-  x2ex(x) {
-    return (-x * this.outerGroup.transform('scaleX') + this.outerGroup.transform('translateX'));
-  }
-
-  y2ey(y) {
-    return (-y * this.outerGroup.transform('scaleY') + this.outerGroup.transform('translateY'));
-  }
-
-  addNode(ex, ey) {
-    this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
-    this.refreshInfo();
-    this.render();
-  }
-
-  onMouseDown(e, node) {
-    console.log("node mousedown, edit mode: ", this.editMode);
-    // Track mouse movement to distinguish click vs drag
-    this.mouseDownPos = { x: e.clientX, y: e.clientY };
-    if (this.editMode === "edges") {
-      if (this.edgeNodeId1 != null && this.edgeNodeId1 != node.id) {
-        this.graph.addEdge({ from: this.edgeNodeId1, to: node.id, weight: 1 });
-        this.edgeNodeId1 = null;
-        this.refreshInfo();
-        this.render();
-      }
-      else {
-        this.edgeNodeId1 = node.id;
-      }
-    }
-    else if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
-      this.grabbedNodeId = node.id;
-      // this.render();
-    }
-  }
-
-  onMouseUp(e, node, circle) {
-    console.log("node mouseup");
-    if (this.mouseDownPos) {
-      const dx = Math.abs(e.clientX - this.mouseDownPos.x);
-      const dy = Math.abs(e.clientY - this.mouseDownPos.y);
-      // Only treat as click if mouse didn't move much
-      if (dx < 3 && dy < 3) {
-        if (this.editMode === "nodes") {
-          this.graph.deleteNode(node);
-          this.refreshInfo();
-          this.render();
-        }
-      }
-      this.mouseDownPos = null;
-      this.grabbedNodeId = null;
-      circle.node.classList.remove("grabbing");
-      if (this.editMode === "rubber-band-move") {
-        rubberBandStep(this);
-      }
-    }
-  }
-
-  renderNode(node) {
-    let color = this.settings.nodes.color;
-    if (node.color) {
-      color = this.settings.colors.get(node.color);
-    }
-    let size = node.size || this.settings.nodes.size;
-    let circle = this.graphGroup.circle(size)
-      .move(node.x - size / 2, node.y - size / 2)
-      .fill(color);
-    
-    let nail_circle = null;
-    if (node.nailed) {
-      let nailRadius = size * 0.4;
-      nail_circle = this.graphGroup.circle(nailRadius)
-        .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
-        .fill(this.settings.nodes.nailColor);
-    }
-
-    circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
-    circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, circle));
-    if (node.nailed) {
-      nail_circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
-      nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, nail_circle));
-    }
-
-    if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
-      circle.node.classList.add("grab");
-      if (node.nailed) {
-        nail_circle.node.classList.add("grab");
-      }
-    }
-    if (this.grabbedNodeId == node.id && (this.editMode === "manual-move" || this.editMode === "rubber-band-move")) {
-      circle.node.classList.add("grabbing");
-      if (node.nailed) {
-        nail_circle.node.classList.add("grabbing");
-      }
-    }
-    if (this.editMode === "nodes") {
-      circle.node.classList.add("delete-cursor");
-      if (node.nailed) {
-        nail_circle.node.classList.add("delete-cursor");
-      }
-    }
-  }
-
-  render() {
-    this.clearAll();
-    this.renderSquareTiling();
-    if (this.showGraph) {
-      this.renderGraph();
-    }
-  }
-
-  renderGraph() {
-    this.graph.forEachEdge((edge) => {
-      let color = edge.color || this.settings.edges.color;
-      let width = edge.width || this.settings.edges.width;
-      let s = this.graph.getNode(edge.from);
-      let t = this.graph.getNode(edge.to);
-      this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
-      // transparent line for interaction
-      this.graphGroup.line(s.x, s.y, t.x, t.y)
-        .stroke({ width: 3 * width, color: '#000', opacity: 0 })
-        .on('click', () => {
-          //TODO masik gombra kotni!
-          if (this.editMode === "edges") {
-            this.graph.deleteEdge(edge);
-            this.refreshInfo();
-            this.render();
-          }
-        });
-    });
-    this.graph.forEachNode((node) => this.renderNode(node));
-  }
-
-  renderSquareTiling() {
-    if (!this.squareTiling) return;
-    this.squareTiling.squares.forEach((square) => {
-      this.tilingGroup.rect(square.size, square.size)
-        .stroke({ color: "#fff", width: 0.005 })
-        .move(square.x, square.y)
-        .fill(square.color);
-    });
-  }
-
-  renderTilingSegments() {
-    if (!this.squareTiling) return;
-    // draw the vertical segments corresponding to the nodes
-    this.squareTiling.verticalSegments.forEach((segment, nodeId) => {
-      let x = this.graph.getNode(nodeId).x;
-      this.morphGroup.line(x, segment.y1, x, segment.y2)
-        .stroke({ width: 0.02, color: this.settings.nodes.color });
-    });
-    // draw the horizontal segments corresponding to the edges
-    this.squareTiling.squares.forEach((square) => {
-      let y = square.y + square.size / 2;
-      this.morphGroup.line(square.x, y, square.x + square.size, y)
-        .stroke({ width: this.settings.edges.width, 
-                  color: this.settings.edges.color, 
-                  linecap: 'round' });
-    });
-  }
-
-  morphSegments(step=0) {
-    if (!this.squareTiling) return;
-    let totalSteps = this.settings.morphSteps;
-    if (step == totalSteps) {
-        this.morphGroup.clear();
-        this.showGraph = true;
-        this.renderGraph();
-        return;
-    }
-    this.morphGroup.clear();
-    let verticalSegments = new Map();
-    this.squareTiling.verticalSegments.forEach((segment, nodeId) => {
-        let shrinkedSegment = { ...segment };
-        shrinkedSegment.y1 += step / totalSteps * (segment.y2 - segment.y1) * 0.5;
-        shrinkedSegment.y2 -= step / totalSteps * (segment.y2 - segment.y1) * 0.5;
-        verticalSegments.set(nodeId, shrinkedSegment);
-    });
-    // draw the shrinked vertical segments corresponding to the nodes
-    verticalSegments.forEach((segment, nodeId) => {
-        let x = this.graph.getNode(nodeId).x;
-        this.morphGroup.line(x, segment.y1, x, segment.y2)
-            .stroke({ width: 0.02, color: this.settings.nodes.color });
-    });
-
-    // draw the horizontal segments corresponding to the edges,
-    // so that it moves with the shrinking vertical segment
-    this.squareTiling.squares.forEach((square) => {
-      let y = square.y + square.size / 2;
-      let seg1 = verticalSegments.get(square.nodeId1);
-      let seg2 = verticalSegments.get(square.nodeId2);
-      let y1 = clamp(y, seg1.y1, seg1.y2);
-      let y2 = clamp(y, seg2.y1, seg2.y2);
-      this.morphGroup.line(square.x, y1, square.x + square.size, y2)
-        .stroke({ width: this.settings.edges.width,
-                   color: this.settings.edges.color,
-                   linecap: 'round' });
-    });
-
-    setTimeout(() => {
-        this.morphSegments(step+1);
-    }, this.settings.delay);
-  }
-
-  morphTiling() {
-    if (!this.squareTiling) return;
-    if (this.morphStage == 0) {
-      this.morphStage = 1;
-      this.showGraph = false;
-      this.render();
-      this.renderTilingSegments();
-    } else if (this.morphStage == 1) {
-      this.morphStage = 0;
-      this.morphSegments();
-    }
-  }
-}
-
-
-function loadGraph(url, renderer, callback, topicName="") {
-  console.log("loadGraph");
-  renderer.clearAll();
-  renderer.setGraph(null);
-  renderer.setSquareTiling(null);
-  parseGrf(url, (graph) => {
-    if (topicName == "SquareTiling")
-      setupGraphForTiling(graph, renderer);
-    else
-      setupGraph(graph, renderer);
-    if (callback)
-      callback(graph);
-  })
-}
-
-
 function parseGrf(url, callback) {
-  var xhr = new XMLHttpRequest()
-  if (!xhr) throw 'XMLHttpRequest not supported, cannot load the file.'
+  var xhr = new XMLHttpRequest();
+  if (!xhr) throw 'XMLHttpRequest not supported, cannot load the file.';
 
-  var graph = new Graph()
-  xhr.open('GET', url, true)
+  var graph = new Graph();
+  xhr.open('GET', url, true);
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       var lines = xhr.responseText.split('\n')
@@ -423,7 +90,7 @@ function parseGrf(url, callback) {
       var nodeCount = parseInt(lines[0]);
       var i, j, nodeData, isEdge, color;
       for (i = 0; i < nodeCount; i++) {
-        graph.addNode({ id: 'n' + i })
+        graph.addNode({ id: 'n' + i });
       }
       for (i = 0; i < nodeCount; i++) {
         nodeData = lines[i + 1].split(',');
@@ -450,22 +117,50 @@ function parseGrf(url, callback) {
 }
 
 
-function setupGraph(graph, renderer) {
-  console.log("setupGraph")
-  placeNailedNodes(graph);
-  randomizeFreeNodes(graph);
-  renderer.setGraph(graph);
-  renderer.render();
+function placeNailedNodes(graph) {
+  let nailedNodes = [];
+  graph.forEachNode((node) => {
+    if (node.nailed) nailedNodes.push(node);
+  });
+  if (nailedNodes.length == 0) return;
+  if (nailedNodes.length == 1) {
+    nailedNodes[0].x = 0;
+    nailedNodes[0].y = 1;
+    return;
+  }
+  if (nailedNodes.length == 2) {
+    nailedNodes[0].x = -1;
+    nailedNodes[0].y = 0;
+    nailedNodes[1].x = 1;
+    nailedNodes[1].y = 0;
+    return;
+  }
+  let alpha = 2 * Math.PI / nailedNodes.length
+  // put nailed nodes around unit circle, in the order they are in the file
+  for (let i = 0; i < nailedNodes.length; i++) {
+    nailedNodes[i].x = Math.sin(i * alpha);
+    nailedNodes[i].y = Math.cos(i * alpha);
+  }
 }
 
 
-function setupGraphForTiling(graph, renderer) {
+function randomizeFreeNodes(graph) {
+  graph.forEachNode((node) => {
+    if (!node.nailed) {
+      if (!node.fixed_x) node.x = Math.random() * 2 - 1;
+      if (!node.fixed_y) node.y = Math.random() * 2 - 1;
+    }
+  });
+}
+
+
+function setupGraphForTiling(graph) {
   console.log("setupGraphForTiling")
   // choose two nodes (which should be on a face)
   let nailedNodes = [];
   graph.forEachNode((node) => {
-    if (node.nailed) nailedNodes.push(node)
-  })
+    if (node.nailed) nailedNodes.push(node);
+  });
   if (nailedNodes.length < 2) {
     console.log("Not enough nailed nodes");
     return;
@@ -484,144 +179,6 @@ function setupGraphForTiling(graph, renderer) {
       node.fixed_y = true;
     }
   });
-
-  randomizeFreeNodes(graph);
-  renderer.setGraph(graph);
-  renderer.render();
-}
-
-
-function placeNailedNodes(graph) {
-  let nailedNodes = [];
-  graph.forEachNode((node) => {
-    if (node.nailed) nailedNodes.push(node)
-  })
-  if (nailedNodes.length == 0) return;
-  if (nailedNodes.length == 1) {
-    nailedNodes[0].x = 0
-    nailedNodes[0].y = 1
-    return;
-  }
-  if (nailedNodes.length == 2) {
-    nailedNodes[0].x = -1
-    nailedNodes[0].y = 0
-    nailedNodes[1].x = 1
-    nailedNodes[1].y = 0
-    return;
-  }
-  let alpha = 2 * Math.PI / nailedNodes.length
-  // put nailed nodes around unit circle, in the order they are in the file
-  for (let i = 0; i < nailedNodes.length; i++) {
-    nailedNodes[i].x = Math.sin(i * alpha)
-    nailedNodes[i].y = Math.cos(i * alpha)
-  }
-}
-
-
-function randomizeFreeNodes(graph) {
-  graph.forEachNode((node) => {
-    if (!node.nailed) {
-      if (!node.fixed_x) node.x = Math.random() * 2 - 1
-      if (!node.fixed_y) node.y = Math.random() * 2 - 1
-    }
-  })
-}
-
-
-function rubberBandStep(renderer) {
-  let graph = renderer.graph
-  console.log('step')
-  let force, dx, dy
-  let maxChange = 0
-  let maxCoord = 0
-  graph.forEachNode((node) => {
-    node.prevX = node.x
-    node.prevY = node.y
-    node.force = { x: 0, y: 0 }
-  })
-  graph.forEachNode((node) => {
-    if (!node.nailed && graph.degree(node.id) > 0) {
-      force = { x: 0, y: 0 }
-      graph.forEachEdgeAt(node.id, (edge) => {
-        let otherId = edge.from == node.id ? edge.to : edge.from
-        let otherNode = graph.getNode(otherId)
-        force.x += (otherNode.prevX - node.prevX) * edge.weight
-        force.y += (otherNode.prevY - node.prevY) * edge.weight
-      })
-      dx = renderer.settings.rate * force.x
-      dy = renderer.settings.rate * force.y
-      if (node.fixed_x) dx = 0
-      if (node.fixed_y) dy = 0
-      if (renderer.mode == "attract") {
-        node.x += dx
-        node.y += dy
-      } else {
-        node.x -= dx
-        node.y -= dy
-      }
-      if (renderer.mode == "repel-constrained") {
-        let r = Math.sqrt(node.x * node.x + node.y * node.y)
-        if (r > 1) {
-          node.x /= r
-          node.y /= r
-        }
-      }
-      maxChange = Math.max(maxChange, Math.abs(node.x - node.prevX), Math.abs(node.y - node.prevY))
-      maxCoord = Math.max(maxCoord, Math.abs(node.x), Math.abs(node.y))
-    }
-  })
-  renderer.render()
-
-  if (maxChange > renderer.settings.threshold && maxCoord < 10000) {
-    renderer.lastTimeoutId = setTimeout(rubberBandStep, renderer.settings.delay, renderer)
-  }
-}
-
-
-function solveEquilibrium(graph, otherFixedNodeId=null) {
-  // see https://mathjs.org/docs/reference/functions/sparse.html
-  // and https://mathjs.org/docs/reference/functions/lsolve.html
-  let nodeIndex = new Map();
-  let indexNode = [];
-  let n = graph.nodeCount();
-  let matrix = math.zeros(n, n, 'sparse');
-  let bX = [];
-  let bY = [];
-  let i = 0;
-  graph.forEachNode((node) => {
-    nodeIndex.set(node.id, i);
-    indexNode.push(node.id);
-    i++;
-  });
-  
-  for (let row = 0; row < n; row++) {
-    let nodeId = indexNode[row];
-    let node = graph.getNode(nodeId);
-    if (node.nailed || otherFixedNodeId === nodeId) {
-      matrix.set([row, row], 1);
-      bX.push(node.x);
-      bY.push(node.y);
-    } else {
-      for (let edge of graph.edgesAt.get(nodeId)) {
-        let otherId = edge.from == nodeId ? edge.to : edge.from;
-        let col = nodeIndex.get(otherId);
-        matrix.set([row, col], matrix.get([row, col]) - 1 * edge.weight);
-      }
-      matrix.set([row, row], graph.weightedDegree(nodeId));
-      bX.push(0);
-      bY.push(0);
-   }
-  }
-  // Solve for x and y coordinates
-  let xSolution = math.lusolve(matrix, bX);
-  let ySolution = math.lusolve(matrix, bY);
-  // Update node positions
-  for (let i = 0; i < n; i++) {
-    let nodeId = indexNode[i];
-    let node = graph.getNode(nodeId);
-    node.x = xSolution.get([i, 0]);
-    node.y = ySolution.get([i, 0]);
-  }
 }
 
 
@@ -638,10 +195,9 @@ function createSquareTiling(graph) {
   nodes.sort((a, b) => a.x - b.x);
   // define heights for the nodes:
   // the height of the first node is 0
-
-  let tiling = {squares: [], verticalSegments: new Map()};
+  let tiling = { squares: [], verticalSegments: new Map() };
   nodes[0].height = -1;
-  tiling.verticalSegments.set(nodes[0].id, {y1: nodes[0].height, y2: 2 * nodes[0].y});
+  tiling.verticalSegments.set(nodes[0].id, { y1: nodes[0].height, y2: 2 * nodes[0].y });
   nodes.forEach((node) => {
     let laterNeighbors = [];
     graph.forEachEdgeAt(node.id, (edge) => {
@@ -677,15 +233,103 @@ function createSquareTiling(graph) {
     // corresponding to the node
     if (laterNeighbors.length > 0) {
       node.y = (node.height + currHeight) / 2;
-      tiling.verticalSegments.set(node.id, {y1: node.height, y2: currHeight});
+      tiling.verticalSegments.set(node.id, { y1: node.height, y2: currHeight });
     } else {
       node.y = nodes[0].y;
       let seg0 = tiling.verticalSegments.get(nodes[0].id);
-      tiling.verticalSegments.set(node.id, {y1: seg0.y1, y2: seg0.y2});
+      tiling.verticalSegments.set(node.id, { y1: seg0.y1, y2: seg0.y2 });
     }
   });
   return tiling;
 }
 
 
-export { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep, createSquareTiling };
+function solveEquilibrium(graph, otherFixedNodeId = null) {
+  let nodeIndex = new Map();
+  let indexNode = [];
+  let n = graph.nodeCount();
+  let matrix = math.zeros(n, n, 'sparse');
+  let bX = [];
+  let bY = [];
+  let i = 0;
+  graph.forEachNode((node) => {
+    nodeIndex.set(node.id, i);
+    indexNode.push(node.id);
+    i++;
+  });
+
+  for (let row = 0; row < n; row++) {
+    let nodeId = indexNode[row];
+    let node = graph.getNode(nodeId);
+    if (node.nailed || otherFixedNodeId === nodeId) {
+      matrix.set([row, row], 1);
+      bX.push(node.x);
+      bY.push(node.y);
+    } else {
+      for (let edge of graph.edgesAt.get(nodeId)) {
+        let otherId = edge.from == nodeId ? edge.to : edge.from;
+        let col = nodeIndex.get(otherId);
+        matrix.set([row, col], matrix.get([row, col]) - 1 * edge.weight);
+      }
+      matrix.set([row, row], graph.weightedDegree(nodeId));
+      bX.push(0);
+      bY.push(0);
+    }
+  }
+  // Solve for x and y coordinates
+  let xSolution = math.lusolve(matrix, bX);
+  let ySolution = math.lusolve(matrix, bY);
+  // Update node positions
+  for (let i = 0; i < n; i++) {
+    let nodeId = indexNode[i];
+    let node = graph.getNode(nodeId);
+    node.x = xSolution.get([i, 0]);
+    node.y = ySolution.get([i, 0]);
+  }
+}
+
+
+function rubberBandStepNodes(graph, rate, mode) {
+  let force, dx, dy
+  let maxChange = 0
+  let maxCoord = 0
+  graph.forEachNode((node) => {
+    node.prevX = node.x
+    node.prevY = node.y
+  })
+  graph.forEachNode((node) => {
+    if (!node.nailed && graph.degree(node.id) > 0) {
+      force = { x: 0, y: 0 }
+      graph.forEachEdgeAt(node.id, (edge) => {
+        let otherId = edge.from == node.id ? edge.to : edge.from
+        let otherNode = graph.getNode(otherId)
+        force.x += (otherNode.prevX - node.prevX) * edge.weight
+        force.y += (otherNode.prevY - node.prevY) * edge.weight
+      })
+      dx = rate * force.x
+      dy = rate * force.y
+      if (node.fixed_x) dx = 0
+      if (node.fixed_y) dy = 0
+      if (mode == "attract") {
+        node.x += dx
+        node.y += dy
+      } else {
+        node.x -= dx
+        node.y -= dy
+      }
+      if (mode == "repel-constrained") {
+        let r = Math.sqrt(node.x * node.x + node.y * node.y)
+        if (r > 1) {
+          node.x /= r
+          node.y /= r
+        }
+      }
+      maxChange = Math.max(maxChange, Math.abs(node.x - node.prevX), Math.abs(node.y - node.prevY))
+      maxCoord = Math.max(maxCoord, Math.abs(node.x), Math.abs(node.y))
+    }
+  })
+  return { maxChange: maxChange, maxCoord: maxCoord }
+}
+
+
+export { Graph, parseGrf, createSquareTiling, solveEquilibrium, placeNailedNodes, randomizeFreeNodes, setupGraphForTiling, rubberBandStepNodes };

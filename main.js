@@ -1,4 +1,5 @@
-import { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep, createSquareTiling } from './graph.js'
+import { loadGraph, GraphRenderer, rubberBandStep } from './renderer.js'
+import { createSquareTiling, randomizeFreeNodes } from "./graph.js";
 
 
 const topicTextElement = document.getElementById('topic-text');
