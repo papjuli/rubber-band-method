@@ -290,45 +290,45 @@ function solveEquilibrium(graph, otherFixedNodeId = null) {
 
 
 function rubberBandStepNodes(graph, rate, mode) {
-  let force, dx, dy
-  let maxChange = 0
-  let maxCoord = 0
+  let force, dx, dy;
+  let maxChange = 0;
+  let maxCoord = 0;
   graph.forEachNode((node) => {
-    node.prevX = node.x
-    node.prevY = node.y
+    node.prevX = node.x;
+    node.prevY = node.y;
   })
   graph.forEachNode((node) => {
     if (!node.nailed && graph.degree(node.id) > 0) {
-      force = { x: 0, y: 0 }
+      force = { x: 0, y: 0 };
       graph.forEachEdgeAt(node.id, (edge) => {
-        let otherId = edge.from == node.id ? edge.to : edge.from
-        let otherNode = graph.getNode(otherId)
-        force.x += (otherNode.prevX - node.prevX) * edge.weight
-        force.y += (otherNode.prevY - node.prevY) * edge.weight
-      })
-      dx = rate * force.x
-      dy = rate * force.y
-      if (node.fixed_x) dx = 0
-      if (node.fixed_y) dy = 0
+        let otherId = edge.from == node.id ? edge.to : edge.from;
+        let otherNode = graph.getNode(otherId);
+        force.x += (otherNode.prevX - node.prevX) * edge.weight;
+        force.y += (otherNode.prevY - node.prevY) * edge.weight;
+      });
+      dx = rate * force.x;
+      dy = rate * force.y;
+      if (node.fixed_x) dx = 0;
+      if (node.fixed_y) dy = 0;
       if (mode == "attract") {
-        node.x += dx
-        node.y += dy
+        node.x += dx;
+        node.y += dy;
       } else {
-        node.x -= dx
-        node.y -= dy
+        node.x -= dx;
+        node.y -= dy;
       }
       if (mode == "repel-constrained") {
-        let r = Math.sqrt(node.x * node.x + node.y * node.y)
+        let r = Math.sqrt(node.x * node.x + node.y * node.y);
         if (r > 1) {
-          node.x /= r
-          node.y /= r
+          node.x /= r;
+          node.y /= r;
         }
       }
-      maxChange = Math.max(maxChange, Math.abs(node.x - node.prevX), Math.abs(node.y - node.prevY))
-      maxCoord = Math.max(maxCoord, Math.abs(node.x), Math.abs(node.y))
+      maxChange = Math.max(maxChange, Math.abs(node.x - node.prevX), Math.abs(node.y - node.prevY));
+      maxCoord = Math.max(maxCoord, Math.abs(node.x), Math.abs(node.y));
     }
   })
-  return { maxChange: maxChange, maxCoord: maxCoord }
+  return { maxChange: maxChange, maxCoord: maxCoord };
 }
 
 

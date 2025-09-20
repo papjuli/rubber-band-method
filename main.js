@@ -1,4 +1,4 @@
-import { loadGraph, GraphRenderer, rubberBandStep } from './renderer.js'
+import { loadGraph, GraphRenderer } from './renderer.js'
 import { createSquareTiling, randomizeFreeNodes } from "./graph.js";
 
 
@@ -106,7 +106,7 @@ document.getElementById('randomize-button').onclick = () => {
   randomizeFreeNodes(renderer.graph);
   renderer.render();
 };
-document.getElementById('run-button').onclick = () => rubberBandStep(renderer);
+document.getElementById('run-button').onclick = () => renderer.rubberBandStep();
 
 
 function hideSecondMenuRow() {

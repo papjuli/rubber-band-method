@@ -1,6 +1,6 @@
 import { parseGrf, solveEquilibrium, placeNailedNodes, randomizeFreeNodes, setupGraphForTiling, rubberBandStepNodes } from "./graph.js";
 
-const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
 
 class GraphRenderer {
@@ -54,30 +54,13 @@ class GraphRenderer {
     );
   }
 
-  resetScale() {
+  resetInnerGroupScale() {
     this.innerGroup.transform({ scale: [1, 1] });
   }
 
   setGraph(graph) {
     this.graph = graph;
-    this.resetScale();
-  }
-
-  setSquareTiling(tiling) {
-    this.squareTiling = tiling;
-    if (tiling) {
-      let maxY = Math.max(...this.squareTiling.squares.map(tile => tile.y + tile.size));
-      if (maxY > 1) {
-        let scale = 2 / (maxY + 1);
-        console.log("Scale:", scale);
-        this.innerGroup.transform({
-          scale: [scale, scale]
-        });
-      }
-    } else {
-      this.resetScale();
-    }
-    this.morphStage = 0;
+    this.resetInnerGroupScale();
   }
 
   clearAll() {
@@ -132,7 +115,6 @@ class GraphRenderer {
     }
     else if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
       this.grabbedNodeId = node.id;
-      // this.render();
     }
   }
 
@@ -153,7 +135,7 @@ class GraphRenderer {
       this.grabbedNodeId = null;
       circle.node.classList.remove("grabbing");
       if (this.editMode === "rubber-band-move") {
-        rubberBandStep(this);
+        this.rubberBandStep();
       }
     }
   }
@@ -231,6 +213,33 @@ class GraphRenderer {
         });
     });
     this.graph.forEachNode((node) => this.renderNode(node));
+  }
+
+  rubberBandStep() {
+    console.log('step')
+    let { maxChange, maxCoord } = rubberBandStepNodes(this.graph, this.settings.rate, this.mode);
+    this.render();
+
+    if (maxChange > this.settings.threshold && maxCoord < 10000) {
+      this.lastTimeoutId = setTimeout(this.rubberBandStep.bind(this), this.settings.delay);
+    }
+  }
+  
+  setSquareTiling(tiling) {
+    this.squareTiling = tiling;
+    if (tiling) {
+      let maxY = Math.max(...this.squareTiling.squares.map(tile => tile.y + tile.size));
+      if (maxY > 1) {
+        let scale = 2 / (maxY + 1);
+        console.log("Scale:", scale);
+        this.innerGroup.transform({
+          scale: [scale, scale]
+        });
+      }
+    } else {
+      this.resetInnerGroupScale();
+    }
+    this.morphStage = 0;
   }
 
   renderSquareTiling() {
@@ -342,16 +351,4 @@ function loadGraph(url, renderer, callback, topicName="") {
 }
 
 
-function rubberBandStep(renderer) {
-  let graph = renderer.graph
-  console.log('step')
-  let { maxChange, maxCoord } = rubberBandStepNodes(graph, renderer.settings.rate, renderer.mode);
-  renderer.render()
-
-  if (maxChange > renderer.settings.threshold && maxCoord < 10000) {
-    renderer.lastTimeoutId = setTimeout(rubberBandStep, renderer.settings.delay, renderer)
-  }
-}
-
-
-export { loadGraph, GraphRenderer, randomizeFreeNodes, rubberBandStep };
+export { GraphRenderer, loadGraph, randomizeFreeNodes };
