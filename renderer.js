@@ -29,6 +29,13 @@ class GraphRenderer {
     this.mouseDownPos = null;
     this.grabbedNodeId = null;
 
+    // Context menu setup
+    this.contextMenu = this.createContextMenu();
+    container.appendChild(this.contextMenu);
+    document.addEventListener('click', () => {
+      this.hideContextMenu();
+    });
+  
     this.svg.node.addEventListener("click", (e) => {
       console.log("svg.node click");
       if (this.editMode === "nodes") {
@@ -139,6 +146,53 @@ class GraphRenderer {
       }
     }
   }
+  
+  createContextMenu() {
+    const menu = document.createElement('div');
+    menu.className = 'node-context-menu';
+
+    // Delete Node
+    const deleteButton = document.createElement('button');
+    deleteButton.id = 'delete-node-button';
+    deleteButton.textContent = 'Delete Node';
+    menu.appendChild(deleteButton);
+
+    // Toggle Nail
+    const toggleNailButton = document.createElement('button');
+    toggleNailButton.id = 'toggle-nailed-button';
+    menu.appendChild(toggleNailButton);
+
+    return menu;
+  }
+
+  showContextMenu(x, y, node) {
+    let deleteNodeButton = this.contextMenu.querySelector('#delete-node-button');
+    deleteNodeButton.onclick = (e) => {
+      e.stopPropagation();
+      this.graph.deleteNode(node);
+      this.refreshInfo();
+      this.render();
+      this.hideContextMenu();
+    };
+
+    let toggleNailButton = this.contextMenu.querySelector('#toggle-nailed-button');
+    toggleNailButton.textContent = node.nailed ? 'Unnail Node' : 'Nail Node';
+    toggleNailButton.onclick = (e) => {
+      e.stopPropagation();
+      node.nailed = !node.nailed;
+      this.refreshInfo();
+      this.render();
+      this.hideContextMenu();
+    };
+
+    this.contextMenu.style.left = x + 'px';
+    this.contextMenu.style.top = y + 'px';
+    this.contextMenu.style.display = 'block';
+  }
+
+  hideContextMenu() {
+    this.contextMenu.style.display = 'none';
+  }
 
   renderNode(node) {
     let color = this.settings.nodes.color;
@@ -160,9 +214,17 @@ class GraphRenderer {
 
     circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
     circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, circle));
+    circle.node.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      this.showContextMenu(e.clientX, e.clientY, node);
+    });
     if (node.nailed) {
       nail_circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
       nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, nail_circle));
+      nail_circle.node.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        this.showContextMenu(e.clientX, e.clientY, node);
+      });
     }
 
     if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
