@@ -41,7 +41,6 @@ li {
 }
 
 .tooltip {
-  /* font-weight: bold; */
   position: relative;
   cursor: help;
   border-bottom: 1px dotted #888;
@@ -182,7 +181,9 @@ button.active-button {
   background-color: var(--color1);
 }
 
-.node-context-menu {
+.context-menu {
+  font-weight: bold;
+  color: var(--color7);
   position: absolute;
   background-color: var(--color1);
   border: 1px solid var(--color4);
@@ -190,14 +191,15 @@ button.active-button {
   box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
   z-index: 1000;
   padding: 0.4em;
-  min-width: 120px;
+  /* min-width: 120px; */
+  font-size: 0.9em;
   display: none;
 }
 
-.node-context-menu button {
+.context-menu button {
   display: block;
 }
 
-.node-context-menu button + button {
+.context-menu button + button {
   margin-top: 0.5em;
 }

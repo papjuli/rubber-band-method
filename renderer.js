@@ -30,10 +30,18 @@ class GraphRenderer {
     this.grabbedNodeId = null;
 
     // Context menu setup
-    this.contextMenu = this.createContextMenu();
+    this.contextMenu = this.createNodeContextMenu();
     container.appendChild(this.contextMenu);
+    // SVG context menu setup
+    this.svgContextMenu = this.createSvgContextMenu();
+    container.appendChild(this.svgContextMenu);
+    // Edge context menu setup
+    this.edgeContextMenu = this.createEdgeContextMenu();
+    container.appendChild(this.edgeContextMenu);
     document.addEventListener('click', () => {
-      this.hideContextMenu();
+      this.hideNodeContextMenu();
+      this.hideSvgContextMenu();
+      this.hideEdgeContextMenu();
     });
   
     this.svg.node.addEventListener("click", (e) => {
@@ -41,6 +49,14 @@ class GraphRenderer {
       if (this.editMode === "nodes") {
         this.addNode(e.offsetX, e.offsetY);
         this.render();
+      }
+    });
+
+    this.svg.node.addEventListener("contextmenu", (e) => {
+      // Only show if not on a node (let node context menu take precedence)
+      if (e.target === this.svg.node) {
+        e.preventDefault();
+        this.showSvgContextMenu(e.clientX, e.clientY, e.offsetX, e.offsetY);
       }
     });
 
@@ -147,9 +163,37 @@ class GraphRenderer {
     }
   }
   
-  createContextMenu() {
+  createSvgContextMenu() {
     const menu = document.createElement('div');
-    menu.className = 'node-context-menu';
+    menu.className = 'context-menu';
+    // Add Node button
+    const addButton = document.createElement('button');
+    addButton.textContent = 'Add Node';
+    addButton.id = 'svg-add-node-button';
+    menu.appendChild(addButton);
+    return menu;
+  }
+
+  showSvgContextMenu(x, y, ex, ey) {
+    let addButton = this.svgContextMenu.querySelector('#svg-add-node-button');
+    addButton.onclick = (e) => {
+      e.stopPropagation();
+      this.addNode(ex, ey);
+      this.render();
+      this.hideSvgContextMenu();
+    };
+    this.svgContextMenu.style.left = x + 'px';
+    this.svgContextMenu.style.top = y + 'px';
+    this.svgContextMenu.style.display = 'block';
+  }
+
+  hideSvgContextMenu() {
+    this.svgContextMenu.style.display = 'none';
+  }
+  
+  createNodeContextMenu() {
+    const menu = document.createElement('div');
+    menu.className = 'context-menu';
 
     // Delete Node
     const deleteButton = document.createElement('button');
@@ -165,14 +209,14 @@ class GraphRenderer {
     return menu;
   }
 
-  showContextMenu(x, y, node) {
+  showNodeContextMenu(x, y, node) {
     let deleteNodeButton = this.contextMenu.querySelector('#delete-node-button');
     deleteNodeButton.onclick = (e) => {
       e.stopPropagation();
       this.graph.deleteNode(node);
       this.refreshInfo();
       this.render();
-      this.hideContextMenu();
+      this.hideNodeContextMenu();
     };
 
     let toggleNailButton = this.contextMenu.querySelector('#toggle-nailed-button');
@@ -182,7 +226,7 @@ class GraphRenderer {
       node.nailed = !node.nailed;
       this.refreshInfo();
       this.render();
-      this.hideContextMenu();
+      this.hideNodeContextMenu();
     };
 
     this.contextMenu.style.left = x + 'px';
@@ -190,8 +234,61 @@ class GraphRenderer {
     this.contextMenu.style.display = 'block';
   }
 
-  hideContextMenu() {
+  hideNodeContextMenu() {
     this.contextMenu.style.display = 'none';
+  }
+
+  createEdgeContextMenu() {
+    const menu = document.createElement('div');
+    menu.className = 'context-menu';
+    // Delete Edge button
+    const deleteButton = document.createElement('button');
+    deleteButton.id = 'delete-edge-button';
+    deleteButton.textContent = 'Delete Edge';
+    menu.appendChild(deleteButton);
+    // Strength slider
+    menu.appendChild(document.createElement('br'));
+    menu.innerHTML += 'Set strength: ';
+    const strengthSlider = document.createElement('input');
+    strengthSlider.type = 'range';
+    strengthSlider.min = '0.25';
+    strengthSlider.max = '6';
+    strengthSlider.step = '0.25';
+    strengthSlider.id = 'edge-strength-slider';
+    menu.appendChild(strengthSlider);
+    // Value display
+    const valueSpan = document.createElement('span');
+    valueSpan.id = 'edge-strength-value';
+    valueSpan.style.marginLeft = '4px';
+    menu.appendChild(valueSpan);
+    return menu;
+  }
+
+  showEdgeContextMenu(x, y, edge) {
+    let deleteButton = this.edgeContextMenu.querySelector('#delete-edge-button');
+    deleteButton.onclick = (e) => {
+      e.stopPropagation();
+      this.graph.deleteEdge(edge);
+      this.refreshInfo();
+      this.render();
+      this.hideEdgeContextMenu();
+    };
+    let strengthSlider = this.edgeContextMenu.querySelector('#edge-strength-slider');
+    let valueSpan = this.edgeContextMenu.querySelector('#edge-strength-value');
+    strengthSlider.value = edge.weight || 1;
+    valueSpan.textContent = strengthSlider.value;
+    strengthSlider.oninput = (e) => {
+      valueSpan.textContent = strengthSlider.value;
+      edge.weight = parseFloat(strengthSlider.value);
+      this.render();
+    };
+    this.edgeContextMenu.style.left = x + 'px';
+    this.edgeContextMenu.style.top = y + 'px';
+    this.edgeContextMenu.style.display = 'block';
+  }
+
+  hideEdgeContextMenu() {
+    this.edgeContextMenu.style.display = 'none';
   }
 
   renderNode(node) {
@@ -216,14 +313,14 @@ class GraphRenderer {
     circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, circle));
     circle.node.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      this.showContextMenu(e.clientX, e.clientY, node);
+      this.showNodeContextMenu(e.clientX, e.clientY, node);
     });
     if (node.nailed) {
       nail_circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
       nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, nail_circle));
       nail_circle.node.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        this.showContextMenu(e.clientX, e.clientY, node);
+        this.showNodeContextMenu(e.clientX, e.clientY, node);
       });
     }
 
@@ -258,21 +355,18 @@ class GraphRenderer {
   renderGraph() {
     this.graph.forEachEdge((edge) => {
       let color = edge.color || this.settings.edges.color;
-      let width = edge.width || this.settings.edges.width;
+      let defaultWidth = this.settings.edges.width;
+      let width = edge.weight * defaultWidth;
       let s = this.graph.getNode(edge.from);
       let t = this.graph.getNode(edge.to);
       this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
       // transparent line for interaction
-      this.graphGroup.line(s.x, s.y, t.x, t.y)
-        .stroke({ width: 3 * width, color: '#000', opacity: 0 })
-        .on('click', () => {
-          //TODO masik gombra kotni!
-          if (this.editMode === "edges") {
-            this.graph.deleteEdge(edge);
-            this.refreshInfo();
-            this.render();
-          }
-        });
+      let interactionLine = this.graphGroup.line(s.x, s.y, t.x, t.y)
+        .stroke({ width: 6 * defaultWidth, color: '#000', opacity: 0 });
+      interactionLine.on('contextmenu', (e) => {
+        e.preventDefault();
+        this.showEdgeContextMenu(e.clientX, e.clientY, edge);
+      });
     });
     this.graph.forEachNode((node) => this.renderNode(node));
   }
