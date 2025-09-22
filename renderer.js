@@ -2,6 +2,20 @@ import { parseGrf, solveEquilibrium, placeNailedNodes, randomizeFreeNodes, setup
 
 const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
+function positionContextMenu(menu, x, y) {
+  let menuRect = menu.getBoundingClientRect();
+  let left = x;
+  let top = y;
+  if (x + menuRect.width > window.innerWidth) {
+    left = Math.max(0, x - menuRect.width);
+  }
+  if (y + menuRect.height > window.innerHeight) {
+    top = Math.max(0, y - menuRect.height);
+  }
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+}
+
 
 class GraphRenderer {
   constructor(container, settings) {
@@ -179,9 +193,8 @@ class GraphRenderer {
       this.render();
       this.hideSvgContextMenu();
     };
-    this.svgContextMenu.style.left = x + 'px';
-    this.svgContextMenu.style.top = y + 'px';
     this.svgContextMenu.style.display = 'block';
+    positionContextMenu(this.svgContextMenu, x, y);
   }
 
   hideSvgContextMenu() {
@@ -251,9 +264,8 @@ class GraphRenderer {
       this.render();
     };
 
-    this.nodeContextMenu.style.left = x + 'px';
-    this.nodeContextMenu.style.top = y + 'px';
     this.nodeContextMenu.style.display = 'block';
+    positionContextMenu(this.nodeContextMenu, x, y);
   }
 
   hideNodeContextMenu() {
@@ -284,9 +296,8 @@ class GraphRenderer {
       this.render();
       ev.stopPropagation();
     };
-    this.edgeContextMenu.style.left = x + 'px';
-    this.edgeContextMenu.style.top = y + 'px';
     this.edgeContextMenu.style.display = 'block';
+    positionContextMenu(this.edgeContextMenu, x, y);
   }
 
   hideEdgeContextMenu() {
