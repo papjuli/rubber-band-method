@@ -29,7 +29,7 @@ class GraphRenderer {
     });
     this.lastTimeoutId = null;
     this.mode = "attract";
-    this.editMode = null; // "edges", "editing" or null
+    this.editMode = null; // "editing", "edges", "manual-move", "rubber-band-move" or null
     this.showGraph = true;
     this.morphStage = 0;
     this.grabbedNodeId = null;
@@ -171,6 +171,7 @@ class GraphRenderer {
   }
 
   showSvgContextMenu(x, y, ex, ey) {
+    if (this.editMode === null) return;
     let addButton = this.svgContextMenu.querySelector('#svg-add-node-button');
     addButton.onclick = (e) => {
       e.stopPropagation();
@@ -211,6 +212,7 @@ class GraphRenderer {
   }
 
   showNodeContextMenu(x, y, node) {
+    if (this.editMode === null) return;
     let deleteNodeButton = this.nodeContextMenu.querySelector('#delete-node-button');
     deleteNodeButton.onclick = (ev) => {
       ev.stopPropagation();
@@ -263,6 +265,7 @@ class GraphRenderer {
   }
 
   showEdgeContextMenu(x, y, edge) {
+    if (this.editMode === null) return;
     let deleteButton = this.edgeContextMenu.querySelector('#delete-edge-button');
     deleteButton.onclick = (ev) => {
       ev.stopPropagation();
@@ -327,16 +330,23 @@ class GraphRenderer {
     }
 
     if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
-      circle.node.classList.add("grab");
-      if (node.nailed) {
-        nail_circle.node.classList.add("grab");
+      if (this.grabbedNodeId == node.id) {
+          circle.node.classList.add("grabbing");
+        if (node.nailed) {
+          nail_circle.node.classList.add("grabbing");
+        }
+      } else {
+        circle.node.classList.add("grab");
+        if (node.nailed) {
+          nail_circle.node.classList.add("grab");
+        }
       }
     }
-    if (this.grabbedNodeId == node.id && (this.editMode === "manual-move" || this.editMode === "rubber-band-move")) {
-      circle.node.classList.add("grabbing");
+    else if (this.editMode === "edges") {
+      circle.node.style.cursor = "pointer";
       if (node.nailed) {
-        nail_circle.node.classList.add("grabbing");
-      }
+          nail_circle.node.style.cursor = "pointer";
+        }
     }
   }
 

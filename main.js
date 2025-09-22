@@ -169,7 +169,7 @@ const editButton = document.getElementById('edit-graph-button');
 const editButtonIcon = document.getElementById('edit-graph-icon');
 const editButtonsContainer = document.getElementById('edit-buttons-container');
 const editModeButtons = new Map([
-  ['edges', document.getElementById('edit-edges-button')],
+  ['edges', document.getElementById('add-edge-button')],
   ['manual-move', document.getElementById('manual-move-button')],
   ['rubber-band-move', document.getElementById('rubber-band-move-button')],
 ]);
