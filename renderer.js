@@ -18,10 +18,17 @@ function positionContextMenu(menu, x, y) {
 
 
 class GraphRenderer {
+  graph = null;
+  squareTiling = null;
+  lastTimeoutId = null;
+  mode = "attract";
+  editMode = null; // "editing", "edges", "manual-move", "rubber-band-move" or null
+  showGraph = true;
+  morphStage = 0;
+  grabbedNodeId = null;
+
   constructor(container, settings) {
     this.settings = settings;
-    this.graph = null;
-    this.squareTiling = null;
     this.svg = SVG().addTo(container).size("100%", "100%");
     this.outerGroup = this.svg.group();
     this.innerGroup = this.outerGroup.group();
@@ -41,12 +48,6 @@ class GraphRenderer {
       translateX: width / 2,
       translateY: height / 2
     });
-    this.lastTimeoutId = null;
-    this.mode = "attract";
-    this.editMode = null; // "editing", "edges", "manual-move", "rubber-band-move" or null
-    this.showGraph = true;
-    this.morphStage = 0;
-    this.grabbedNodeId = null;
 
     // Bind onMouseMove once for consistent add/removeEventListener
     this.boundOnMouseMove = this.onMouseMove.bind(this);
@@ -354,7 +355,7 @@ class GraphRenderer {
 
     if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
       if (this.grabbedNodeId == node.id) {
-          circle.node.classList.add("grabbing");
+        circle.node.classList.add("grabbing");
         if (node.nailed) {
           nail_circle.node.classList.add("grabbing");
         }
@@ -368,8 +369,8 @@ class GraphRenderer {
     else if (this.editMode === "edges") {
       circle.node.style.cursor = "pointer";
       if (node.nailed) {
-          nail_circle.node.style.cursor = "pointer";
-        }
+        nail_circle.node.style.cursor = "pointer";
+      }
     }
   }
 
