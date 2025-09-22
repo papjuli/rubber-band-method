@@ -66,23 +66,29 @@ const allGraphs = new Map([
 
 let settings = {
   nodes: {
-    size: 0.05,
-    color: "#445498",
+    size: 0.04,
+    strokeWidth: 0.008,
+    color: "#2c43a5ff",
     nailColor: "lightgrey"
   },
   edges: {
-    color: "#445498",
+    color: "#2c43a5ff",
     width: 0.006
   },
   rate: 0.04,
   delay: 0.04,
   threshold: 0.00001,
   colors: new Map([
-    ["Red", "#ee0000"],
-    ["Blue", "#0000ee"],
-    ["Green", "#03e090"],
+    ["Red", "#ed0707ff"],
+    ["Dark blue", "#2c43a5ff"],
+    ["Light blue", "#3795f9ff"],
+    ["Green", "#09c681ff"],
     ["Yellow", "#eeee00"],
-    ["White", "#445498"]
+    ["Orange", "#ee8800"],
+    ["Purple", "#aa00ee"],
+    ["Black", "#000000"],
+    ["Grey", "#888888"],
+    ["White", "#ffffff"],
   ]),
   morphSteps: 200
 }

@@ -39,6 +39,7 @@ class GraphRenderer {
     this.edgeContextMenu = this.createEdgeContextMenu();
     container.appendChild(this.edgeContextMenu);
     document.addEventListener('click', () => {
+      console.log("document click");
       this.hideNodeContextMenu();
       this.hideSvgContextMenu();
       this.hideEdgeContextMenu();
@@ -206,6 +207,36 @@ class GraphRenderer {
     toggleNailButton.id = 'toggle-nailed-button';
     menu.appendChild(toggleNailButton);
 
+    // Color Dropdown
+    const colorLabel = document.createElement('span');
+    colorLabel.textContent = 'Change color:';
+    colorLabel.style.fontSize = "1.1em";
+    colorLabel.style.margin = '4px';
+    colorLabel.htmlFor = 'node-color-dropdown';
+    menu.appendChild(document.createElement('br'));
+    menu.appendChild(colorLabel);
+    const colorDropdown = document.createElement('select');
+    colorDropdown.id = 'node-color-dropdown';
+    colorDropdown.style.padding = '4px';
+    colorDropdown.style.margin = '4px';
+    // Add options from settings.colors
+    if (this.settings.colors) {
+      for (const [name, hex] of this.settings.colors.entries()) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        option.style.backgroundColor = hex;
+        option.style.color = (name === "Black" || name === "Dark blue" || name === "Brown") ? "white" : "black";
+        option.style.margin = '2px';
+        colorDropdown.appendChild(option);
+      }
+    }
+    menu.appendChild(colorDropdown);
+    // Prevent menu from closing when interacting with dropdown
+    colorDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
     return menu;
   }
 
@@ -226,7 +257,15 @@ class GraphRenderer {
       node.nailed = !node.nailed;
       this.refreshInfo();
       this.render();
-      this.hideNodeContextMenu();
+    };
+
+    // Color Dropdown
+    let colorDropdown = this.contextMenu.querySelector('#node-color-dropdown');
+    colorDropdown.value = node.color;
+    colorDropdown.onchange = (e) => {
+      node.color = colorDropdown.value;
+      this.refreshInfo();
+      this.render();
     };
 
     this.contextMenu.style.left = x + 'px';
@@ -292,15 +331,18 @@ class GraphRenderer {
   }
 
   renderNode(node) {
-    let color = this.settings.nodes.color;
-    if (node.color) {
-      color = this.settings.colors.get(node.color);
+    let defaultColor = this.settings.nodes.color;
+    if (node.color && this.settings.colors.has(node.color)) {
+      var color = this.settings.colors.get(node.color);
+    } else {
+      var color = defaultColor;
     }
+    let strokeColor = (node.color === "White" || node.color === "Yellow" || node.color === "Light Grey") ? defaultColor : color;
     let size = node.size || this.settings.nodes.size;
     let circle = this.graphGroup.circle(size)
       .move(node.x - size / 2, node.y - size / 2)
-      .fill(color);
-    
+      .fill(color).stroke({ width: this.settings.nodes.strokeWidth, color: strokeColor });
+
     let nail_circle = null;
     if (node.nailed) {
       let nailRadius = size * 0.4;
