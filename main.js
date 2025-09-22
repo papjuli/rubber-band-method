@@ -169,7 +169,6 @@ const editButton = document.getElementById('edit-graph-button');
 const editButtonIcon = document.getElementById('edit-graph-icon');
 const editButtonsContainer = document.getElementById('edit-buttons-container');
 const editModeButtons = new Map([
-  ['nodes', document.getElementById('edit-nodes-button')],
   ['edges', document.getElementById('edit-edges-button')],
   ['manual-move', document.getElementById('manual-move-button')],
   ['rubber-band-move', document.getElementById('rubber-band-move-button')],
@@ -198,7 +197,6 @@ document.getElementById('edit-graph-button').onclick = () => {
     editButton.classList.remove('active-button');
     deactivateEditModeButtons();
     renderer.editMode = null;
-    graphContainer.classList.remove('add-cursor');
   }
   renderer.render();
 }
@@ -211,7 +209,6 @@ editModeButtons.forEach((btn, mode) => {
       btn.classList.add('active-button');
     }
     renderer.editMode = was_active ? "editing" : mode;
-    graphContainer.classList.toggle('add-cursor', renderer.editMode === 'nodes');
     renderer.render();
   };
 });

@@ -23,7 +23,7 @@ class GraphRenderer {
     this.settings = settings;
     this.lastTimeoutId = null;
     this.mode = "attract";
-    this.editMode = null; // "nodes", "edges", "editing" or null
+    this.editMode = null; // "edges", "editing" or null
     this.showGraph = true;
     this.morphStage = 0;
     this.mouseDownPos = null;
@@ -43,14 +43,6 @@ class GraphRenderer {
       this.hideNodeContextMenu();
       this.hideSvgContextMenu();
       this.hideEdgeContextMenu();
-    });
-  
-    this.svg.node.addEventListener("click", (e) => {
-      console.log("svg.node click");
-      if (this.editMode === "nodes") {
-        this.addNode(e.offsetX, e.offsetY);
-        this.render();
-      }
     });
 
     this.svg.node.addEventListener("contextmenu", (e) => {
@@ -145,16 +137,6 @@ class GraphRenderer {
   onMouseUp(e, node, circle) {
     console.log("node mouseup");
     if (this.mouseDownPos) {
-      const dx = Math.abs(e.clientX - this.mouseDownPos.x);
-      const dy = Math.abs(e.clientY - this.mouseDownPos.y);
-      // Only treat as click if mouse didn't move much
-      if (dx < 3 && dy < 3) {
-        if (this.editMode === "nodes") {
-          this.graph.deleteNode(node);
-          this.refreshInfo();
-          this.render();
-        }
-      }
       this.mouseDownPos = null;
       this.grabbedNodeId = null;
       circle.node.classList.remove("grabbing");
@@ -376,12 +358,6 @@ class GraphRenderer {
       circle.node.classList.add("grabbing");
       if (node.nailed) {
         nail_circle.node.classList.add("grabbing");
-      }
-    }
-    if (this.editMode === "nodes") {
-      circle.node.classList.add("delete-cursor");
-      if (node.nailed) {
-        nail_circle.node.classList.add("delete-cursor");
       }
     }
   }
