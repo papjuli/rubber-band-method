@@ -5,11 +5,18 @@ const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
 class GraphRenderer {
   constructor(container, settings) {
+    this.settings = settings;
+    this.graph = null;
+    this.squareTiling = null;
     this.svg = SVG().addTo(container).size("100%", "100%");
     this.outerGroup = this.svg.group();
     this.innerGroup = this.outerGroup.group();
     this.tilingGroup = this.innerGroup.group();
     this.morphGroup = this.innerGroup.group();
+    this.newEdgeLine = this.innerGroup.line(0, 0, 0, 0)
+      .stroke({ width: this.settings.edges.width, 
+                color: this.settings.edges.color, 
+                opacity: 0 });
     this.graphGroup = this.innerGroup.group();
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
@@ -20,14 +27,15 @@ class GraphRenderer {
       translateX: width / 2,
       translateY: height / 2
     });
-    this.settings = settings;
     this.lastTimeoutId = null;
     this.mode = "attract";
     this.editMode = null; // "edges", "editing" or null
     this.showGraph = true;
     this.morphStage = 0;
-    this.mouseDownPos = null;
     this.grabbedNodeId = null;
+
+    // Bind onMouseMove once for consistent add/removeEventListener
+    this.boundOnMouseMove = this.onMouseMove.bind(this);
 
     // Context menu setup
     this.contextMenu = this.createNodeContextMenu();
@@ -54,13 +62,13 @@ class GraphRenderer {
     });
 
     this.svg.node.addEventListener("mousemove",
-      (e) => {
+      (ev) => {
         if (this.grabbedNodeId != null && 
             (this.editMode === "manual-move" || this.editMode === "rubber-band-move")) {
           let node = this.graph.getNode(this.grabbedNodeId);
           //if ((this.x2ex(node.x) == e.offsetX) && (this.y2ey(node.y) == e.offsetY)) { console.log("kihagy"); }
-          node.x = this.ex2x(e.offsetX);
-          node.y = this.ey2y(e.offsetY);
+          node.x = this.ex2x(ev.offsetX);
+          node.y = this.ey2y(ev.offsetY);
           if (this.editMode === "rubber-band-move") {
             solveEquilibrium(this.graph, this.grabbedNodeId);
           }
@@ -114,38 +122,55 @@ class GraphRenderer {
     this.render();
   }
 
-  onMouseDown(e, node) {
+  onMouseDown(ev, node) {
     console.log("node mousedown, edit mode: ", this.editMode);
-    // Track mouse movement to distinguish click vs drag
-    this.mouseDownPos = { x: e.clientX, y: e.clientY };
+    this.grabbedNodeId = node.id;
     if (this.editMode === "edges") {
-      if (this.edgeNodeId1 != null && this.edgeNodeId1 != node.id) {
-        this.graph.addEdge({ from: this.edgeNodeId1, to: node.id, weight: 1 });
-        this.edgeNodeId1 = null;
-        this.refreshInfo();
-        this.render();
-      }
-      else {
-        this.edgeNodeId1 = node.id;
-      }
-    }
-    else if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
-      this.grabbedNodeId = node.id;
+      this.svg.node.addEventListener("mousemove", this.boundOnMouseMove);
+      document.addEventListener("mouseup", this.onMouseUp.bind(this), { once: true });
     }
   }
 
-  onMouseUp(e, node, circle) {
+  onMouseUpOnNode(ev, node, circle) {
     console.log("node mouseup");
-    if (this.mouseDownPos) {
-      this.mouseDownPos = null;
-      this.grabbedNodeId = null;
+    this.svg.node.removeEventListener("mousemove", this.boundOnMouseMove);
+    if (this.grabbedNodeId) {
       circle.node.classList.remove("grabbing");
-      if (this.editMode === "rubber-band-move") {
+      if (this.editMode === "edges") {
+        if (this.grabbedNodeId != null && this.grabbedNodeId != node.id) {
+          this.graph.addEdge({ from: this.grabbedNodeId, to: node.id, weight: 1 });
+          this.refreshInfo();
+          this.render();
+        }
+      }
+      else if (this.editMode === "rubber-band-move") {
         this.rubberBandStep();
       }
+      this.newEdgeLine.stroke({ opacity: 0 });
+      this.grabbedNodeId = null;
     }
   }
-  
+
+  onMouseUp(ev) {
+    console.log("mouseup");
+    this.svg.node.removeEventListener("mousemove", this.boundOnMouseMove);
+    if (this.grabbedNodeId) {
+      if (this.editMode === "edges") {
+        this.newEdgeLine.stroke({ opacity: 0 });
+      }
+      this.grabbedNodeId = null;
+    }
+  }
+
+  onMouseMove(ev) {
+    console.log("mousemove");
+    if (this.grabbedNodeId != null && this.editMode === "edges") {
+      let node = this.graph.getNode(this.grabbedNodeId);
+      this.newEdgeLine.plot(node.x, node.y, this.ex2x(ev.offsetX), this.ey2y(ev.offsetY));
+      this.newEdgeLine.stroke({ opacity: 1 });
+    }
+  }
+
   createSvgContextMenu() {
     const menu = document.createElement('div');
     menu.className = 'context-menu';
@@ -215,8 +240,8 @@ class GraphRenderer {
     }
     menu.appendChild(colorDropdown);
     // Prevent menu from closing when interacting with dropdown
-    colorDropdown.addEventListener('click', (e) => {
-      e.stopPropagation();
+    colorDropdown.addEventListener('click', (ev) => {
+      ev.stopPropagation();
     });
 
     return menu;
@@ -224,8 +249,8 @@ class GraphRenderer {
 
   showNodeContextMenu(x, y, node) {
     let deleteNodeButton = this.contextMenu.querySelector('#delete-node-button');
-    deleteNodeButton.onclick = (e) => {
-      e.stopPropagation();
+    deleteNodeButton.onclick = (ev) => {
+      ev.stopPropagation();
       this.graph.deleteNode(node);
       this.refreshInfo();
       this.render();
@@ -234,8 +259,8 @@ class GraphRenderer {
 
     let toggleNailButton = this.contextMenu.querySelector('#toggle-nailed-button');
     toggleNailButton.textContent = node.nailed ? 'Unnail Node' : 'Nail Node';
-    toggleNailButton.onclick = (e) => {
-      e.stopPropagation();
+    toggleNailButton.onclick = (ev) => {
+      ev.stopPropagation();
       node.nailed = !node.nailed;
       this.refreshInfo();
       this.render();
@@ -244,7 +269,7 @@ class GraphRenderer {
     // Color Dropdown
     let colorDropdown = this.contextMenu.querySelector('#node-color-dropdown');
     colorDropdown.value = node.color;
-    colorDropdown.onchange = (e) => {
+    colorDropdown.onchange = (ev) => {
       node.color = colorDropdown.value;
       this.refreshInfo();
       this.render();
@@ -287,8 +312,8 @@ class GraphRenderer {
 
   showEdgeContextMenu(x, y, edge) {
     let deleteButton = this.edgeContextMenu.querySelector('#delete-edge-button');
-    deleteButton.onclick = (e) => {
-      e.stopPropagation();
+    deleteButton.onclick = (ev) => {
+      ev.stopPropagation();
       this.graph.deleteEdge(edge);
       this.refreshInfo();
       this.render();
@@ -334,14 +359,14 @@ class GraphRenderer {
     }
 
     circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
-    circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, circle));
+    circle.node.addEventListener('mouseup', (e) => this.onMouseUpOnNode(e, node, circle));
     circle.node.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       this.showNodeContextMenu(e.clientX, e.clientY, node);
     });
     if (node.nailed) {
       nail_circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
-      nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUp(e, node, nail_circle));
+      nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUpOnNode(e, node, nail_circle));
       nail_circle.node.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         this.showNodeContextMenu(e.clientX, e.clientY, node);
