@@ -39,6 +39,8 @@ class GraphRenderer {
                 color: this.settings.edges.color, 
                 opacity: 0 });
     this.graphGroup = this.innerGroup.group();
+    this.edgesGroup = this.graphGroup.group();
+    this.nodesGroup = this.graphGroup.group();
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
     console.log(width, height);
@@ -71,6 +73,10 @@ class GraphRenderer {
       }
     });
 
+    this.svg.node.addEventListener("mouseup", (e) => {
+      this.grabbedNodeId = null;
+    });
+
     this.svg.node.addEventListener("mousemove",
       (ev) => {
         if (this.grabbedNodeId != null && 
@@ -82,10 +88,31 @@ class GraphRenderer {
           if (this.editMode === "rubber-band-move") {
             solveEquilibrium(this.graph, this.grabbedNodeId);
           }
-          this.render();          
+          this.updatePositions();          
         }
       }
     );
+  }
+
+  loadGraph(url, callback, topicName="") {
+    console.log("loadGraph");
+    this.clearAll();
+    this.setGraph(null);
+    this.setSquareTiling(null);
+    parseGrf(url, (graph) => {
+      if (topicName == "SquareTiling") {
+        setupGraphForTiling(graph);
+      }
+      else {
+        placeNailedNodes(graph);
+      }
+      randomizeFreeNodes(graph);
+      this.setGraph(graph);
+      this.createSvg();
+
+      if (callback)
+        callback(graph);
+    })
   }
 
   resetInnerGroupScale() {
@@ -99,7 +126,8 @@ class GraphRenderer {
 
   clearAll() {
     clearTimeout(this.lastTimeoutId);
-    this.graphGroup.clear();
+    this.edgesGroup.clear();
+    this.nodesGroup.clear();
     this.tilingGroup.clear();
     this.morphGroup.clear();
   }
@@ -107,6 +135,14 @@ class GraphRenderer {
   refreshInfo() {
     document.getElementById('num-vertices').innerHTML = this.graph.nodeCount();
     document.getElementById('num-edges').innerHTML = this.graph.edgeCount();  
+  }
+
+  createSvg() {
+    this.clearAll();
+    this.renderSquareTiling();
+    if (this.showGraph) {
+      this.createGraphSvg();
+    }
   }
 
   // TODO handle scaling in innerGroup
@@ -129,7 +165,7 @@ class GraphRenderer {
   addNode(ex, ey) {
     let newNode = this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
     this.refreshInfo();
-    this.render();
+    this.createNodeSvg(newNode);
     return newNode;
   }
 
@@ -142,16 +178,17 @@ class GraphRenderer {
     }
   }
 
-  onMouseUpOnNode(ev, node, circle) {
+  onMouseUpOnNode(ev, node) {
     console.log("node mouseup");
     this.svg.node.removeEventListener("mousemove", this.boundOnMouseMove);
     if (this.grabbedNodeId) {
-      circle.node.classList.remove("grabbing");
+      node.group.node.classList.remove("grabbing");
       if (this.editMode === "edges") {
         if (this.grabbedNodeId != null && this.grabbedNodeId != node.id) {
-          this.graph.addEdge({ from: this.grabbedNodeId, to: node.id, weight: 1 });
+          let newEdge = { from: this.grabbedNodeId, to: node.id, weight: 1 };
+          this.graph.addEdge(newEdge);
           this.refreshInfo();
-          this.render();
+          this.createEdgeSvg(newEdge);
         }
       }
       else if (this.editMode === "rubber-band-move") {
@@ -191,8 +228,8 @@ class GraphRenderer {
     let addButton = this.svgContextMenu.querySelector('#svg-add-node-button');
     addButton.onclick = (e) => {
       e.stopPropagation();
-      this.addNode(ex, ey);
-      this.render();
+      let newNode = this.addNode(ex, ey);
+      this.createNodeSvg(newNode);
       this.hideSvgContextMenu();
     };
     this.svgContextMenu.style.display = 'block';
@@ -231,9 +268,12 @@ class GraphRenderer {
     let deleteNodeButton = this.nodeContextMenu.querySelector('#delete-node-button');
     deleteNodeButton.onclick = (ev) => {
       ev.stopPropagation();
+      node.group.remove();
+      this.graph.forEachEdgeAt(node.id, (edge) => {
+        edge.group.remove();
+      });
       this.graph.deleteNode(node);
       this.refreshInfo();
-      this.render();
       this.hideNodeContextMenu();
     };
 
@@ -254,7 +294,7 @@ class GraphRenderer {
         pinIcon.src = 'assets/unpin-line.svg';
       }
       this.refreshInfo();
-      this.render();
+      this.createNodeSvg(node);
     };
     
     // Color Dropdown
@@ -263,7 +303,7 @@ class GraphRenderer {
     colorDropdown.onchange = (ev) => {
       node.color = colorDropdown.value;
       this.refreshInfo();
-      this.render();
+      this.createNodeSvg(node);
     };
 
     this.nodeContextMenu.style.display = 'block';
@@ -285,18 +325,23 @@ class GraphRenderer {
       ev.stopPropagation();
       this.graph.deleteEdge(edge);
       this.refreshInfo();
-      this.render();
+      edge.group.remove();
       this.hideEdgeContextMenu();
     };
     let splitNodeButton = this.edgeContextMenu.querySelector('#split-node-button');
     splitNodeButton.onclick = (ev) => {
       ev.stopPropagation();
       let newNode = this.addNode(offsetX, offsetY);
-      this.graph.addEdge({from: edge.from, to: newNode.id, weight: edge.weight});
-      this.graph.addEdge({from: newNode.id, to: edge.to, weight: edge.weight});
+      let newEdge = { from: edge.from, to: newNode.id, weight: edge.weight };
+      this.graph.addEdge(newEdge);
+      let newEdge2 = { from: newNode.id, to: edge.to, weight: edge.weight };
+      this.graph.addEdge(newEdge2);
+      edge.group.remove();
       this.graph.deleteEdge(edge);
       this.refreshInfo();
-      this.render();
+      this.createNodeSvg(newNode);
+      this.createEdgeSvg(newEdge);
+      this.createEdgeSvg(newEdge2);
       this.hideEdgeContextMenu();
     };
     let strengthSlider = this.edgeContextMenu.querySelector('#edge-strength-slider');
@@ -306,7 +351,7 @@ class GraphRenderer {
     strengthSlider.oninput = (ev) => {
       valueSpan.textContent = strengthSlider.value;
       edge.weight = parseFloat(strengthSlider.value);
-      this.render();
+      this.createEdgeSvg(edge);
       ev.stopPropagation();
     };
     this.edgeContextMenu.style.display = 'block';
@@ -317,7 +362,15 @@ class GraphRenderer {
     this.edgeContextMenu.style.display = 'none';
   }
 
-  renderNode(node) {
+  createGraphSvg() {
+    this.graph.forEachEdge((edge) => this.createEdgeSvg(edge));
+    this.graph.forEachNode((node) => this.createNodeSvg(node));
+  }
+
+  createNodeSvg(node) {
+    if (node.group) {
+      node.group.remove();
+    }
     let defaultColor = this.settings.nodes.color;
     if (node.color && this.settings.colors.has(node.color)) {
       var color = this.settings.colors.get(node.color);
@@ -326,85 +379,77 @@ class GraphRenderer {
     }
     let strokeColor = (node.color === "White" || node.color === "Yellow" || node.color === "Light Grey") ? defaultColor : color;
     let size = node.size || this.settings.nodes.size;
-    let circle = this.graphGroup.circle(size)
-      .move(node.x - size / 2, node.y - size / 2)
+    node.group = this.nodesGroup.group().transform({ translateX: node.x, translateY: node.y });
+    node.group.circle(size)
+      .move(-size / 2, -size / 2)
       .fill(color).stroke({ width: this.settings.nodes.strokeWidth, color: strokeColor });
 
-    let nail_circle = null;
     if (node.nailed) {
       let nailRadius = size * 0.4;
-      nail_circle = this.graphGroup.circle(nailRadius)
-        .move(node.x - nailRadius / 2, node.y - nailRadius / 2)
+      node.group.circle(nailRadius)
+        .move(-nailRadius / 2, -nailRadius / 2)
         .fill(this.settings.nodes.nailColor);
     }
 
-    circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
-    circle.node.addEventListener('mouseup', (e) => this.onMouseUpOnNode(e, node, circle));
-    circle.node.addEventListener('contextmenu', (e) => {
+    node.group.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
+    node.group.node.addEventListener('mouseup', (e) => this.onMouseUpOnNode(e, node));
+    node.group.node.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       this.showNodeContextMenu(e.clientX, e.clientY, node);
     });
-    if (node.nailed) {
-      nail_circle.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
-      nail_circle.node.addEventListener('mouseup', (e) => this.onMouseUpOnNode(e, node, nail_circle));
-      nail_circle.node.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        this.showNodeContextMenu(e.clientX, e.clientY, node);
-      });
-    }
 
     if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
       if (this.grabbedNodeId == node.id) {
-        circle.node.classList.add("grabbing");
-        if (node.nailed) {
-          nail_circle.node.classList.add("grabbing");
-        }
+        node.group.node.classList.add("grabbing");
       } else {
-        circle.node.classList.add("grab");
-        if (node.nailed) {
-          nail_circle.node.classList.add("grab");
-        }
+        node.group.node.classList.add("grab");
       }
     }
     else if (this.editMode === "edges") {
-      circle.node.style.cursor = "pointer";
-      if (node.nailed) {
-        nail_circle.node.style.cursor = "pointer";
+      node.group.node.style.cursor = "pointer";
+    }
+  }
+
+  createEdgeSvg(edge) {
+    if (edge.group) {
+      edge.group.remove();
+    }
+    let color = edge.color || this.settings.edges.color;
+    let defaultWidth = this.settings.edges.width;
+    let width = edge.weight * defaultWidth;
+    let s = this.graph.getNode(edge.from);
+    let t = this.graph.getNode(edge.to);
+    edge.group = this.edgesGroup.group();
+    edge.line = edge.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+    // transparent line for interaction
+    edge.interactionLine = edge.group.line(s.x, s.y, t.x, t.y)
+      .stroke({ width: 6 * defaultWidth, color: '#000', opacity: 0 });
+    edge.interactionLine.on('contextmenu', (e) => {
+      e.preventDefault();
+      this.showEdgeContextMenu(e.clientX, e.clientY, e.offsetX, e.offsetY, edge);
+    });
+  }
+
+  updatePositions() {
+    this.graph.forEachNode((node) => {
+      if (node.group) {
+        node.group.transform({ translateX: node.x, translateY: node.y });
       }
-    }
-  }
-
-  render() {
-    this.clearAll();
-    this.renderSquareTiling();
-    if (this.showGraph) {
-      this.renderGraph();
-    }
-  }
-
-  renderGraph() {
+    });
     this.graph.forEachEdge((edge) => {
-      let color = edge.color || this.settings.edges.color;
-      let defaultWidth = this.settings.edges.width;
-      let width = edge.weight * defaultWidth;
       let s = this.graph.getNode(edge.from);
       let t = this.graph.getNode(edge.to);
-      this.graphGroup.line(s.x, s.y, t.x, t.y).stroke({ width, color });
-      // transparent line for interaction
-      let interactionLine = this.graphGroup.line(s.x, s.y, t.x, t.y)
-        .stroke({ width: 6 * defaultWidth, color: '#000', opacity: 0 });
-      interactionLine.on('contextmenu', (e) => {
-        e.preventDefault();
-        this.showEdgeContextMenu(e.clientX, e.clientY, e.offsetX, e.offsetY, edge);
-      });
+      if (edge.line) {
+        edge.line.plot(s.x, s.y, t.x, t.y);
+        edge.interactionLine.plot(s.x, s.y, t.x, t.y);
+      }
     });
-    this.graph.forEachNode((node) => this.renderNode(node));
   }
 
   rubberBandStep() {
     console.log('step')
     let { maxChange, maxCoord } = rubberBandStepNodes(this.graph, this.settings.rate, this.mode);
-    this.render();
+    this.updatePositions();
 
     if (maxChange > this.settings.threshold && maxCoord < 10000) {
       this.lastTimeoutId = setTimeout(this.rubberBandStep.bind(this), this.settings.delay);
@@ -462,7 +507,7 @@ class GraphRenderer {
     if (step == totalSteps) {
         this.morphGroup.clear();
         this.showGraph = true;
-        this.renderGraph();
+        this.createGraphSvg();
         return;
     }
     this.morphGroup.clear();
@@ -504,7 +549,7 @@ class GraphRenderer {
     if (this.morphStage == 0) {
       this.morphStage = 1;
       this.showGraph = false;
-      this.render();
+      this.createSvg();
       this.renderTilingSegments();
     } else if (this.morphStage == 1) {
       this.morphStage = 0;
@@ -514,27 +559,4 @@ class GraphRenderer {
 }
 
 
-function loadGraph(url, renderer, callback, topicName="") {
-  console.log("loadGraph");
-  renderer.clearAll();
-  renderer.setGraph(null);
-  renderer.setSquareTiling(null);
-  parseGrf(url, (graph) => {
-    if (topicName == "SquareTiling") {
-      setupGraphForTiling(graph);
-    }
-    else {
-      placeNailedNodes(graph);
-    }
-
-    randomizeFreeNodes(graph);
-    renderer.setGraph(graph);
-    renderer.render();
-
-    if (callback)
-      callback(graph);
-  })
-}
-
-
-export { GraphRenderer, loadGraph, randomizeFreeNodes };
+export { GraphRenderer, randomizeFreeNodes };

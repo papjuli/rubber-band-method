@@ -1,4 +1,4 @@
-import { loadGraph, GraphRenderer } from './renderer.js'
+import { GraphRenderer } from './renderer.js'
 import { createSquareTiling, randomizeFreeNodes } from "./graph.js";
 
 
@@ -99,7 +99,7 @@ let renderer = new GraphRenderer(graphContainer, settings);
 function loadGraphAndSetInfo(
     graphName, topicName, path=allGraphs.get(graphName)) {
   console.log("Loading graph:", graphName, "for topic:", topicName);
-  loadGraph(path, renderer, (graph) => {
+  renderer.loadGraph(path, (graph) => {
     document.getElementById('graph-name').innerHTML = graphName;
     document.getElementById('num-vertices').innerHTML = graph.nodeCount();
     document.getElementById('num-edges').innerHTML = graph.edgeCount();
@@ -110,7 +110,7 @@ loadGraphAndSetInfo("dodecahedron", "Intro");
 
 document.getElementById('randomize-button').onclick = () => {
   randomizeFreeNodes(renderer.graph);
-  renderer.render();
+  renderer.updatePositions();
 };
 document.getElementById('run-button').onclick = () => renderer.rubberBandStep();
 
@@ -198,7 +198,7 @@ document.getElementById('edit-graph-button').onclick = () => {
     deactivateEditModeButtons();
     renderer.editMode = null;
   }
-  renderer.render();
+  renderer.createSvg();
 }
 
 editModeButtons.forEach((btn, mode) => {
@@ -209,20 +209,20 @@ editModeButtons.forEach((btn, mode) => {
       btn.classList.add('active-button');
     }
     renderer.editMode = was_active ? "editing" : mode;
-    renderer.render();
+    renderer.createSvg();
   };
 });
 
 document.getElementById('squares-button').onclick = () => {
   let tiling = createSquareTiling(renderer.graph);
   renderer.setSquareTiling(tiling);
-  renderer.render();
+  renderer.createSvg();
 };
 
 
 document.getElementById('show-hide-button').onclick = () => {
     renderer.showGraph = !renderer.showGraph;
-    renderer.render();
+    renderer.createSvg();
 };
 
 
