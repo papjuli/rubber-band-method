@@ -191,15 +191,21 @@ button.active-button {
   box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
   z-index: 1000;
   padding: 0.4em;
-  /* min-width: 120px; */
   font-size: 0.9em;
   display: none;
 }
 
 .context-menu button {
   display: block;
+  padding: 0.4em 0.4em 0.3em 0.3em;
 }
 
 .context-menu button + button {
   margin-top: 0.5em;
+}
+
+.context-menu .menu-icon {
+  height: 1em;
+  margin-bottom: -0.1em;
+  margin-right: 0.1em;
 }

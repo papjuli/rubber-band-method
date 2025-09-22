@@ -70,6 +70,36 @@
   <script type="module" src="main.js"></script>
   <script type="module" src="tooltips.js"></script>
 
+  <div id="context-menus">
+    <div id="svg-context-menu" class="context-menu" style="display:none;">
+      <button class="context-menu-item" id="svg-add-node-button"><img class="menu-icon" src="assets/add-circle-line.svg"> Add node </button>
+    </div>
+    <div id="node-context-menu" class="context-menu" style="display:none;">
+      <button class="context-menu-item" id="delete-node-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete node </button>
+      <button class="context-menu-item" id="toggle-nailed-button"><img class="menu-icon" src="assets/pushpin-line.svg"><span>Nail node</span></button>
+      <br>
+      <span class="context-menu-item" style="font-size:1.1em;margin:0.2em;" htmlFor="node-color-dropdown">
+        Change color:
+        <select id="node-color-dropdown" style="padding:0.2em;margin:0.2em;">
+        </select>
+      </span>
+    </div>
+    <div id="edge-context-menu" class="context-menu" style="display:none;">
+      <button class="context-menu-item" id="delete-edge-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete edge </button>
+      <br>
+      <span style="margin-left: 0.3em;">Set strength: </span>
+      <input type="range" 
+             id="edge-strength-slider" 
+             class="context-menu-item" 
+             min="0.25" 
+             max="6" 
+             value="1"
+             step="0.25" 
+             style="width:8em; vertical-align: middle; margin-left:0.5em;">
+      <span id="edge-strength-value" class="context-menu-item" style="display:inline-block; width:2.5em;">1</span>
+    </div>
+  </div>
+
   <div id="tooltip-box" class="tooltip-box"></div>
   <div id="tooltip-contents" style="display:none;">
     <div id="tooltip-Tutte">

@@ -38,14 +38,9 @@ class GraphRenderer {
     this.boundOnMouseMove = this.onMouseMove.bind(this);
 
     // Context menu setup
-    this.contextMenu = this.createNodeContextMenu();
-    container.appendChild(this.contextMenu);
-    // SVG context menu setup
-    this.svgContextMenu = this.createSvgContextMenu();
-    container.appendChild(this.svgContextMenu);
-    // Edge context menu setup
-    this.edgeContextMenu = this.createEdgeContextMenu();
-    container.appendChild(this.edgeContextMenu);
+    this.svgContextMenu = this.getSvgContextMenu();
+    this.nodeContextMenu = this.getNodeContextMenu();
+    this.edgeContextMenu = this.getEdgeContextMenu();
     document.addEventListener('click', () => {
       console.log("document click");
       this.hideNodeContextMenu();
@@ -171,15 +166,8 @@ class GraphRenderer {
     }
   }
 
-  createSvgContextMenu() {
-    const menu = document.createElement('div');
-    menu.className = 'context-menu';
-    // Add Node button
-    const addButton = document.createElement('button');
-    addButton.textContent = 'Add Node';
-    addButton.id = 'svg-add-node-button';
-    menu.appendChild(addButton);
-    return menu;
+  getSvgContextMenu() {
+    return document.getElementById('svg-context-menu');
   }
 
   showSvgContextMenu(x, y, ex, ey) {
@@ -199,33 +187,9 @@ class GraphRenderer {
     this.svgContextMenu.style.display = 'none';
   }
   
-  createNodeContextMenu() {
-    const menu = document.createElement('div');
-    menu.className = 'context-menu';
-
-    // Delete Node
-    const deleteButton = document.createElement('button');
-    deleteButton.id = 'delete-node-button';
-    deleteButton.textContent = 'Delete Node';
-    menu.appendChild(deleteButton);
-
-    // Toggle Nail
-    const toggleNailButton = document.createElement('button');
-    toggleNailButton.id = 'toggle-nailed-button';
-    menu.appendChild(toggleNailButton);
-
-    // Color Dropdown
-    const colorLabel = document.createElement('span');
-    colorLabel.textContent = 'Change color:';
-    colorLabel.style.fontSize = "1.1em";
-    colorLabel.style.margin = '4px';
-    colorLabel.htmlFor = 'node-color-dropdown';
-    menu.appendChild(document.createElement('br'));
-    menu.appendChild(colorLabel);
-    const colorDropdown = document.createElement('select');
-    colorDropdown.id = 'node-color-dropdown';
-    colorDropdown.style.padding = '4px';
-    colorDropdown.style.margin = '4px';
+  getNodeContextMenu() {
+    const menu = document.getElementById('node-context-menu');
+    const colorDropdown = document.getElementById('node-color-dropdown');
     // Add options from settings.colors
     if (this.settings.colors) {
       for (const [name, hex] of this.settings.colors.entries()) {
@@ -238,7 +202,6 @@ class GraphRenderer {
         colorDropdown.appendChild(option);
       }
     }
-    menu.appendChild(colorDropdown);
     // Prevent menu from closing when interacting with dropdown
     colorDropdown.addEventListener('click', (ev) => {
       ev.stopPropagation();
@@ -248,7 +211,7 @@ class GraphRenderer {
   }
 
   showNodeContextMenu(x, y, node) {
-    let deleteNodeButton = this.contextMenu.querySelector('#delete-node-button');
+    let deleteNodeButton = this.nodeContextMenu.querySelector('#delete-node-button');
     deleteNodeButton.onclick = (ev) => {
       ev.stopPropagation();
       this.graph.deleteNode(node);
@@ -257,17 +220,28 @@ class GraphRenderer {
       this.hideNodeContextMenu();
     };
 
-    let toggleNailButton = this.contextMenu.querySelector('#toggle-nailed-button');
-    toggleNailButton.textContent = node.nailed ? 'Unnail Node' : 'Nail Node';
+    let toggleNailButton = this.nodeContextMenu.querySelector('#toggle-nailed-button');
+    let textSpan = toggleNailButton.querySelector('span');
+    textSpan.textContent = node.nailed ? 'Unnail Node' : 'Nail Node';
+    let pinIcon = toggleNailButton.querySelector('.menu-icon');
+    pinIcon.src = node.nailed ? 'assets/unpin-line.svg' : 'assets/pushpin-line.svg';
     toggleNailButton.onclick = (ev) => {
       ev.stopPropagation();
-      node.nailed = !node.nailed;
+      if (node.nailed) {
+        node.nailed = false;
+        textSpan.textContent = 'Nail Node';
+        pinIcon.src = 'assets/pushpin-line.svg';
+      } else {
+        node.nailed = true;
+        textSpan.textContent = 'Unnail Node';
+        pinIcon.src = 'assets/unpin-line.svg';
+      }
       this.refreshInfo();
       this.render();
     };
-
+    
     // Color Dropdown
-    let colorDropdown = this.contextMenu.querySelector('#node-color-dropdown');
+    let colorDropdown = this.nodeContextMenu.querySelector('#node-color-dropdown');
     colorDropdown.value = node.color;
     colorDropdown.onchange = (ev) => {
       node.color = colorDropdown.value;
@@ -275,39 +249,17 @@ class GraphRenderer {
       this.render();
     };
 
-    this.contextMenu.style.left = x + 'px';
-    this.contextMenu.style.top = y + 'px';
-    this.contextMenu.style.display = 'block';
+    this.nodeContextMenu.style.left = x + 'px';
+    this.nodeContextMenu.style.top = y + 'px';
+    this.nodeContextMenu.style.display = 'block';
   }
 
   hideNodeContextMenu() {
-    this.contextMenu.style.display = 'none';
+    this.nodeContextMenu.style.display = 'none';
   }
 
-  createEdgeContextMenu() {
-    const menu = document.createElement('div');
-    menu.className = 'context-menu';
-    // Delete Edge button
-    const deleteButton = document.createElement('button');
-    deleteButton.id = 'delete-edge-button';
-    deleteButton.textContent = 'Delete Edge';
-    menu.appendChild(deleteButton);
-    // Strength slider
-    menu.appendChild(document.createElement('br'));
-    menu.innerHTML += 'Set strength: ';
-    const strengthSlider = document.createElement('input');
-    strengthSlider.type = 'range';
-    strengthSlider.min = '0.25';
-    strengthSlider.max = '6';
-    strengthSlider.step = '0.25';
-    strengthSlider.id = 'edge-strength-slider';
-    menu.appendChild(strengthSlider);
-    // Value display
-    const valueSpan = document.createElement('span');
-    valueSpan.id = 'edge-strength-value';
-    valueSpan.style.marginLeft = '4px';
-    menu.appendChild(valueSpan);
-    return menu;
+  getEdgeContextMenu() {
+    return document.getElementById('edge-context-menu');
   }
 
   showEdgeContextMenu(x, y, edge) {
@@ -323,10 +275,11 @@ class GraphRenderer {
     let valueSpan = this.edgeContextMenu.querySelector('#edge-strength-value');
     strengthSlider.value = edge.weight || 1;
     valueSpan.textContent = strengthSlider.value;
-    strengthSlider.oninput = (e) => {
+    strengthSlider.oninput = (ev) => {
       valueSpan.textContent = strengthSlider.value;
       edge.weight = parseFloat(strengthSlider.value);
       this.render();
+      ev.stopPropagation();
     };
     this.edgeContextMenu.style.left = x + 'px';
     this.edgeContextMenu.style.top = y + 'px';
