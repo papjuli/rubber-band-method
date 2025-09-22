@@ -62,7 +62,10 @@
 
   <p>Load the "connectivity proof" graph and click <b>Run</b> to get a nicer drawing of it. You'll see three green nodes that are lined up. It is probably easy (by trial and error) to reinforce an edge to make them noncollinear, but the following should convince you that this is <i>always</i> possible.</p>
 
-  <p>Since these three green nodes cannot be separated from the three red nodes by two nodes, you can find <i>three disjoint paths</i> that connect them to the three red nodes. Select Edit>Add thick edge, and make the edges on these paths thick by clicking one of their endnodes and then the other. Click <b>Run</b>: the thick edges pull the green nodes close to the red nodes. If you make them thicker by repeating the process, they will be pulled in even closer. Trivially, they are not collinear for such a reinforcement of the paths. QED.</p>
+  <p>Since these three green nodes cannot be separated from the three red nodes by two nodes, you can find <i>three disjoint paths</i> that connect them to the three red nodes. 
+  <!-- Select Edit>Add thick edge, and make the edges on these paths thick by clicking one of their endnodes and then the other.  -->
+  Click <b>Edit graph</b> and strengthen the edges on these paths by right-clicking the edges and setting their strength to a higher value.
+  Click <b>Run</b>: the thick edges pull the green nodes close to the red nodes. If you make them thicker by repeating the process, they will be pulled in even closer. Trivially, they are not collinear for such a reinforcement of the paths. QED.</p>
 
   <p>But can we always find three disjoint paths from the green nodes to the red nodes? Yes, this is guaranteed by <span class="tooltip">
   Menger's Theorem<span class="tooltip-content" style="display:none;">
