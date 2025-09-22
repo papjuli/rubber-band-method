@@ -126,9 +126,10 @@ class GraphRenderer {
   }
 
   addNode(ex, ey) {
-    this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
+    let newNode = this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
     this.refreshInfo();
     this.render();
+    return newNode;
   }
 
   onMouseDown(ev, node) {
@@ -276,11 +277,22 @@ class GraphRenderer {
     return document.getElementById('edge-context-menu');
   }
 
-  showEdgeContextMenu(x, y, edge) {
+  showEdgeContextMenu(clientX, clientY, offsetX, offsetY, edge) {
     if (this.editMode === null) return;
     let deleteButton = this.edgeContextMenu.querySelector('#delete-edge-button');
     deleteButton.onclick = (ev) => {
       ev.stopPropagation();
+      this.graph.deleteEdge(edge);
+      this.refreshInfo();
+      this.render();
+      this.hideEdgeContextMenu();
+    };
+    let splitNodeButton = this.edgeContextMenu.querySelector('#split-node-button');
+    splitNodeButton.onclick = (ev) => {
+      ev.stopPropagation();
+      let newNode = this.addNode(offsetX, offsetY);
+      this.graph.addEdge({from: edge.from, to: newNode.id, weight: edge.weight});
+      this.graph.addEdge({from: newNode.id, to: edge.to, weight: edge.weight});
       this.graph.deleteEdge(edge);
       this.refreshInfo();
       this.render();
@@ -297,7 +309,7 @@ class GraphRenderer {
       ev.stopPropagation();
     };
     this.edgeContextMenu.style.display = 'block';
-    positionContextMenu(this.edgeContextMenu, x, y);
+    positionContextMenu(this.edgeContextMenu, clientX, clientY);
   }
 
   hideEdgeContextMenu() {
@@ -382,7 +394,7 @@ class GraphRenderer {
         .stroke({ width: 6 * defaultWidth, color: '#000', opacity: 0 });
       interactionLine.on('contextmenu', (e) => {
         e.preventDefault();
-        this.showEdgeContextMenu(e.clientX, e.clientY, edge);
+        this.showEdgeContextMenu(e.clientX, e.clientY, e.offsetX, e.offsetY, edge);
       });
     });
     this.graph.forEachNode((node) => this.renderNode(node));
