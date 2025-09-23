@@ -8,8 +8,6 @@ const loadGraphDropdown = document.getElementById('loadGraphDropdown');
 const forceDropdown = document.getElementById('forceDropdown');
 let currentTopic = "Intro";
 
-loadTopic(currentTopic, document.getElementById('IntroTab'));
-
 const graphsForTopics = new Map([
   ["Intro", "dodecahedron"],
   ["Planarity", "dodecahedron"],
@@ -96,6 +94,9 @@ let settings = {
 const graphContainer = document.getElementById('graph-container');
 let renderer = new GraphRenderer(graphContainer, settings);
 
+loadTopic(currentTopic, document.getElementById('IntroTab'));
+
+
 function loadGraphAndSetInfo(
     graphName, topicName, path=allGraphs.get(graphName)) {
   console.log("Loading graph:", graphName, "for topic:", topicName);
@@ -123,6 +124,7 @@ function hideSecondMenuRow() {
 
 function loadTopic(topicName, button) {
   currentTopic = topicName;
+  renderer.reset();
   if (topicName == "SquareTiling") {
     hideSecondMenuRow();
     document.getElementById("square-tiling-controls").removeAttribute("hidden");
@@ -142,7 +144,7 @@ function loadTopic(topicName, button) {
 }
 
 
-document.querySelectorAll("#topicTabs button").forEach(btn => {
+tabLinks.forEach(btn => {
   btn.onclick = () => {
     loadTopic(btn.dataset.topicName, btn);
     let graphName = graphsForTopics.get(btn.dataset.topicName);

@@ -94,6 +94,18 @@ class GraphRenderer {
     );
   }
 
+  reset() {
+    this.clearAll();
+    this.setGraph(null);
+    this.setSquareTiling(null);
+    this.lastTimeoutId = null;
+    this.mode = "attract";
+    this.editMode = null;
+    this.showGraph = true;
+    this.morphStage = 0;
+    this.grabbedNodeId = null;
+  }
+
   loadGraph(url, callback, topicName="") {
     console.log("loadGraph");
     this.clearAll();
