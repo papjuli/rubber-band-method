@@ -401,6 +401,12 @@ class GraphRenderer {
       node.group.circle(nailRadius)
         .move(-nailRadius / 2, -nailRadius / 2)
         .fill(this.settings.nodes.nailColor);
+    } else if (node.fixed_x) {
+      node.group.line(0, -size/2, 0, size/2)
+        .stroke({ width: size * 0.3, color: this.settings.nodes.nailColor });
+    } else if (node.fixed_y) {
+      node.group.line(-size/2, 0, size/2, 0)
+        .stroke({ width: size * 0.3, color: this.settings.nodes.nailColor });
     }
 
     node.group.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
