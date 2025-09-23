@@ -282,6 +282,8 @@ function solveEquilibrium(graph, otherFixedNodeId = null) {
   // Update node positions
   for (let i = 0; i < n; i++) {
     let nodeId = indexNode[i];
+    // leave isolated node where it is (otherwise would go to 0,0)
+    if (graph.degree(nodeId) == 0) continue;
     let node = graph.getNode(nodeId);
     node.x = xSolution.get([i, 0]);
     node.y = ySolution.get([i, 0]);
