@@ -392,23 +392,33 @@ class GraphRenderer {
       var color = defaultColor;
     }
     let strokeColor = (node.color === "White" || node.color === "Yellow" || node.color === "Light Grey") ? defaultColor : color;
-    let size = node.size || this.settings.nodes.size;
+    let diameter = node.size || this.settings.nodes.size;
     node.group = this.nodesGroup.group().transform({ translateX: node.x, translateY: node.y });
-    node.group.circle(size)
-      .move(-size / 2, -size / 2)
+    // Main node circle
+    const mainCircle = node.group.circle(diameter)
+      .move(-diameter / 2, -diameter / 2)
       .fill(color).stroke({ width: this.settings.nodes.strokeWidth, color: strokeColor });
 
+    // Highlight circle (hidden by default)
+    let highlightDiameter = diameter * 1.5;
+    const highlightCircle = node.group.circle(highlightDiameter)
+      .move(-highlightDiameter / 2, -highlightDiameter / 2)
+      .fill('none')
+      .stroke({ width: this.settings.nodes.strokeWidth * 2.2, color: this.settings.highlightColor, opacity: 0.7 })
+      .attr({ visibility: 'hidden' });
+    node._highlightCircle = highlightCircle;
+
     if (node.nailed) {
-      let nailRadius = size * 0.4;
-      node.group.circle(nailRadius)
-        .move(-nailRadius / 2, -nailRadius / 2)
+      let nailDiameter = diameter * 0.4;
+      node.group.circle(nailDiameter)
+        .move(-nailDiameter / 2, -nailDiameter / 2)
         .fill(this.settings.nodes.nailColor);
     } else if (node.fixed_x) {
-      node.group.line(0, -size/2, 0, size/2)
-        .stroke({ width: size * 0.3, color: this.settings.nodes.nailColor });
+      node.group.line(0, -diameter/2, 0, diameter/2)
+        .stroke({ width: diameter * 0.3, color: this.settings.nodes.nailColor });
     } else if (node.fixed_y) {
-      node.group.line(-size/2, 0, size/2, 0)
-        .stroke({ width: size * 0.3, color: this.settings.nodes.nailColor });
+      node.group.line(-diameter/2, 0, diameter/2, 0)
+        .stroke({ width: diameter * 0.3, color: this.settings.nodes.nailColor });
     }
 
     node.group.node.addEventListener('mousedown', (e) => this.onMouseDown(e, node));
@@ -416,6 +426,16 @@ class GraphRenderer {
     node.group.node.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       this.showNodeContextMenu(e.clientX, e.clientY, node);
+    });
+
+    // Highlight on hover only in editing mode
+    node.group.node.addEventListener('mouseover', () => {
+      if (this.editMode !== null) {
+        highlightCircle.attr({ visibility: 'visible' });
+      }
+    });
+    node.group.node.addEventListener('mouseout', () => {
+      highlightCircle.attr({ visibility: 'hidden' });
     });
 
     if (this.editMode === "manual-move" || this.editMode === "rubber-band-move") {
@@ -440,6 +460,12 @@ class GraphRenderer {
     let s = this.graph.getNode(edge.from);
     let t = this.graph.getNode(edge.to);
     edge.group = this.edgesGroup.group();
+
+    // Highlight line (hidden by default)
+    edge._highlightLine = edge.group.line(s.x, s.y, t.x, t.y)
+      .stroke({ width: width * 2.2, color: this.settings.highlightColor, opacity: 0.7 })
+      .attr({ visibility: 'hidden' });
+    // Main edge line
     edge.line = edge.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
     // transparent line for interaction
     edge.interactionLine = edge.group.line(s.x, s.y, t.x, t.y)
@@ -447,6 +473,15 @@ class GraphRenderer {
     edge.interactionLine.on('contextmenu', (e) => {
       e.preventDefault();
       this.showEdgeContextMenu(e.clientX, e.clientY, e.offsetX, e.offsetY, edge);
+    });
+    // Highlight on hover only in editing mode
+    edge.interactionLine.on('mouseover', () => {
+      if (this.editMode !== null) {
+        edge._highlightLine.attr({ visibility: 'visible' });
+      }
+    });
+    edge.interactionLine.on('mouseout', () => {
+      edge._highlightLine.attr({ visibility: 'hidden' });
     });
   }
 
@@ -462,6 +497,7 @@ class GraphRenderer {
       if (edge.line) {
         edge.line.plot(s.x, s.y, t.x, t.y);
         edge.interactionLine.plot(s.x, s.y, t.x, t.y);
+        edge._highlightLine.plot(s.x, s.y, t.x, t.y);
       }
     });
   }

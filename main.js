@@ -88,6 +88,7 @@ let settings = {
     ["Grey", "#888888"],
     ["White", "#ffffff"],
   ]),
+  highlightColor: "#FFD700",
   morphSteps: 200
 }
 
