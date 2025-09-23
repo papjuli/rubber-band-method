@@ -271,6 +271,10 @@ class GraphRenderer {
     colorDropdown.addEventListener('click', (ev) => {
       ev.stopPropagation();
     });
+    const constraintDropdown = document.getElementById('node-constraint-dropdown');
+    constraintDropdown.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+    });
 
     return menu;
   }
@@ -289,32 +293,30 @@ class GraphRenderer {
       this.hideNodeContextMenu();
     };
 
-    let toggleNailButton = this.nodeContextMenu.querySelector('#toggle-nailed-button');
-    let textSpan = toggleNailButton.querySelector('span');
-    textSpan.textContent = node.nailed ? 'Unnail Node' : 'Nail Node';
-    let pinIcon = toggleNailButton.querySelector('.menu-icon');
-    pinIcon.src = node.nailed ? 'assets/unpin-line.svg' : 'assets/pushpin-line.svg';
-    toggleNailButton.onclick = (ev) => {
-      ev.stopPropagation();
-      if (node.nailed) {
-        node.nailed = false;
-        textSpan.textContent = 'Nail Node';
-        pinIcon.src = 'assets/pushpin-line.svg';
-      } else {
-        node.nailed = true;
-        textSpan.textContent = 'Unnail Node';
-        pinIcon.src = 'assets/unpin-line.svg';
-      }
-      this.refreshInfo();
+    // Nail/constraint dropdown
+    let constraintDropdown = this.nodeContextMenu.querySelector('#node-constraint-dropdown');
+    // Set dropdown value based on node state
+    if (node.nailed) constraintDropdown.value = 'nailed';
+    else if (node.fixed_x) constraintDropdown.value = 'fixed_x';
+    else if (node.fixed_y) constraintDropdown.value = 'fixed_y';
+    else constraintDropdown.value = 'unnailed';
+
+    constraintDropdown.onchange = (ev) => {
+      // Reset all constraints
+      node.nailed = false;
+      node.fixed_x = false;
+      node.fixed_y = false;
+      if (constraintDropdown.value === 'nailed') node.nailed = true;
+      else if (constraintDropdown.value === 'fixed_x') node.fixed_x = true;
+      else if (constraintDropdown.value === 'fixed_y') node.fixed_y = true;
       this.createNodeSvg(node);
     };
-    
+
     // Color Dropdown
     let colorDropdown = this.nodeContextMenu.querySelector('#node-color-dropdown');
     colorDropdown.value = node.color;
     colorDropdown.onchange = (ev) => {
       node.color = colorDropdown.value;
-      this.refreshInfo();
       this.createNodeSvg(node);
     };
 

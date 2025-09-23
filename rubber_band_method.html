@@ -76,7 +76,15 @@
     </div>
     <div id="node-context-menu" class="context-menu" style="display:none;">
       <button class="context-menu-item" id="delete-node-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete node </button>
-      <button class="context-menu-item" id="toggle-nailed-button"><img class="menu-icon" src="assets/pushpin-line.svg"><span>Nail node</span></button>
+      <span class="context-menu-item" style="font-size:1.1em;margin:0.2em;">
+        Constraint:
+        <select id="node-constraint-dropdown" style="padding:0.2em;margin:0.2em;">
+          <option value="unnailed">Unnailed</option>
+          <option value="nailed">Nailed</option>
+          <option value="fixed_x">Fixed X</option>
+          <option value="fixed_y">Fixed Y</option>
+        </select>
+      </span>
       <br>
       <span class="context-menu-item" style="font-size:1.1em;margin:0.2em;" htmlFor="node-color-dropdown">
         Change color:
