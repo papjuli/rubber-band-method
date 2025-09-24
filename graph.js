@@ -67,6 +67,17 @@ class Graph {
     return this.edgesAt.get(nodeId).size;
   }
 
+  edgeCountBetween(nodeId, nodeSet) {
+    if (nodeSet.has(nodeId)) return 0;
+    let count = 0;
+    this.forEachEdgeAt(nodeId, (edge) => {
+      if (nodeSet.has(edge.from) || nodeSet.has(edge.to)) {
+        count++;
+      }
+    });
+    return count;
+  }
+
   weightedDegree(nodeId) {
     let degree = 0;
     this.forEachEdgeAt(nodeId, (edge) => {
@@ -284,6 +295,69 @@ class Graph {
       }
     });
     return tiling;
+  }
+
+  currentCutSize(colorName) {
+    let cutSize = 0;
+    this.forEachEdge((edge) => {
+      let node1 = this.getNode(edge.from);
+      let node2 = this.getNode(edge.to);
+      if (node1.color === colorName && node2.color !== colorName ||
+          node1.color !== colorName && node2.color === colorName) {
+        cutSize++;
+      }
+    });
+    return cutSize;
+  }
+
+  preciseMaxCut() {
+    // Brute force search for max cut, using branch-and-bound.
+    // Returns an object with part1, part2 (sets of node ids) and cutSize.
+    let nodes = [];
+    this.forEachNode((node) => {
+      nodes.push(node);
+    });
+    // sort decreasing by degree
+    nodes.sort((a, b) => this.degree(b.id) - this.degree(a.id));
+    let n = nodes.length;
+    let bestCut = { part1: new Set(), part2: new Set(), cutSize: 0 };
+    let currentCut = { part1: new Set(), part2: new Set(), cutSize: 0 };
+
+    function backtrack(index) {
+      if (index == n) {
+        if (currentCut.cutSize > bestCut.cutSize) {
+          bestCut.part1 = new Set(currentCut.part1);
+          bestCut.part2 = new Set(currentCut.part2);
+          bestCut.cutSize = currentCut.cutSize;
+        }
+        return;
+      }
+      let node = nodes[index];
+
+      // bound: if current cut size + max possible remaining edges <= best cut size, prune
+      if (currentCut.cutSize + (n - index) * this.degree(node.id) <= bestCut.cutSize) {
+        return;
+      }
+
+      // branch 1: put node in part1
+      currentCut.part1.add(node.id);
+      let edgesBetween = this.edgeCountBetween(node.id, currentCut.part2);
+      currentCut.cutSize += edgesBetween;
+      backtrack.bind(this)(index + 1);
+      currentCut.part1.delete(node.id);
+      currentCut.cutSize -= edgesBetween;
+      // branch 2: put node in part2
+      currentCut.part2.add(node.id);
+      edgesBetween = this.edgeCountBetween(node.id, currentCut.part1);
+      currentCut.cutSize += edgesBetween;
+      backtrack.bind(this)(index + 1);
+      currentCut.part2.delete(node.id);
+      currentCut.cutSize -= edgesBetween;
+    }
+
+    backtrack.bind(this)(0);
+    console.log(bestCut);
+    return bestCut;
   }
 }
 

@@ -100,11 +100,21 @@ loadTopic(currentTopic, document.getElementById('IntroTab'));
 function loadGraphAndSetInfo(
     graphName, topicName, path=allGraphs.get(graphName)) {
   console.log("Loading graph:", graphName, "for topic:", topicName);
-  renderer.loadGraph(path, (graph) => {
+  if (topicName === "MaxCut") {
+    document.getElementById("max-cut-info").removeAttribute("style");
+  } else {
+    document.getElementById("max-cut-info").setAttribute("style", "display:none");
+  }
+  renderer.loadGraph(path, topicName, (graph, topicName) => {
     document.getElementById('graph-name').innerHTML = graphName;
     document.getElementById('num-vertices').innerHTML = graph.nodeCount();
     document.getElementById('num-edges').innerHTML = graph.edgeCount();
-  }, topicName);
+    document.getElementById('max-cut-size').innerHTML = "?";
+    if (topicName === "MaxCut") {
+      let currentCutSize = graph.currentCutSize("White");
+      document.getElementById('current-cut-size').innerHTML = currentCutSize;
+    }
+  });
 }
 
 loadGraphAndSetInfo("dodecahedron", "Intro");
@@ -125,11 +135,12 @@ function hideSecondMenuRow() {
 function loadTopic(topicName, button) {
   currentTopic = topicName;
   renderer.reset();
-  if (topicName == "SquareTiling") {
+  if (topicName == "SquareTiling" || topicName == "MaxCut") {
     hideSecondMenuRow();
-    document.getElementById("square-tiling-controls").removeAttribute("hidden");
+    document.getElementById(topicName + "-controls").removeAttribute("hidden");
   } else {
-    document.getElementById("square-tiling-controls").setAttribute("hidden", "true");
+    document.getElementById("SquareTiling-controls").setAttribute("hidden", "true");
+    document.getElementById("MaxCut-controls").setAttribute("hidden", "true");
   }
   fetch(`./topics/${topicName}.html`)
   .then(response => response.text())
@@ -192,8 +203,8 @@ document.getElementById('edit-graph-button').onclick = () => {
   }
   else {
     editButtonsContainer.setAttribute("hidden", "true");
-    if (currentTopic === "SquareTiling") {
-      document.getElementById("square-tiling-controls").removeAttribute("hidden");
+    if (currentTopic === "SquareTiling" || currentTopic === "MaxCut") {
+      document.getElementById(currentTopic + "-controls").removeAttribute("hidden");
     }
     editButtonIcon.setAttribute("src", "assets/lock-line.svg");
     editButton.classList.remove('active-button');
@@ -231,3 +242,10 @@ document.getElementById('show-hide-button').onclick = () => {
 document.getElementById('morph-button').onclick = () => {
   renderer.morphTiling();
 };
+
+
+document.getElementById('max-cut-button').onclick = () => {
+  renderer.colorMaxCut();
+  renderer.createSvg();
+};
+

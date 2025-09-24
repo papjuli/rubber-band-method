@@ -118,7 +118,7 @@ class GraphRenderer {
     }
   }
 
-  loadGraph(url, callback, topicName="") {
+  loadGraph(url, topicName, callback) {
     console.log("loadGraph");
     this.clearAll();
     this.setGraph(null);
@@ -135,7 +135,7 @@ class GraphRenderer {
       this.createSvg();
 
       if (callback)
-        callback(graph);
+        callback(graph, topicName);
     })
   }
 
@@ -156,9 +156,26 @@ class GraphRenderer {
     this.morphGroup.clear();
   }
 
-  refreshInfo() {
+  updateInfo() {
     document.getElementById('num-vertices').innerHTML = this.graph.nodeCount();
     document.getElementById('num-edges').innerHTML = this.graph.edgeCount();  
+    let currentCutSize = this.graph.currentCutSize("White");
+    document.getElementById('current-cut-size').innerHTML = currentCutSize;
+    document.getElementById('max-cut-size').innerHTML = "?";
+  }
+
+  updateCurrentCutInfo() {
+    if (!this.graph) return;
+    let currentCutSize = this.graph.currentCutSize("White");
+    document.getElementById('current-cut-size').innerHTML = currentCutSize;
+  }
+
+  updateMaxCutInfo(maxCut=null) {
+    if (!this.graph) return;
+    if (maxCut === null) {
+      maxCut = this.graph.preciseMaxCut();
+    }
+    document.getElementById('max-cut-size').innerHTML = maxCut.cutSize;
   }
 
   createSvg() {
@@ -188,7 +205,7 @@ class GraphRenderer {
 
   addNode(ex, ey) {
     let newNode = this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
-    this.refreshInfo();
+    this.updateInfo();
     this.createNodeSvg(newNode);
     return newNode;
   }
@@ -211,7 +228,7 @@ class GraphRenderer {
         if (this.grabbedNodeId != null && this.grabbedNodeId != node.id) {
           let newEdge = { from: this.grabbedNodeId, to: node.id, weight: 1 };
           this.graph.addEdge(newEdge);
-          this.refreshInfo();
+          this.updateInfo();
           this.createEdgeSvg(newEdge);
         }
       }
@@ -301,7 +318,7 @@ class GraphRenderer {
         edge.group.remove();
       });
       this.graph.deleteNode(node);
-      this.refreshInfo();
+      this.updateInfo();
       this.hideNodeContextMenu();
     };
 
@@ -330,6 +347,7 @@ class GraphRenderer {
     colorDropdown.onchange = (ev) => {
       node.color = colorDropdown.value;
       this.createNodeSvg(node);
+      this.updateCurrentCutInfo();
     };
 
     this.nodeContextMenu.style.display = 'block';
@@ -350,7 +368,7 @@ class GraphRenderer {
     deleteButton.onclick = (ev) => {
       ev.stopPropagation();
       this.graph.deleteEdge(edge);
-      this.refreshInfo();
+      this.updateInfo();
       edge.group.remove();
       this.hideEdgeContextMenu();
     };
@@ -364,7 +382,7 @@ class GraphRenderer {
       this.graph.addEdge(newEdge2);
       edge.group.remove();
       this.graph.deleteEdge(edge);
-      this.refreshInfo();
+      this.updateInfo();
       this.createNodeSvg(newNode);
       this.createEdgeSvg(newEdge);
       this.createEdgeSvg(newEdge2);
@@ -623,6 +641,23 @@ class GraphRenderer {
       this.morphStage = 0;
       this.morphSegments();
     }
+  }
+
+  colorMaxCut() {
+    if (!this.graph) return;
+    let maxCut = this.graph.preciseMaxCut();
+    this.graph.forEachNode((node) => {
+      if (maxCut.part1.has(node.id)) {
+        node.color = "White";
+      } else {
+        node.color = "Blue";
+      }
+    });
+    this.createSvg();
+    console.log("Max cut size:", maxCut.cutSize);
+    this.updateMaxCutInfo(maxCut);
+    this.updateCurrentCutInfo();
+    return maxCut;
   }
 }
 

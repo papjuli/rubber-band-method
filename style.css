@@ -40,6 +40,11 @@ li {
   padding: 1em; 
 }
 
+.graph-menu-row-2 {
+  margin-top: 0.7em;
+  line-height: 76%;
+}
+
 .tooltip {
   position: relative;
   cursor: help;
@@ -116,7 +121,7 @@ button:disabled {
   background: var(--color1);
 }
 
-#graph-menu .menu-icon, #topic-menu .menu-icon, #topic .menu-icon {
+.menu-icon {
   height: 1.2em;
   margin-bottom: -0.2em;
   margin-right: 0.1em;

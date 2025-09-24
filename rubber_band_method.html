@@ -39,10 +39,14 @@
         <button id="manual-move-button"> Manual move </button>
         <button id="rubber-band-move-button"> Rubber move </button>
       </div>
-      <div id="square-tiling-controls" class="graph-menu-row-2" style="line-height: 76%" hidden="true">
-        <button id="squares-button">Squares</button>
-        <button id="show-hide-button">Show / hide</button>
-        <button id="morph-button">Morph</button>
+      <div id="SquareTiling-controls" class="graph-menu-row-2" hidden="true">
+        <button id="squares-button"> Squares </button>
+        <button id="show-hide-button"> Show / hide </button>
+        <button id="morph-button"> Morph </button>
+      </div>
+      <div id="MaxCut-controls" class="graph-menu-row-2" hidden="true">
+        <button id="max-cut-button"> Max cut </button>
+        <button id="random-diameter-button"> Random diameter </button>
       </div>
     </div>
     <div id="graph-container" style="grid-area: graph;"></div>
@@ -61,8 +65,12 @@
     </div>
     <div id="info" style="grid-area: info">
       Graph: <span id="graph-name" style="display:inline-block;width:10em"> </span>
-      Vertices: <span id="num-vertices" style="display:inline-block;width:4em"> </span>
-      Edges: <span id="num-edges" style="display:inline-block;width:4em"> </span>
+      Vertices: <span id="num-vertices" style="display:inline-block;width:3em"> </span>
+      Edges: <span id="num-edges" style="display:inline-block;width:3em"> </span>
+      <span id="max-cut-info" style="display:none">
+        Current cut size: <span id="current-cut-size" style="display:inline-block;width:3em"> </span>
+        Max cut size: <span id="max-cut-size" style="display:inline-block;width:3em">?</span>
+      </span>
     </div>
   </div>
 
@@ -159,12 +167,13 @@
     </div>
     <div id="tooltip-brute-force">
       <b>Brute force</b> in this case means looking at all possible ways of dividing the nodes into 
-      two classes (black and white), counting the edges that go across, and selecting the best.
-
-      <!-- Actually, in this program a useful trick called <b>Branch-and-Bound</b> is added: we do look at 
-      extensions of partial black-and-white colorings if some easy calculation tells us that they are 
-      not going to beat the best cut found so far. This allows us to find the maximum cut in graphs 
-      with 20+ nodes. Real brute force would fail on graphs with about 15 nodes. -->
+      two classes, counting the edges that go across, and selecting the best.
+      <br>
+      Actually, in this program a useful trick called <b>Branch-and-Bound</b> is added: 
+      we do not look at extensions of a partial coloring if some easy calculation tells us 
+      that they are not going to beat the best cut found so far. 
+      <!-- This allows us to find the maximum cut in graphs  -->
+      <!-- with 20+ nodes. Real brute force would fail on graphs with about 15 nodes. -->
     </div>
     <div id="tooltip-equilibrium">
       Working out the physics: the <i>energy</i> of the system is defined by: <br>

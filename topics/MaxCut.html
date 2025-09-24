@@ -13,7 +13,7 @@
     original layout.</p> -->
 
   <p>
-    The algorithm behind the Max Cut button computes the maximum cut (24) by 
+    The algorithm behind the Max Cut button computes the maximum cut by 
     <span class="tooltip" data-tooltip-id="tooltip-brute-force">brute force</span>. 
     For such a small graph this is possible; but try open the graph called "max cut big"; 
     this graph is only a few nodes bigger, but it takes quite a while to get the result. 
@@ -39,12 +39,13 @@
   </p>
 
   <p>
-    Click on any node to toggle its color. 
-    The number of edges connecting different colors is displayed on the bottom of the screen. If you feel you have found the best cut, click the <b>Max Cut</b> button to see how large the "real" maximum cut is.
+    <!-- Click on any node to toggle its color.  -->
+    Click the <b>Edit graph</b> button to be able to change the color of any node by right-clicking on it.
+    The current cut size, that is the number of edges connecting white and non-white nodes is displayed on the bottom of the screen. If you feel you have found the best cut, click the <b>Max Cut</b> button (after exiting Edit mode) to see how large the "real" maximum cut is.
   </p>
 
   <p>
-    If you find that no toggle improves the current solution, you have a <b>locally maximum cut</b>. You see that this is not necessarily optimal. But it is easy to show that this cut contains at least half of the edges, so in particular it is at least 50% of the maximum cut.
+    If you find that no toggle improves the current solution, you have a <b>locally maximum cut</b>. You see that this is not necessarily optimal. But it is easy to show that such a cut contains at least half of the edges, so in particular it is at least 50% of the maximum cut.
   </p>
 
 <!-- 
@@ -65,7 +66,7 @@
 
   <h3>An approximation algorithm using rubber bands</h3>
 
-  <p>On the right you see the <span class="tooltip" data-tooltip-id="tooltip-dodecahedron">
+  <p>Load the <span class="tooltip" data-tooltip-id="tooltip-dodecahedron">
   dodecahedron</span> graph again. Click <b>Max Cut</b> to see that the maximum cut has 24 edges.</p>
 
   <p>Click <b>Random Cut</b>. This spins a line like in roulette, and gives a random cut when it stops. Try this several times; you get different cuts as the process is random, but most probably they will all be quite small compared with the maximum cut (24).</p>
