@@ -164,7 +164,7 @@ allGraphs.forEach((path, name) => {
 
 forceDropdown.querySelectorAll("input").forEach(btn => {
   btn.onclick = () => {
-    renderer.mode = btn.dataset.mode;
+    renderer.setMode(btn.dataset.mode);
   }
 })
 

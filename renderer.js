@@ -38,6 +38,9 @@ class GraphRenderer {
       .stroke({ width: this.settings.edges.width, 
                 color: this.settings.edges.color, 
                 opacity: 0 });
+    this.unitCircle = this.innerGroup.circle(2).move(-1, -1)
+      .fill('#f2f2f2').stroke({ width: 0 });
+    this.unitCircle.hide();
     this.graphGroup = this.innerGroup.group();
     this.edgesGroup = this.graphGroup.group();
     this.nodesGroup = this.graphGroup.group();
@@ -50,7 +53,7 @@ class GraphRenderer {
       translateX: width / 2,
       translateY: height / 2
     });
-
+    
     // Bind onMouseMove once for consistent add/removeEventListener
     this.boundOnMouseMove = this.onMouseMove.bind(this);
 
@@ -104,6 +107,15 @@ class GraphRenderer {
     this.showGraph = true;
     this.morphStage = 0;
     this.grabbedNodeId = null;
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+    if (mode === "repel-constrained") {
+      this.unitCircle.show();
+    } else {
+      this.unitCircle.hide();
+    }
   }
 
   loadGraph(url, callback, topicName="") {
