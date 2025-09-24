@@ -36,14 +36,17 @@ class GraphRenderer {
     this.morphGroup = this.innerGroup.group();
     this.newEdgeLine = this.innerGroup.line(0, 0, 0, 0)
       .stroke({ width: this.settings.edges.width, 
-                color: this.settings.edges.color, 
-                opacity: 0 });
+                color: this.settings.edges.color}).hide();
     this.unitCircle = this.innerGroup.circle(2).move(-1, -1)
       .fill('#f2f2f2').stroke({ width: 0 });
     this.unitCircle.hide();
     this.graphGroup = this.innerGroup.group();
     this.edgesGroup = this.graphGroup.group();
     this.nodesGroup = this.graphGroup.group();
+    this.cutLine = this.innerGroup.line(0, 0, 0, 0)
+      .stroke({ width: this.settings.edges.width * 0.8, color: 'grey'})
+      // dasharray: '5,5' })
+      .hide();
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
     console.log(width, height);
@@ -154,6 +157,8 @@ class GraphRenderer {
     this.nodesGroup.clear();
     this.tilingGroup.clear();
     this.morphGroup.clear();
+    this.newEdgeLine.hide();
+    this.cutLine.hide();
   }
 
   updateInfo() {
@@ -235,7 +240,7 @@ class GraphRenderer {
       else if (this.editMode === "rubber-band-move") {
         this.rubberBandStep();
       }
-      this.newEdgeLine.stroke({ opacity: 0 });
+      this.newEdgeLine.hide();
       this.grabbedNodeId = null;
     }
   }
@@ -245,7 +250,7 @@ class GraphRenderer {
     this.svg.node.removeEventListener("mousemove", this.boundOnMouseMove);
     if (this.grabbedNodeId) {
       if (this.editMode === "edges") {
-        this.newEdgeLine.stroke({ opacity: 0 });
+        this.newEdgeLine.hide();
       }
       this.grabbedNodeId = null;
     }
@@ -256,7 +261,7 @@ class GraphRenderer {
     if (this.grabbedNodeId != null && this.editMode === "edges") {
       let node = this.graph.getNode(this.grabbedNodeId);
       this.newEdgeLine.plot(node.x, node.y, this.ex2x(ev.offsetX), this.ey2y(ev.offsetY));
-      this.newEdgeLine.stroke({ opacity: 1 });
+      this.newEdgeLine.show();
     }
   }
 
@@ -645,6 +650,7 @@ class GraphRenderer {
 
   colorMaxCut() {
     if (!this.graph) return;
+    this.cutLine.hide();
     let maxCut = this.graph.preciseMaxCut();
     this.graph.forEachNode((node) => {
       if (maxCut.part1.has(node.id)) {
@@ -658,6 +664,31 @@ class GraphRenderer {
     this.updateMaxCutInfo(maxCut);
     this.updateCurrentCutInfo();
     return maxCut;
+  }
+
+  randomCut() {
+    // get a random cut by cutting along a random line through the origin
+    if (!this.graph) return;
+    // reset the cut line to a random line through the origin
+    let angle = Math.random() * 2 * Math.PI;
+    let length = 100;
+    let x1 = Math.cos(angle) * length;
+    let y1 = Math.sin(angle) * length;
+    console.log("plot line", x1, y1, -x1, -y1);
+    this.cutLine.plot(x1, y1, -x1, -y1);
+    this.cutLine.show();
+    // color nodes based on which side of the line they are on
+    this.graph.forEachNode((node) => {
+      let dot = node.x * y1 - node.y * x1;
+      if (dot > 0) {
+        node.color = "White";
+      } else {
+        node.color = "Blue";
+      }
+    });
+    this.createSvg();
+    this.cutLine.show();
+    this.updateCurrentCutInfo();
   }
 }
 

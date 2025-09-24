@@ -246,6 +246,9 @@ document.getElementById('morph-button').onclick = () => {
 
 document.getElementById('max-cut-button').onclick = () => {
   renderer.colorMaxCut();
-  renderer.createSvg();
 };
 
+
+document.getElementById('random-cut-button').onclick = () => {
+  renderer.randomCut();
+};
