@@ -1,4 +1,4 @@
-import { parseGrf, solveEquilibrium, placeNailedNodes, randomizeFreeNodes, setupGraphForTiling, rubberBandStepNodes } from "./graph.js";
+import { parseGrf } from "./graph.js";
 
 const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
@@ -89,7 +89,7 @@ class GraphRenderer {
           node.x = this.ex2x(ev.offsetX);
           node.y = this.ey2y(ev.offsetY);
           if (this.editMode === "rubber-band-move") {
-            solveEquilibrium(this.graph, this.grabbedNodeId);
+            this.graph.solveEquilibrium(this.grabbedNodeId);
           }
           this.updatePositions();          
         }
@@ -125,12 +125,12 @@ class GraphRenderer {
     this.setSquareTiling(null);
     parseGrf(url, (graph) => {
       if (topicName == "SquareTiling") {
-        setupGraphForTiling(graph);
+        graph.setupGraphForTiling();
       }
       else {
-        placeNailedNodes(graph);
+        graph.placeNailedNodes();
       }
-      randomizeFreeNodes(graph);
+      graph.randomizeFreeNodes();
       this.setGraph(graph);
       this.createSvg();
 
@@ -516,7 +516,7 @@ class GraphRenderer {
 
   rubberBandStep() {
     console.log('step')
-    let { maxChange, maxCoord } = rubberBandStepNodes(this.graph, this.settings.rate, this.mode);
+    let { maxChange, maxCoord } = this.graph.rubberBandStepNodes(this.settings.rate, this.mode);
     this.updatePositions();
 
     if (maxChange > this.settings.threshold && maxCoord < 10000) {
@@ -627,4 +627,4 @@ class GraphRenderer {
 }
 
 
-export { GraphRenderer, randomizeFreeNodes };
+export { GraphRenderer };

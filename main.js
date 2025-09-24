@@ -1,5 +1,4 @@
 import { GraphRenderer } from './renderer.js'
-import { createSquareTiling, randomizeFreeNodes } from "./graph.js";
 
 
 const topicTextElement = document.getElementById('topic-text');
@@ -111,7 +110,7 @@ function loadGraphAndSetInfo(
 loadGraphAndSetInfo("dodecahedron", "Intro");
 
 document.getElementById('randomize-button').onclick = () => {
-  randomizeFreeNodes(renderer.graph);
+  renderer.graph.randomizeFreeNodes();
   renderer.updatePositions();
 };
 document.getElementById('run-button').onclick = () => renderer.rubberBandStep();
@@ -217,7 +216,7 @@ editModeButtons.forEach((btn, mode) => {
 });
 
 document.getElementById('squares-button').onclick = () => {
-  let tiling = createSquareTiling(renderer.graph);
+  let tiling = renderer.graph.createSquareTiling();
   renderer.setSquareTiling(tiling);
   renderer.createSvg();
 };
