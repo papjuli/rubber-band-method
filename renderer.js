@@ -538,6 +538,7 @@ class GraphRenderer {
   }
 
   rubberBandStep() {
+    this.cutLine.hide();
     console.log('step')
     let { maxChange, maxCoord } = this.graph.rubberBandStepNodes(this.settings.rate, this.mode);
     this.updatePositions();
