@@ -122,7 +122,7 @@ button:disabled {
 }
 
 .menu-icon {
-  height: 1.2em;
+  height: 1.1em;
   margin-bottom: -0.2em;
   margin-right: 0.1em;
 }
@@ -150,6 +150,10 @@ button:disabled {
 .dropdown:hover .dropdown-content {
   display: block;
   height: 300px;
+}
+
+.graph-menu-row-2 .dropdown-content label {
+  padding-bottom: 0.6em;
 }
 
 hr {

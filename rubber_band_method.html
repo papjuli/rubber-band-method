@@ -25,14 +25,6 @@
         <div class="dropdown-content" id="loadGraphDropdown">
         </div>
       </div>
-      <div class="dropdown">
-        <button class="dropbtn"><img class="menu-icon" src="assets/contract-left-right-line.svg"> Force </button>
-        <div class="dropdown-content" id="forceDropdown">
-          <label><input type="radio" name="force-rb" data-force="attract" checked="checked" />attract</label>
-          <label><input type="radio" name="force-rb" data-force="repel" />repel</label>
-          <label><input type="radio" name="force-rb" data-force="repel-constrained" />repel constrained</label>
-        </div>
-      </div>
       <button id="edit-graph-button"><img id="edit-graph-icon" class="menu-icon" src="assets/lock-line.svg"> Edit graph </button>
       <div id="edit-buttons-container" class="graph-menu-row-2" hidden="true">
         <button id="add-edge-button"> Add edge </button>
@@ -47,6 +39,14 @@
       <div id="MaxCut-controls" class="graph-menu-row-2" hidden="true">
         <button id="max-cut-button"> Max cut </button>
         <button id="random-cut-button"> Random cut </button>
+        <div class="dropdown">
+          <button class="dropbtn"><img class="menu-icon" src="assets/contract-left-right-line.svg"> Force </button>
+          <div class="dropdown-content" id="forceDropdown">
+            <label><input type="radio" name="force-rb" data-force="attract" checked="checked" />attract</label><br>
+            <label><input type="radio" name="force-rb" data-force="repel" />repel</label><br>
+            <label><input type="radio" name="force-rb" data-force="repel-constrained" />repel constrained</label>
+          </div>
+        </div>
       </div>
     </div>
     <div id="graph-container" style="grid-area: graph;"></div>

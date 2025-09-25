@@ -64,7 +64,6 @@ class GraphRenderer {
     this.nodeContextMenu = this.getNodeContextMenu();
     this.edgeContextMenu = this.getEdgeContextMenu();
     document.addEventListener('click', () => {
-      console.log("document click");
       this.hideNodeContextMenu();
       this.hideSvgContextMenu();
       this.hideEdgeContextMenu();
