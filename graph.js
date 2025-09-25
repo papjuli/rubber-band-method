@@ -121,7 +121,7 @@ class Graph {
     });
   }
 
-  rubberBandStepNodes(rate, mode) {
+  rubberBandStepNodes(rate, forceMode) {
     let force, dx, dy;
     let maxChange = 0;
     let maxCoord = 0;
@@ -142,14 +142,14 @@ class Graph {
         dy = rate * force.y;
         if (node.fixed_x) dx = 0;
         if (node.fixed_y) dy = 0;
-        if (mode == "attract") {
+        if (forceMode == "attract") {
           node.x += dx;
           node.y += dy;
         } else {
           node.x -= dx;
           node.y -= dy;
         }
-        if (mode == "repel-constrained") {
+        if (forceMode == "repel-constrained") {
           let r = Math.sqrt(node.x * node.x + node.y * node.y);
           if (r > 1) {
             node.x /= r;

@@ -21,7 +21,7 @@ class GraphRenderer {
   graph = null;
   squareTiling = null;
   lastTimeoutId = null;
-  mode = "attract";
+  force = "attract";
   editMode = null; // "editing", "edges", "manual-move", "rubber-band-move" or null
   showGraph = true;
   morphStage = 0;
@@ -45,7 +45,6 @@ class GraphRenderer {
     this.nodesGroup = this.graphGroup.group();
     this.cutLine = this.innerGroup.line(0, 0, 0, 0)
       .stroke({ width: this.settings.edges.width * 0.8, color: 'purple'})
-      // dasharray: '5,5' })
       .hide();
     let width = this.svg.node.clientWidth;
     let height = this.svg.node.clientHeight;
@@ -105,23 +104,28 @@ class GraphRenderer {
     this.setGraph(null);
     this.setSquareTiling(null);
     this.lastTimeoutId = null;
-    this.mode = "attract";
+    this.setForce("attract");
     this.editMode = null;
     this.showGraph = true;
     this.morphStage = 0;
     this.grabbedNodeId = null;
   }
 
-  setMode(mode) {
-    this.mode = mode;
-    if (mode === "repel-constrained") {
+  setForce(force) {
+    this.force = force;
+    if (force === "repel-constrained") {
       this.unitCircle.show();
     } else {
       this.unitCircle.hide();
     }
+    // Dispatch custom event for force change
+    const event = new CustomEvent('forcechange', { detail: { force: force } });
+    if (this.svg && this.svg.node) {
+      this.svg.node.dispatchEvent(event);
+    }
   }
 
-  loadGraph(url, topicName, callback) {
+  loadGraph(url, topicName) {
     console.log("loadGraph");
     this.clearAll();
     this.setGraph(null);
@@ -136,9 +140,7 @@ class GraphRenderer {
       graph.randomizeFreeNodes();
       this.setGraph(graph);
       this.createSvg();
-
-      if (callback)
-        callback(graph, topicName);
+      this.updateInfo();
     })
   }
 
@@ -162,17 +164,26 @@ class GraphRenderer {
   }
 
   updateInfo() {
-    document.getElementById('num-vertices').innerHTML = this.graph.nodeCount();
-    document.getElementById('num-edges').innerHTML = this.graph.edgeCount();  
     let currentCutSize = this.graph.currentCutSize("White");
-    document.getElementById('current-cut-size').innerHTML = currentCutSize;
-    document.getElementById('max-cut-size').innerHTML = "?";
+    const event = new CustomEvent('graphinfochange', { detail: {
+      numVertices: this.graph.nodeCount(),
+      numEdges: this.graph.edgeCount(),
+      currentCutSize: currentCutSize,
+    }});
+    if (this.svg && this.svg.node) {
+      this.svg.node.dispatchEvent(event);
+    }
   }
 
   updateCurrentCutInfo() {
     if (!this.graph) return;
     let currentCutSize = this.graph.currentCutSize("White");
-    document.getElementById('current-cut-size').innerHTML = currentCutSize;
+    const event = new CustomEvent('graphcurrentcutchange', { detail: {
+      currentCutSize: currentCutSize,
+    }});
+    if (this.svg && this.svg.node) {
+      this.svg.node.dispatchEvent(event);
+    }
   }
 
   updateMaxCutInfo(maxCut=null) {
@@ -180,7 +191,12 @@ class GraphRenderer {
     if (maxCut === null) {
       maxCut = this.graph.preciseMaxCut();
     }
-    document.getElementById('max-cut-size').innerHTML = maxCut.cutSize;
+    const event = new CustomEvent('graphmaxcutchange', { detail: {
+      maxCut: maxCut.cutSize,
+    }});
+    if (this.svg && this.svg.node) {
+      this.svg.node.dispatchEvent(event);
+    }
   }
 
   createSvg() {
@@ -551,7 +567,7 @@ class GraphRenderer {
   rubberBandStep() {
     this.cutLine.hide();
     console.log('step')
-    let { maxChange, maxCoord } = this.graph.rubberBandStepNodes(this.settings.rate, this.mode);
+    let { maxChange, maxCoord } = this.graph.rubberBandStepNodes(this.settings.rate, this.force);
     this.updatePositions();
 
     if (maxChange > this.settings.threshold && maxCoord < 10000) {

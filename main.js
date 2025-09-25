@@ -94,6 +94,14 @@ let settings = {
 const graphContainer = document.getElementById('graph-container');
 let renderer = new GraphRenderer(graphContainer, settings);
 
+// Listen for forcechange event and update force radio buttons
+renderer.svg.node.addEventListener('forcechange', (e) => {
+  const force = e.detail.force;
+  forceDropdown.querySelectorAll('input').forEach(btn => {
+    btn.checked = btn.dataset.force === force;
+  });
+});
+
 loadTopic(currentTopic, document.getElementById('IntroTab'));
 
 
@@ -105,17 +113,26 @@ function loadGraphAndSetInfo(
   } else {
     document.getElementById("max-cut-info").setAttribute("style", "display:none");
   }
-  renderer.loadGraph(path, topicName, (graph, topicName) => {
-    document.getElementById('graph-name').innerHTML = graphName;
-    document.getElementById('num-vertices').innerHTML = graph.nodeCount();
-    document.getElementById('num-edges').innerHTML = graph.edgeCount();
-    document.getElementById('max-cut-size').innerHTML = "?";
-    if (topicName === "MaxCut") {
-      let currentCutSize = graph.currentCutSize("White");
-      document.getElementById('current-cut-size').innerHTML = currentCutSize;
-    }
-  });
+  renderer.loadGraph(path, topicName);
+  document.getElementById('graph-name').innerHTML = graphName;
 }
+
+renderer.svg.node.addEventListener('graphinfochange', (e) => {
+  let info = e.detail;
+  document.getElementById('num-vertices').innerHTML = info.numVertices;
+  document.getElementById('num-edges').innerHTML = info.numEdges;
+  document.getElementById('current-cut-size').innerHTML = info.currentCutSize;
+  document.getElementById('max-cut-size').innerHTML = "?";
+});
+renderer.svg.node.addEventListener('graphcurrentcutchange', (e) => {
+  let info = e.detail;
+  document.getElementById('current-cut-size').innerHTML = info.currentCutSize;
+});
+renderer.svg.node.addEventListener('graphmaxcutchange', (e) => {
+  let info = e.detail;
+  document.getElementById('max-cut-size').innerHTML = info.maxCut;
+});
+
 
 loadGraphAndSetInfo("dodecahedron", "Intro");
 
@@ -174,7 +191,7 @@ allGraphs.forEach((path, name) => {
 
 forceDropdown.querySelectorAll("input").forEach(btn => {
   btn.onclick = () => {
-    renderer.setMode(btn.dataset.mode);
+    renderer.setForce(btn.dataset.force);
   }
 })
 
