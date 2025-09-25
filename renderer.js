@@ -34,9 +34,10 @@ class GraphRenderer {
     this.innerGroup = this.outerGroup.group();
     this.tilingGroup = this.innerGroup.group();
     this.morphGroup = this.innerGroup.group();
+    this.settings.defaultColor = this.settings.colors.get(this.settings.defaultColorName);
     this.newEdgeLine = this.innerGroup.line(0, 0, 0, 0)
-      .stroke({ width: this.settings.edges.width, 
-                color: this.settings.edges.color}).hide();
+      .stroke({ width: this.settings.edges.width,
+                color: this.settings.defaultColor }).hide();
     this.unitCircle = this.innerGroup.circle(2).move(-1, -1)
       .fill('#f2f2f2').stroke({ width: 0 });
     this.unitCircle.hide();
@@ -137,6 +138,10 @@ class GraphRenderer {
         graph.placeNailedNodes();
       }
       graph.randomizeFreeNodes();
+      graph.forEachNode((node) => {
+        if (!node.color)
+          node.color = this.settings.defaultColorName;
+      });
       this.setGraph(graph);
       this.createSvg();
       this.updateInfo();
@@ -446,13 +451,8 @@ class GraphRenderer {
     if (node.group) {
       node.group.remove();
     }
-    let defaultColor = this.settings.nodes.color;
-    if (node.color && this.settings.colors.has(node.color)) {
-      var color = this.settings.colors.get(node.color);
-    } else {
-      var color = defaultColor;
-    }
-    let strokeColor = (node.color === "White" || node.color === "Yellow" || node.color === "Light Grey") ? defaultColor : color;
+    let color = this.settings.colors.get(node.color);
+    let strokeColor = (node.color === "White" || node.color === "Yellow" || node.color === "Light Grey") ? this.settings.defaultColor : color;
     let diameter = node.size || this.settings.nodes.size;
     node.group = this.nodesGroup.group().transform({ translateX: node.x, translateY: node.y });
     // Main node circle
@@ -515,7 +515,6 @@ class GraphRenderer {
     if (edge.group) {
       edge.group.remove();
     }
-    let color = edge.color || this.settings.edges.color;
     let defaultWidth = this.settings.edges.width;
     let width = edge.weight * defaultWidth;
     let s = this.graph.getNode(edge.from);
@@ -527,7 +526,8 @@ class GraphRenderer {
       .stroke({ width: width * 2.2, color: this.settings.highlightColor, opacity: 0.7 })
       .attr({ visibility: 'hidden' });
     // Main edge line
-    edge.line = edge.group.line(s.x, s.y, t.x, t.y).stroke({ width, color });
+    edge.line = edge.group.line(s.x, s.y, t.x, t.y)
+      .stroke({ width, color: this.settings.defaultColor });
     // transparent line for interaction
     edge.interactionLine = edge.group.line(s.x, s.y, t.x, t.y)
       .stroke({ width: 6 * defaultWidth, color: '#000', opacity: 0 });
@@ -607,14 +607,14 @@ class GraphRenderer {
     this.squareTiling.verticalSegments.forEach((segment, nodeId) => {
       let x = this.graph.getNode(nodeId).x;
       this.morphGroup.line(x, segment.y1, x, segment.y2)
-        .stroke({ width: 0.02, color: this.settings.nodes.color });
+        .stroke({ width: 0.02, color: this.settings.defaultColor });
     });
     // draw the horizontal segments corresponding to the edges
     this.squareTiling.squares.forEach((square) => {
       let y = square.y + square.size / 2;
       this.morphGroup.line(square.x, y, square.x + square.size, y)
         .stroke({ width: this.settings.edges.width, 
-                  color: this.settings.edges.color, 
+                  color: this.settings.defaultColor, 
                   linecap: 'round' });
     });
   }
@@ -640,7 +640,7 @@ class GraphRenderer {
     verticalSegments.forEach((segment, nodeId) => {
         let x = this.graph.getNode(nodeId).x;
         this.morphGroup.line(x, segment.y1, x, segment.y2)
-            .stroke({ width: 0.02, color: this.settings.nodes.color });
+            .stroke({ width: 0.02, color: this.settings.defaultColor });
     });
 
     // draw the horizontal segments corresponding to the edges,
@@ -653,7 +653,7 @@ class GraphRenderer {
       let y2 = clamp(y, seg2.y1, seg2.y2);
       this.morphGroup.line(square.x, y1, square.x + square.size, y2)
         .stroke({ width: this.settings.edges.width,
-                   color: this.settings.edges.color,
+                   color: this.settings.defaultColor,
                    linecap: 'round' });
     });
 

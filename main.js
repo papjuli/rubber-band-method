@@ -65,11 +65,9 @@ let settings = {
   nodes: {
     size: 0.04,
     strokeWidth: 0.008,
-    color: "#2c43a5ff",
     nailColor: "lightgrey"
   },
   edges: {
-    color: "#2c43a5ff",
     width: 0.006
   },
   rate: 0.04,
@@ -87,6 +85,7 @@ let settings = {
     ["Grey", "#888888"],
     ["White", "#ffffff"],
   ]),
+  defaultColorName: "Dark blue",
   highlightColor: "#FFD700",
   morphSteps: 200
 }
