@@ -69,25 +69,28 @@
   <p>Load the <span class="tooltip" data-tooltip-id="tooltip-dodecahedron">
   dodecahedron</span> graph again. Click <b>Max Cut</b> to see that the maximum cut has 24 edges.</p>
 
-  <p>Click <b>Random Cut</b>. This spins a line like in roulette, and gives a random cut when it stops. Try this several times; you get different cuts as the process is random, but most probably they will all be quite small compared with the maximum cut (24).</p>
+  <p>
+    <!-- Click <b>Random Cut</b>. This spins a line like in roulette, and gives a random cut when it stops.  -->
+    Click <b>Random Cut</b>. This chooses a random line through the center of the drawing, and gives a random cut. 
+    Try this several times; you get different cuts as the process is random, but most probably they will all be quite small compared with the maximum cut (24).</p>
 
-  <p>Click <b>Move</b> to get a nicer picture, and then try <b>Random Cut</b>. The result is even worse (6 edges). Of course, Tutte's method brings adjacent nodes closer, so it will be less likely that a random line cuts through many edges.</p>
+  <p>Click <b>Run</b> to get a nicer picture, and then try <b>Random Cut</b>. The result is even worse (6 edges). Of course, Tutte's method brings adjacent nodes closer, so it will be less likely that a random line cuts through many edges.</p>
 
   <hr></hr>
 
-  <p>This gives the idea to <b>reverse Tutte's procedure</b>: replace the rubber bands by "springs" that provide a repellent (rather than attractive) force between adjacent nodes. Choose <b>repel</b> from the <b>Force</b> menu and then open any graph, say the dodecahedron. Click <b>Move</b>... </p>
+  <p>This gives the idea to <b>reverse Tutte's procedure</b>: replace the rubber bands by "springs" that provide a repellent (rather than attractive) force between adjacent nodes. Choose <b>repel</b> from the <b>Force</b> menu and then open any graph, say the dodecahedron. Click <b>Run</b>... </p>
 
   <p>Whoops, the nodes flew away to infinity (as we could have expected). To do anything useful, we have to constrain them. Choose <b>repel constrained</b> from the <b>Force</b> menu. A circle appears showing the region in which the nodes can move. </p>
   
-  <p>Open the graph called "cube", and click <b>Move</b>. The nodes are pushed to the boundary and then wander around until the graph collapses onto a single segment. Check by dragging the nodes a little that all edges go accross. The cube is a bipartite graph and so all edges occur in its maximum cut. The springs found this maximum cut!</p>
+  <p>Open the graph called "cube", unnail the nodes in editing mode, and click <b>Run</b>. The nodes are pushed to the boundary and then wander around until the graph collapses onto a single segment. Check by dragging the nodes a little that all edges go accross. The cube is a bipartite graph and so all edges occur in its maximum cut. The springs found this maximum cut!</p>
 
   <hr></hr>
 
-  <p>Next, open the dodecahedron graph again. Click <b>Move</b>. Again, the nodes are pushed to the boundary and then wander around until they reach an equilibrium. This equilibrium is not particularly simple, and may be different if you repeat this from loading the same graph again.</p>
+  <p>Next, open the dodecahedron graph again. Unnail the nodes and click <b>Run</b>. Again, the nodes are pushed to the boundary and then wander around until they reach an equilibrium. This equilibrium is not particularly simple, and may be different if you repeat this from loading the same graph again.</p>
 
   <p>Try <b>Random Cut</b>. The result is much better; if you try it many times, you get the true maximum (24) often, and not much less in most cases.  Of course, the springs pushed adjacent nodes as far as possible, so a random line will more likely cut through many edges.</p>
   
-  <p>Experiment with other graphs; doing <b>Move</b> with the repel constrained force and then <b>Random Cut</b> gets very close to the maximum cut! An interesting choice is to generate a <b>Random Graph</b> and choose about 20 nodes and various densities.</p>
+  <p>Experiment with other graphs; doing <b>Run</b> with the repel constrained force and then <b>Random Cut</b> gets very close to the maximum cut! An interesting choice is to generate a <b>Random Graph</b> and choose about 20 nodes and various densities.</p>
 
   <hr></hr>
 
