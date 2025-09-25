@@ -44,7 +44,7 @@ class GraphRenderer {
     this.edgesGroup = this.graphGroup.group();
     this.nodesGroup = this.graphGroup.group();
     this.cutLine = this.innerGroup.line(0, 0, 0, 0)
-      .stroke({ width: this.settings.edges.width * 0.8, color: 'grey'})
+      .stroke({ width: this.settings.edges.width * 0.8, color: 'purple'})
       // dasharray: '5,5' })
       .hide();
     let width = this.svg.node.clientWidth;
@@ -276,6 +276,17 @@ class GraphRenderer {
       e.stopPropagation();
       let newNode = this.addNode(ex, ey);
       this.createNodeSvg(newNode);
+      this.hideSvgContextMenu();
+    };
+    let unnailAllButton = this.svgContextMenu.querySelector('#unnail-all-button');
+    unnailAllButton.onclick = (e) => {
+      e.stopPropagation();
+      this.graph.forEachNode((node) => {
+        node.nailed = false;
+        node.fixed_x = false;
+        node.fixed_y = false;
+        this.createNodeSvg(node);
+      });
       this.hideSvgContextMenu();
     };
     this.svgContextMenu.style.display = 'block';
