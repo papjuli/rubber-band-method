@@ -125,27 +125,28 @@ class GraphRenderer {
     }
   }
 
+  setupGraph(graph, topicName) {
+    if (topicName == "SquareTiling") {
+      graph.setupGraphForTiling();
+    } else {
+      graph.placeNailedNodes();
+    }
+    graph.randomizeFreeNodes();
+    graph.forEachNode((node) => {
+      if (!node.color)
+        node.color = this.settings.defaultColorName;
+    });
+    this.clearAll();
+    this.setSquareTiling(null);
+    this.setGraph(graph);
+    this.createSvg();
+    this.updateInfo();
+  }
+
   loadGraph(url, topicName) {
     console.log("loadGraph");
-    this.clearAll();
-    this.setGraph(null);
-    this.setSquareTiling(null);
-    parseGrf(url, (graph) => {
-      if (topicName == "SquareTiling") {
-        graph.setupGraphForTiling();
-      }
-      else {
-        graph.placeNailedNodes();
-      }
-      graph.randomizeFreeNodes();
-      graph.forEachNode((node) => {
-        if (!node.color)
-          node.color = this.settings.defaultColorName;
-      });
-      this.setGraph(graph);
-      this.createSvg();
-      this.updateInfo();
-    })
+    parseGrf(url, 
+      (graph) => this.setupGraph.bind(this)(graph, topicName));
   }
 
   resetInnerGroupScale() {
@@ -457,8 +458,9 @@ class GraphRenderer {
     node.group = this.nodesGroup.group().transform({ translateX: node.x, translateY: node.y });
     // Main node circle
     const mainCircle = node.group.circle(diameter)
-      .move(-diameter / 2, -diameter / 2)
-      .fill(color).stroke({ width: this.settings.nodes.strokeWidth, color: strokeColor });
+    mainCircle.move(-diameter / 2, -diameter / 2)
+    mainCircle.fill(color)
+    mainCircle.stroke({ width: this.settings.nodes.strokeWidth, color: strokeColor });
 
     // Highlight circle (hidden by default)
     let highlightDiameter = diameter * 1.5;
@@ -683,7 +685,7 @@ class GraphRenderer {
       if (maxCut.part1.has(node.id)) {
         node.color = "White";
       } else {
-        node.color = "Blue";
+        node.color = "Dark blue";
       }
     });
     this.createSvg();
@@ -701,7 +703,6 @@ class GraphRenderer {
     let length = 100;
     let x1 = Math.cos(angle) * length;
     let y1 = Math.sin(angle) * length;
-    console.log("plot line", x1, y1, -x1, -y1);
     this.cutLine.plot(x1, y1, -x1, -y1);
     this.cutLine.show();
     // color nodes based on which side of the line they are on
@@ -710,7 +711,7 @@ class GraphRenderer {
       if (dot > 0) {
         node.color = "White";
       } else {
-        node.color = "Blue";
+        node.color = "Dark blue";
       }
     });
     this.createSvg();

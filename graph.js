@@ -359,6 +359,21 @@ class Graph {
     console.log(bestCut);
     return bestCut;
   }
+
+  static randomGraph(nodeCount, edgeProb) {
+    let graph = new Graph();
+    for (let i = 0; i < nodeCount; i++) {
+      graph.addNode({ id: 'n' + i });
+    }
+    for (let i = 0; i < nodeCount; i++) {
+      for (let j = i + 1; j < nodeCount; j++) {
+        if (Math.random() < edgeProb) {
+          graph.addEdge({ from: 'n' + i, to: 'n' + j, weight: 1 });
+        }
+      }
+    }
+    return graph;
+  }
 }
 
 

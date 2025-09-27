@@ -17,6 +17,7 @@
       <h1>The rubber band method</h1>
     </div>
     <div id="graph-menu" style="grid-area: graph-menu">
+      <div class="graph-menu-row-1 graph-menu-row">
       <button id="run-button"><img class="menu-icon" src="assets/play-line.svg"> Run </button>
       <button id="randomize-button"><img class="menu-icon" src="assets/shuffle-line.svg"> Randomize </button>
 
@@ -25,18 +26,34 @@
         <div class="dropdown-content" id="loadGraphDropdown">
         </div>
       </div>
+
+      <div class="dropdown" style="display:inline-block;">
+        <button class="dropbtn" id="random-graph-button"><img class="menu-icon" src="assets/shuffle-line.svg"> Random graph </button>
+        <div class="dropdown-content" id="randomGraphDropdown">
+          <div><span for="random-node-count">Nodes:</span>
+          <input type="number" id="random-node-count" min="2" max="100" value="10" style="width:4em;">
+          </div>
+          <div><span for="random-edge-prob">Edge probability:</span>
+          <input type="number" id="random-edge-prob" min="0" max="1" step="0.01" value="0.2" style="width:4em;">
+          </div>
+          <div><button id="generate-random-graph">Generate</button></div>
+        </div>
+      </div>
+
       <button id="edit-graph-button"><img id="edit-graph-icon" class="menu-icon" src="assets/lock-line.svg"> Edit graph </button>
-      <div id="edit-buttons-container" class="graph-menu-row-2" hidden="true">
+      </div>
+
+      <div id="edit-buttons-container" class="graph-menu-row-2 graph-menu-row" hidden="true">
         <button id="add-edge-button"> Add edge </button>
         <button id="manual-move-button"> Manual move </button>
         <button id="rubber-band-move-button"> Rubber move </button>
       </div>
-      <div id="SquareTiling-controls" class="graph-menu-row-2" hidden="true">
+      <div id="SquareTiling-controls" class="graph-menu-row-2 graph-menu-row" hidden="true">
         <button id="squares-button"> Squares </button>
         <button id="show-hide-button"> Show / hide </button>
         <button id="morph-button"> Morph </button>
       </div>
-      <div id="MaxCut-controls" class="graph-menu-row-2" hidden="true">
+      <div id="MaxCut-controls" class="graph-menu-row-2 graph-menu-row" hidden="true">
         <button id="max-cut-button"> Max cut </button>
         <button id="random-cut-button"> Random cut </button>
         <div class="dropdown">
@@ -80,12 +97,12 @@
 
   <div id="context-menus">
     <div id="svg-context-menu" class="context-menu" style="display:none;">
-      <button class="context-menu-item" id="svg-add-node-button"><img class="menu-icon" src="assets/add-circle-line.svg"> Add node </button>
-      <button class="context-menu-item" id="unnail-all-button"><img class="menu-icon" src="assets/unpin-line.svg"> Unnail all nodes </button>
+      <div><button class="context-menu-item" id="svg-add-node-button"><img class="menu-icon" src="assets/add-circle-line.svg"> Add node </button></div>
+      <div><button class="context-menu-item" id="unnail-all-button"><img class="menu-icon" src="assets/unpin-line.svg"> Unnail all nodes </button></div>
     </div>
     <div id="node-context-menu" class="context-menu" style="display:none;">
-      <button class="context-menu-item" id="delete-node-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete node </button>
-      <span class="context-menu-item" style="font-size:1.1em;margin:0.2em;">
+      <div><button class="context-menu-item" id="delete-node-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete node </button></div>
+      <div><span class="context-menu-item" style="font-size:1.1em;margin:0.2em;">
         Constraint:
         <select id="node-constraint-dropdown" style="padding:0.2em;margin:0.2em;">
           <option value="unnailed">Unnailed</option>
@@ -93,19 +110,17 @@
           <option value="fixed_x">Fixed X</option>
           <option value="fixed_y">Fixed Y</option>
         </select>
-      </span>
-      <br>
-      <span class="context-menu-item" style="font-size:1.1em;margin:0.2em;" htmlFor="node-color-dropdown">
+      </span></div>
+      <div><span class="context-menu-item" style="font-size:1.1em;margin:0.2em;" htmlFor="node-color-dropdown">
         Change color:
         <select id="node-color-dropdown" style="padding:0.2em;margin:0.2em;">
         </select>
-      </span>
+      </span></div>
     </div>
     <div id="edge-context-menu" class="context-menu" style="display:none;">
-      <button class="context-menu-item" id="delete-edge-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete edge </button>
-      <button class="context-menu-item" id="split-node-button"><img class="menu-icon" src="assets/add-circle-line.svg"> Add split node </button>
-      <br>
-      <span style="margin-left: 0.3em;">Set strength: </span>
+      <div><button class="context-menu-item" id="delete-edge-button"><img class="menu-icon" src="assets/delete-bin-line.svg"> Delete edge </button></div>
+      <div><button class="context-menu-item" id="split-node-button"><img class="menu-icon" src="assets/add-circle-line.svg"> Add split node </button></div>
+      <div><span style="margin-left: 0.3em;font-size: 1.1em;">Set strength: </span>
       <input type="range" 
              id="edge-strength-slider" 
              class="context-menu-item" 
@@ -114,7 +129,7 @@
              value="1"
              step="0.25" 
              style="width:8em; vertical-align: middle; margin-left:0.5em;">
-      <span id="edge-strength-value" class="context-menu-item" style="display:inline-block; width:2.5em;">1</span>
+      <span id="edge-strength-value" class="context-menu-item" style="display:inline-block; width:2.5em;">1</span></div>
     </div>
   </div>
 

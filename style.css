@@ -24,7 +24,7 @@ html, body, #sigma-container {
 #header {
   background-color: var(--color6);
   color: whitesmoke;
-  padding: 1.1em;
+  padding: 1.2em;
 }
 
 li {
@@ -37,12 +37,11 @@ li {
 }
 
 #graph-menu, #info {
-  padding: 1em; 
+  padding: 0.9em; 
 }
 
 .graph-menu-row-2 {
-  margin-top: 0.7em;
-  line-height: 76%;
+  margin-top: 0.6em;
 }
 
 .tooltip {
@@ -88,7 +87,7 @@ button, label {
   display: inline-block;
   border-radius: 0.6em;
   border-color: var(--color4);
-  padding: 0.3em 0.5em 0.3em 0.3em;
+  padding: 0.4em 0.5em 0.4em 0.4em;
   text-align: center;
   border-width: 2px;
   border-style: outset;
@@ -112,11 +111,9 @@ button:disabled {
   border-top-left-radius: 0.6em;
   border-top-right-radius: 0.6em;
   border-bottom: 0;
-  padding: 0.5em 0.5em 0.4em 0.5em;
 }
 
 .tabs .active {
-  /* height: 45px; */
   border-bottom: none;
   background: var(--color1);
 }
@@ -132,37 +129,51 @@ button:disabled {
 }
 
 .dropdown-content {
-  height: 0px;
   position: absolute;
   z-index: 1;
-  overflow: hidden;
-  -webkit-transition: all 0.2s ease-in-out;
-  -moz-transition: all 0.2s ease-in-out;
-  -o-transition: all 0.2s ease-in-out;
-  transition: all 0.2s ease-in-out;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--color7);
+  background: var(--color1);
+  border: 1.5px solid var(--color4);
+  border-radius: 0.6em;
+  box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
+  padding: 0.5em;
+  min-width: 220px;
+  min-height: 90px;
+  display: none;
 }
 
-.dropdown-content button, .dropdown-content label {
+.dropdown-content div + div {
+  margin: 0.4em 0;
+}
+
+#loadGraphDropdown {
   font-size: 1em;
-  border-radius: 0em;
 }
 
-.dropdown:hover .dropdown-content {
+.dropdown-content input[type="number"], .context-menu select {
+  font-size: 1em;
+  font-weight: normal;
+  border-radius: 0.2em;
+  border: 1px solid var(--color4);
+  padding: 0.2em 0.4em;
+  margin: 0.1em;
+  color: var(--color7);
+}
+
+.dropdown-content input[type="number"]:focus {
+  outline: 2px solid var(--color5);
+}
+
+.dropdown:hover .dropdown-content,
+.dropdown:focus-within .dropdown-content {
   display: block;
-  height: 300px;
-}
-
-.graph-menu-row-2 .dropdown-content label {
-  padding-bottom: 0.6em;
 }
 
 hr {
   border: 0;
   border-top: 1px solid var(--color6);
-}
-
-.graph-menu-row-2 {
-  margin-top: 0.7em;
 }
 
 .grab {
@@ -171,18 +182,6 @@ hr {
 
 .grabbing {
   cursor: grabbing;
-}
-
-.not-allowed-cursor {
-  cursor: not-allowed;
-}
-
-.add-cursor {
-  cursor: url("assets/cursor1green.svg") 5 3, auto;
-}
-
-.delete-cursor {
-  cursor: url("assets/cursor1red.svg") 5 3, auto;
 }
 
 button.active-button {
@@ -199,18 +198,13 @@ button.active-button {
   border-radius: 0.8em;
   box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
   z-index: 1000;
-  padding: 0.4em;
-  font-size: 0.9em;
+  padding: 0.5em;
+  font-size: 1em;
   display: none;
 }
 
-.context-menu button {
-  display: block;
-  padding: 0.4em 0.4em 0.3em 0.3em;
-}
-
-.context-menu button + button {
-  margin-top: 0.5em;
+.context-menu div + div {
+  margin-top: 0.4em;
 }
 
 .context-menu .menu-icon {

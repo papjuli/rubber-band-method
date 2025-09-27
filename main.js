@@ -1,4 +1,5 @@
 import { GraphRenderer } from './renderer.js'
+import { Graph } from './graph.js'
 
 
 const topicTextElement = document.getElementById('topic-text');
@@ -268,3 +269,12 @@ document.getElementById('max-cut-button').onclick = () => {
 document.getElementById('random-cut-button').onclick = () => {
   renderer.randomCut();
 };
+
+
+document.getElementById('generate-random-graph').onclick = () => {
+  let nodeCount = parseInt(document.getElementById('random-node-count').value);
+  let edgeProb = parseFloat(document.getElementById('random-edge-prob').value);
+  let randomGraph = Graph.randomGraph(nodeCount, edgeProb);
+  renderer.setupGraph(randomGraph);
+};
+
