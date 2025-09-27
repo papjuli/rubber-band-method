@@ -230,7 +230,9 @@ class GraphRenderer {
   }
 
   addNode(ex, ey) {
-    let newNode = this.graph.addNode({x: this.ex2x(ex), y: this.ey2y(ey)});
+    let newNode = this.graph.addNode(
+      {x: this.ex2x(ex), y: this.ey2y(ey), 
+        color: this.settings.defaultColorName});
     this.updateInfo();
     this.createNodeSvg(newNode);
     return newNode;
@@ -248,6 +250,7 @@ class GraphRenderer {
   onMouseUpOnNode(ev, node) {
     console.log("node mouseup");
     this.svg.node.removeEventListener("mousemove", this.boundOnMouseMove);
+    this.newEdgeLine.hide();
     if (this.grabbedNodeId) {
       node.group.node.classList.remove("grabbing");
       if (this.editMode === "edges") {
@@ -261,7 +264,6 @@ class GraphRenderer {
       else if (this.editMode === "rubber-band-move") {
         this.rubberBandStep();
       }
-      this.newEdgeLine.hide();
       this.grabbedNodeId = null;
     }
   }
@@ -269,12 +271,8 @@ class GraphRenderer {
   onMouseUp(ev) {
     console.log("mouseup");
     this.svg.node.removeEventListener("mousemove", this.boundOnMouseMove);
-    if (this.grabbedNodeId) {
-      if (this.editMode === "edges") {
-        this.newEdgeLine.hide();
-      }
-      this.grabbedNodeId = null;
-    }
+    this.grabbedNodeId = null;
+    this.newEdgeLine.hide();
   }
 
   onMouseMove(ev) {
