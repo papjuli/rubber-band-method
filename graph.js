@@ -167,7 +167,8 @@ class Graph {
     let nodeIndex = new Map();
     let indexNode = [];
     let n = this.nodeCount();
-    let matrix = math.zeros(n, n, 'sparse');
+    let MX = math.zeros(n, n, 'sparse');
+    let MY = math.zeros(n, n, 'sparse');
     let bX = [];
     let bY = [];
     let i = 0;
@@ -180,24 +181,34 @@ class Graph {
     for (let row = 0; row < n; row++) {
       let nodeId = indexNode[row];
       let node = this.getNode(nodeId);
-      if (node.nailed || otherFixedNodeId === nodeId) {
-        matrix.set([row, row], 1);
+      if (node.nailed || otherFixedNodeId === nodeId || node.fixed_x) {
+        MX.set([row, row], 1);
         bX.push(node.x);
+      } else {
+        for (let edge of this.edgesAt.get(nodeId)) {
+          let otherId = edge.from == nodeId ? edge.to : edge.from;
+          let col = nodeIndex.get(otherId);
+          MX.set([row, col], MX.get([row, col]) - 1 * edge.weight);
+        }
+        MX.set([row, row], this.weightedDegree(nodeId));
+        bX.push(0);
+      }
+      if (node.nailed || otherFixedNodeId === nodeId || node.fixed_y) {
+        MY.set([row, row], 1);
         bY.push(node.y);
       } else {
         for (let edge of this.edgesAt.get(nodeId)) {
           let otherId = edge.from == nodeId ? edge.to : edge.from;
           let col = nodeIndex.get(otherId);
-          matrix.set([row, col], matrix.get([row, col]) - 1 * edge.weight);
+          MY.set([row, col], MY.get([row, col]) - 1 * edge.weight);
         }
-        matrix.set([row, row], this.weightedDegree(nodeId));
-        bX.push(0);
+        MY.set([row, row], this.weightedDegree(nodeId));
         bY.push(0);
       }
     }
     // Solve for x and y coordinates
-    let xSolution = math.lusolve(matrix, bX);
-    let ySolution = math.lusolve(matrix, bY);
+    let xSolution = math.lusolve(MX, bX);
+    let ySolution = math.lusolve(MY, bY);
     // Update node positions
     for (let i = 0; i < n; i++) {
       let nodeId = indexNode[i];
