@@ -1,10 +1,10 @@
 <div>
   <h2>Degeneracy and connectivity testing</h2>
 
-  <p>Suppose that we want to avoid "degeneracy": we don't want two nodes on top of each other. Here you see a (nonplanar) graph, with two yellow nodes. Click <b>Run</b>, and observe that the two yellow nodes end up on top of each other. Try pulling them apart (click <b>Move node</b>, and then drag the node), and click Run again. They merge again; they have the same neighbors, which force them to be on the same spot. This degeneracy was due to the symmetry between the twin nodes.
+  <p>Suppose that we want to avoid "degeneracy": we don't want two nodes on top of each other. Here you see a (nonplanar) graph, with two yellow nodes. Click <b>Run</b>, and observe that the two yellow nodes end up on top of each other. Try pulling them apart (click <b>Edit graph</b> then <b>Manual move</b>, and then drag the node), and click Run again. They merge again; they have the same neighbors, which force them to be on the same spot. This degeneracy was due to the symmetry between the twin nodes.
   (You can find this graph again as "twins" in the load menu.)</p>
 
-  <p>Reinforce one of the edges from one of the yellow nodes (click Add edge, and click the two endnodes of the edge), and then click Run. This pulls them apart, but leaves them on one line with a neighbor. Reinforcing another edge from the other node solves this new trouble.</p>
+  <p>Reinforce one of the edges from one of the yellow nodes (right-click an edge in edit mode to change its strength), and then click Run. This pulls them apart, but leaves them on one line with a neighbor. Reinforcing another edge from the other node solves this new trouble.</p>
   
   <p>Load the graph "onesep" and click Run. The whole yellow part collapses to a single node (since there is nothing to pull them the other way). Clearly, reinforcing edges does not help in this case.</p>
 
@@ -26,7 +26,7 @@
 
   <p>It turns out that low <span class="tooltip" data-tooltip-id="tooltip-connectivity">connectivity</span> is the only reason for essential degeneracy:</p>
 
-  <blockquote><b>If two nodes collide for every possible reinforcement of the edges, then they must be separated from the red nodes by a single node; if three nodes end up on one line for every possible reinforcement of the edges, then they must be separated from the red nodes by two nodes.</b></blockquote>
+  <blockquote><b>If two nodes collide for every possible reinforcement of the edges, then they must be separated from the nailed nodes by a single node; if three nodes end up on one line for every possible reinforcement of the edges, then they must be separated from the nailed nodes by two nodes.</b></blockquote>
 
   <p>Later in this section we'll show an illustrated proof of this result, but first here are some algorithmic applications.</p>
 
@@ -51,7 +51,7 @@
   <ul>
     <li>You don't want to simulate the physics if you want to do fast computation; instead, you solve the system of linear equations that describe the <span class="tooltip" data-tooltip-id="tooltip-equilibrium">equilibrium</span>. This takes only one matrix inversion.</li>
 
-    <li>To test for <span class="tooltip" data-tooltip-id="tooltip-connectivity"><i>k</i>-connectivity</span>, we have to do a check for all choices of the red (nailed) nodes and all choices of the green nodes. This is too much; but one can show that it suffices to check for <i>k</i> neighbors of a randomly chosen node as red nodes, and <i>k</i> neighbors of another randomly chosen node as green nodes.</li>
+    <li>To test for <span class="tooltip" data-tooltip-id="tooltip-connectivity"><i>k</i>-connectivity</span>, we have to do a check for all choices of the nailed nodes and all choices of the green nodes. This is too much; but one can show that it suffices to check for <i>k</i> neighbors of a randomly chosen node as red nodes, and <i>k</i> neighbors of another randomly chosen node as green nodes.</li>
 
     <li>If the green nodes are almost but not exactly collinear, how do we know that this is a numerical error? The trick is to do the computation over a finite field, where we can do exact division. Of course, all physical content is then lost, but the result remains valid!</li>
   </ul>
