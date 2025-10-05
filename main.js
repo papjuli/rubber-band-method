@@ -12,7 +12,7 @@ const graphsForTopics = new Map([
   ["Intro", "dodecahedron"],
   ["Planarity", "dodecahedron"],
   ["Connectivity", "twins"],
-  ["MaxCut", "planar5"],
+  ["MaxCut", "planar4"],  // original was "planar5"
   ["SquareTiling", "dodecahedron"],
 ]);
 
