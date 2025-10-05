@@ -54,17 +54,17 @@ li {
   position: absolute;
   display: none;
   background: #d7d3d3;
-  padding: 8px 12px;
-  border-radius: 6px;
   z-index: 1000;
   font-size: 1em;
-  max-width: 380px;
-  box-shadow: 0 2px 8px rgba(144, 140, 140, 0.2);
+  padding: 0.5em 0.75em;
+  border-radius: 0.5em;
+  max-width: 27em;
+  box-shadow: 0 0.2em 0.5em rgba(144, 140, 140, 0.2);
   white-space: normal;
 }
 
 .tooltip-box img {
-  margin: 6px 0;
+  margin: 0.375em 0;
 }
 
 .grid-container {
