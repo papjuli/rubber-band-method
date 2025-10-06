@@ -35,12 +35,11 @@ class GraphRenderer {
     this.tilingGroup = this.innerGroup.group();
     this.morphGroup = this.innerGroup.group();
     this.settings.defaultColor = this.settings.colors.get(this.settings.defaultColorName);
+    this.unitCircle = this.innerGroup.circle(2).move(-1, -1)
+      .fill('#f2f2f2').stroke({ width: 0 }).hide();
     this.newEdgeLine = this.innerGroup.line(0, 0, 0, 0)
       .stroke({ width: this.settings.edges.width,
                 color: this.settings.defaultColor }).hide();
-    this.unitCircle = this.innerGroup.circle(2).move(-1, -1)
-      .fill('#f2f2f2').stroke({ width: 0 });
-    this.unitCircle.hide();
     this.graphGroup = this.innerGroup.group();
     this.edgesGroup = this.graphGroup.group();
     this.nodesGroup = this.graphGroup.group();
