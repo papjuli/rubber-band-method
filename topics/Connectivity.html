@@ -51,7 +51,7 @@
   <ul>
     <li>You don't want to simulate the physics if you want to do fast computation; instead, you solve the system of linear equations that describe the <span class="tooltip" data-tooltip-id="tooltip-equilibrium">equilibrium</span>. This takes only one matrix inversion.</li>
 
-    <li>To test for <span class="tooltip" data-tooltip-id="tooltip-connectivity"><i>k</i>-connectivity</span>, we have to do a check for all choices of the nailed nodes and all choices of the green nodes. This is too much; but one can show that it suffices to check for <i>k</i> neighbors of a randomly chosen node as red nodes, and <i>k</i> neighbors of another randomly chosen node as green nodes.</li>
+    <li>To test for <span class="tooltip" data-tooltip-id="tooltip-connectivity"><i>k</i>-connectivity</span>, we have to do a check for all choices of the nailed (red) nodes and all choices of the potentially cut-off (green) nodes. This is too much; but one can show that it suffices to check for <i>k</i> neighbors of a randomly chosen node as red nodes, and <i>k</i> neighbors of another randomly chosen node as green nodes.</li>
 
     <li>If the green nodes are almost but not exactly collinear, how do we know that this is a numerical error? The trick is to do the computation over a finite field, where we can do exact division. Of course, all physical content is then lost, but the result remains valid!</li>
   </ul>
