@@ -152,6 +152,7 @@ function hideSecondMenuRow() {
 function loadTopic(topicName, button) {
   currentTopic = topicName;
   renderer.reset();
+  renderer.setForce("attract");
   if (topicName == "SquareTiling" || topicName == "MaxCut") {
     hideSecondMenuRow();
     document.getElementById(topicName + "-controls").removeAttribute("hidden");
@@ -174,6 +175,7 @@ function loadTopic(topicName, button) {
 
 tabLinks.forEach(btn => {
   btn.onclick = () => {
+    exitEditMode();
     loadTopic(btn.dataset.topicName, btn);
     let graphName = graphsForTopics.get(btn.dataset.topicName);
     loadGraphAndSetInfo(graphName, btn.dataset.topicName);
@@ -210,7 +212,18 @@ function deactivateEditModeButtons() {
   });
 }
 
-document.getElementById('edit-graph-button').onclick = () => {
+function exitEditMode() {
+  editButtonsContainer.setAttribute("hidden", "true");
+  if (currentTopic === "SquareTiling" || currentTopic === "MaxCut") {
+    document.getElementById(currentTopic + "-controls").removeAttribute("hidden");
+  }
+  editButtonIcon.setAttribute("src", "assets/lock-line.svg");
+  editButton.classList.remove('active-button');
+  deactivateEditModeButtons();
+  renderer.editMode = null;
+}
+
+editButton.onclick = () => {
   if (editButtonsContainer.hasAttribute("hidden")) {
     hideSecondMenuRow()
     editButtonsContainer.removeAttribute("hidden");
@@ -219,14 +232,7 @@ document.getElementById('edit-graph-button').onclick = () => {
     renderer.editMode = "editing";
   }
   else {
-    editButtonsContainer.setAttribute("hidden", "true");
-    if (currentTopic === "SquareTiling" || currentTopic === "MaxCut") {
-      document.getElementById(currentTopic + "-controls").removeAttribute("hidden");
-    }
-    editButtonIcon.setAttribute("src", "assets/lock-line.svg");
-    editButton.classList.remove('active-button');
-    deactivateEditModeButtons();
-    renderer.editMode = null;
+    exitEditMode();
   }
   renderer.createSvg();
 }

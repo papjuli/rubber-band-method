@@ -104,7 +104,6 @@ class GraphRenderer {
     this.setGraph(null);
     this.setSquareTiling(null);
     this.lastTimeoutId = null;
-    this.setForce("attract");
     this.editMode = null;
     this.showGraph = true;
     this.morphStage = 0;
@@ -145,6 +144,7 @@ class GraphRenderer {
 
   loadGraph(url, topicName) {
     console.log("loadGraph");
+    this.reset();
     parseGrf(url, 
       (graph) => this.setupGraph.bind(this)(graph, topicName));
   }
