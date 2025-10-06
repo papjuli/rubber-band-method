@@ -66,7 +66,7 @@ let settings = {
   nodes: {
     size: 0.04,
     strokeWidth: 0.008,
-    nailColor: "lightgrey"
+    nailColor: "#bbbbbb",
   },
   edges: {
     width: 0.006
@@ -79,7 +79,7 @@ let settings = {
     ["Dark blue", "#2c43a5ff"],
     ["Light blue", "#3795f9ff"],
     ["Green", "#09c681ff"],
-    ["Yellow", "#eeee00"],
+    ["Yellow", "#FFD700"],
     ["Orange", "#ee8800"],
     ["Purple", "#aa00ee"],
     ["Black", "#000000"],

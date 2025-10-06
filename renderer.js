@@ -523,7 +523,7 @@ class GraphRenderer {
 
     // Highlight line (hidden by default)
     edge._highlightLine = edge.group.line(s.x, s.y, t.x, t.y)
-      .stroke({ width: width * 2.2, color: this.settings.highlightColor, opacity: 0.7 })
+      .stroke({ width: width * 3, color: this.settings.highlightColor, opacity: 0.7 })
       .attr({ visibility: 'hidden' });
     // Main edge line
     edge.line = edge.group.line(s.x, s.y, t.x, t.y)
